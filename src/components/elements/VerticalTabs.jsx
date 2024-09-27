@@ -1,6 +1,8 @@
+import { NavLink } from "react-router-dom";
+
 export function VerticalTabs() {
   return (
-    <div className="drawer lg:drawer-open ">
+    <div className="drawer-open ">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-side border-y border-x-2 ">
         <label
@@ -11,7 +13,14 @@ export function VerticalTabs() {
         <ul className="menu bg-white text-base-content min-h-full w-70 !p-0  ">
           {/* Sidebar content here */}
           <li>
-            <a className="border-y flex flex-col font-semibold text-slate-500	py-5">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `border-y flex flex-col font-semibold py-5 ${
+                  isActive ? " bg-blue-100" : "text-slate-500"
+                }`
+              }
+            >
               <span>
                 {" "}
                 <svg
@@ -23,10 +32,18 @@ export function VerticalTabs() {
                 </svg>
               </span>
               Dashboard
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a className="border-y flex flex-col font-semibold text-slate-500	py-5">
+            <NavLink
+              to="/barang-masuk"
+              className={({ isActive }) =>
+                `border-y flex flex-col font-semibold py-5 ${
+                  isActive ? " bg-blue-100" : "text-slate-500"
+                }`
+              }
+            >
+              {/* <a className="border-y flex flex-col font-semibold text-slate-500	py-5"> */}
               <span>
                 {" "}
                 <svg
@@ -44,10 +61,17 @@ export function VerticalTabs() {
                 </svg>
               </span>
               Barang Masuk
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a className="border-y flex flex-col font-semibold text-slate-500	py-5">
+            <NavLink
+              to="/barang-keluar"
+              className={({ isActive }) =>
+                `border-y flex flex-col font-semibold py-5 ${
+                  isActive ? " bg-blue-100" : "text-slate-500"
+                }`
+              }
+            >
               <span>
                 {" "}
                 <svg
@@ -60,10 +84,17 @@ export function VerticalTabs() {
                 </svg>
               </span>
               Barang Keluar
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a className="border-y flex flex-col font-semibold text-slate-500	py-5">
+            <NavLink
+              to="/barang-kadaluwarsa"
+              className={({ isActive }) =>
+                `border-y flex flex-col font-semibold py-5 ${
+                  isActive ? " bg-blue-100" : "text-slate-500"
+                }`
+              }
+            >
               <span>
                 {" "}
                 <svg
@@ -81,10 +112,17 @@ export function VerticalTabs() {
                 </svg>
               </span>
               Barang Kadaluarsa
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a className="border-y flex flex-col font-semibold text-slate-500	py-5">
+            <NavLink
+              to="/riwayat-barang"
+              className={({ isActive }) =>
+                `border-y flex flex-col font-semibold py-5 ${
+                  isActive ? " bg-blue-100" : "text-slate-500"
+                }`
+              }
+            >
               <span>
                 {" "}
                 <svg
@@ -98,7 +136,7 @@ export function VerticalTabs() {
                 </svg>
               </span>
               Riwayat Barang
-            </a>
+            </NavLink>
           </li>
         </ul>
       </div>
