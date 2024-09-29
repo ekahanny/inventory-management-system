@@ -43,7 +43,6 @@ export function VerticalTabs() {
                 }`
               }
             >
-              {/* <a className="border-y flex flex-col font-semibold text-slate-500	py-5"> */}
               <span>
                 {" "}
                 <svg
