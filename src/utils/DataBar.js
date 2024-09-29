@@ -1,4 +1,4 @@
-export const Data = [
+export const DataBar = [
   {
     id: 1,
     month: "Jan",
