@@ -46,11 +46,13 @@ export function Dashboard() {
     <>
       <NavBar />
       <div className="flex flex-row bg-slate-200">
-        <VerticalTabs />
+        <div className="">
+          <VerticalTabs />
+        </div>
 
-        <div className="m-5">
+        <div className="my-5 mx-7 w-5/6">
           {/* Charts */}
-          <div className="flex flex-row	gap-3">
+          <div className="flex flex-row	justify-center gap-5 ml-8">
             {/* Bar Chart */}
             <div className="md:w-[700px] sm:w-[500px] bg-white px-5 py-3 rounded-md">
               <h1 className="mt-3 mb-5 text-center font-semibold">
@@ -65,14 +67,16 @@ export function Dashboard() {
                 Barang Terlaris
               </h1>
               <PieChart chartData={dataPie} />
-              <p className="flex justify-center items-center mt-5 font-semibold">Oktober 2022</p>
+              <p className="flex justify-center items-center mt-5 font-semibold">
+                Oktober 2022
+              </p>
             </div>
 
             {/* Ringkasan Penjualan  */}
-            <div className="flex flex-col w-[310px]">
+            <div className="flex flex-col w-[330px]">
               {/* Pemasukan */}
-              <div className="bg-white p-5 ">
-                <div className="flex flex-row gap-2">
+              <div className="bg-white p-5 w-[330px]">
+                <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -94,8 +98,8 @@ export function Dashboard() {
               </div>
 
               {/* Pengeluaran */}
-              <div className="bg-white p-5 mt-3 ">
-                <div className="flex flex-row gap-2">
+              <div className="bg-white p-5 mt-3 w-[330px]">
+                <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -118,20 +122,21 @@ export function Dashboard() {
               </div>
 
               {/* Barang Kadaluwarsa */}
-              <div className="bg-white p-5 mt-3">
-                <div className="flex flex-row gap-2">
+              <div className="bg-white p-5 mt-3 w-[330px]">
+                <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
-                    fill=""
-                    className="size-6 mt-1 fill-sky-600"
+                    fill="currentColor"
+                    className="size-7 fill-sky-600"
                   >
                     <path
                       fillRule="evenodd"
-                      d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM1.75 14.5a.75.75 0 0 0 0 1.5c4.417 0 8.693.603 12.749 1.73 1.111.309 2.251-.512 2.251-1.696v-.784a.75.75 0 0 0-1.5 0v.784a.272.272 0 0 1-.35.25A49.043 49.043 0 0 0 1.75 14.5Z"
+                      d="M10.339 2.237a.531.531 0 0 0-.678 0 11.947 11.947 0 0 1-7.078 2.75.5.5 0 0 0-.479.425A12.11 12.11 0 0 0 2 7c0 5.163 3.26 9.564 7.834 11.257a.48.48 0 0 0 .332 0C14.74 16.564 18 12.163 18 7c0-.538-.035-1.069-.104-1.589a.5.5 0 0 0-.48-.425 11.947 11.947 0 0 1-7.077-2.75ZM10 6a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 6Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
                       clipRule="evenodd"
                     />
                   </svg>
+
                   <p className="font-bold text-xl">Kadaluwarsa:</p>
                   <p className="text-sky-800 text-lg mt-0.5">Oct 2024</p>
                 </div>
