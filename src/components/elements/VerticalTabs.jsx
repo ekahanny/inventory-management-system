@@ -2,15 +2,15 @@ import { NavLink } from "react-router-dom";
 
 export function VerticalTabs() {
   return (
-    <div className="drawer-open ">
+    <div className="drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-side border-y border-x-2 ">
+      <div className="border-y border-x-2 ">
         <label
           htmlFor="my-drawer-2"
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-white text-base-content min-h-full w-70 !p-0  ">
+        <ul className="menu bg-white h-[1115px] w-70 !p-0">
           {/* Sidebar content here */}
           <li>
             <NavLink

@@ -8,6 +8,10 @@ import { BarangMasuk } from "./pages/BarangMasuk.jsx";
 import { BarangKeluar } from "./pages/BarangKeluar.jsx";
 import { BarangKadaluwarsa } from "./pages/BarangKadaluwarsa.jsx";
 import { RiwayatBarang } from "./pages/RiwayatBarang.jsx";
+import "primereact/resources/themes/saga-blue/theme.css"; // atau tema lain
+import "primereact/resources/primereact.min.css"; // CSS PrimeReact
+import "primeicons/primeicons.css"; // PrimeIcons
+import "primeflex/primeflex.css"; // PrimeFlex untuk utilitas CSS opsional
 
 const router = createBrowserRouter([
   {

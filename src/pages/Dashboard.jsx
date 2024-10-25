@@ -6,6 +6,7 @@ import { DataBar } from "../utils/DataBar";
 import { DataPie } from "../utils/DataPie";
 
 import { PieChart } from "../components/elements/PieChart";
+import TabelProduk from "../components/fragments/TabelProduk";
 
 export function Dashboard() {
   const [dataBar, setDataBar] = useState({
@@ -46,15 +47,13 @@ export function Dashboard() {
     <>
       <NavBar />
       <div className="flex flex-row bg-slate-200">
-        <div className="">
-          <VerticalTabs />
-        </div>
+        <VerticalTabs />
 
-        <div className="my-5 mx-7 w-5/6">
+        <div className=" my-5 w-5/6">
           {/* Charts */}
           <div className="flex flex-row	justify-center gap-5 ml-8">
             {/* Bar Chart */}
-            <div className="md:w-[700px] sm:w-[500px] bg-white px-5 py-3 rounded-md">
+            <div className="md:w-[950px] sm:w-[500px] bg-white px-5 py-3 rounded-md shadow-md">
               <h1 className="mt-3 mb-5 text-center font-semibold">
                 Jumlah Barang Masuk & Barang Keluar Per Bulan
               </h1>
@@ -62,7 +61,7 @@ export function Dashboard() {
             </div>
 
             {/* Pie Chart */}
-            <div className="md:w-[350px] bg-white p-4 py-2 rounded-md">
+            {/* <div className="md:w-[350px] bg-white p-4 py-2 rounded-md">
               <h1 className="my-3 text-center font-semibold">
                 Barang Terlaris
               </h1>
@@ -70,12 +69,12 @@ export function Dashboard() {
               <p className="flex justify-center items-center mt-5 font-semibold">
                 Oktober 2022
               </p>
-            </div>
+            </div> */}
 
             {/* Ringkasan Penjualan  */}
-            <div className="flex flex-col w-[330px]">
+            <div className="flex flex-col ">
               {/* Pemasukan */}
-              <div className="bg-white p-5 w-[330px]">
+              <div className="bg-white p-5 w-[370px] rounded-md shadow-md">
                 <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +97,7 @@ export function Dashboard() {
               </div>
 
               {/* Pengeluaran */}
-              <div className="bg-white p-5 mt-3 w-[330px]">
+              <div className="bg-white p-5 mt-3 w-[370px] rounded-md shadow-md">
                 <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +121,7 @@ export function Dashboard() {
               </div>
 
               {/* Barang Kadaluwarsa */}
-              <div className="bg-white p-5 mt-3 w-[330px]">
+              <div className="bg-white p-5 mt-3 w-[370px] rounded-md shadow-md">
                 <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -150,6 +149,10 @@ export function Dashboard() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="">
+            <TabelProduk />
           </div>
         </div>
       </div>
