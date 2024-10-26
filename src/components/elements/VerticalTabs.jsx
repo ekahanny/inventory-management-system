@@ -10,7 +10,7 @@ export function VerticalTabs() {
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-white h-[1115px] w-70 !p-0">
+        <ul className="menu bg-white h-[1298px] w-70 !p-0">
           {/* Sidebar content here */}
           <li>
             <NavLink

@@ -166,14 +166,14 @@ export default function TabelProduk() {
     const value = filters["global"] ? filters["global"].value : "";
 
     return (
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
+      <IconField iconPosition="left" className="border border-slate-400">
+        <InputIcon className="pi pi-search ml-2" />
         <InputText
           type="search"
           value={value || ""}
           onChange={(e) => onGlobalFilterChange(e)}
           placeholder="Search"
-          className="ml-5"
+          className="ml-5 p-3 border-none"
         />
       </IconField>
     );
@@ -182,7 +182,7 @@ export default function TabelProduk() {
   const header = renderHeader();
 
   return (
-    <div className="card ml-8 mt-4 py">
+    <div className="card ml-8 mt-5">
       <DataTable
         value={customers}
         paginator
@@ -198,6 +198,7 @@ export default function TabelProduk() {
         stateKey="dt-state-demo-local"
         emptyMessage="No customers found."
         tableStyle={{ minWidth: "50rem" }}
+        tableClassName="p-7"
       >
         <Column
           field="name"
@@ -206,6 +207,8 @@ export default function TabelProduk() {
           filter
           filterPlaceholder="Search"
           style={{ width: "25%" }}
+          className="border border-slate-300"
+          headerClassName="border border-slate-300"
         ></Column>
         <Column
           header="Country"
@@ -216,6 +219,8 @@ export default function TabelProduk() {
           filterField="country.name"
           filterPlaceholder="Search"
           style={{ width: "25%" }}
+          className="border border-slate-300"
+          headerClassName="border border-gray-300"
         ></Column>
         <Column
           header="Agent"
@@ -228,6 +233,8 @@ export default function TabelProduk() {
           filterElement={representativeFilterTemplate}
           filterMenuStyle={{ width: "14rem" }}
           style={{ width: "25%" }}
+          className="border border-slate-300"
+          headerClassName="border border-gray-300"
         ></Column>
         <Column
           field="status"
@@ -238,6 +245,8 @@ export default function TabelProduk() {
           filterElement={statusFilterTemplate}
           filterMenuStyle={{ width: "14rem" }}
           style={{ width: "25%" }}
+          className="border border-slate-300"
+          headerClassName="border border-gray-300"
         ></Column>
       </DataTable>
     </div>
