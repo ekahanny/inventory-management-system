@@ -45,16 +45,16 @@ export function Dashboard() {
   return (
     <>
       <NavBar />
-      <div className="flex flex-row bg-slate-200 overflow-hidden">
+      <div className="flex flex-row bg-slate-200">
         <VerticalTabs />
 
-        <div className="my-5 w-5/6 overflow-hidden">
+        <div className="my-5 mx-7 overflow-hidden">
           {/* Ringkasan Penjualan */}
-          <div className="flex flex-row ml-20 mb-5 gap-6">
+          <div className="flex flex-row mb-5 ml-2.5 gap-4">
             {/* Pemasukan */}
-            <div className="bg-white p-4 mt-3 h-[130px] w-[375px] rounded-md shadow-md overflow-hidden">
+            <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
               <div className="flex flex-row gap-2 justify-center items-center">
-              <svg
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill=""
@@ -75,7 +75,7 @@ export function Dashboard() {
             </div>
 
             {/* Pengeluaran */}
-            <div className="bg-white p-4 mt-3 h-[130px] w-[375px] rounded-md shadow-md overflow-hidden">
+            <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
               <div className="flex flex-row gap-2 justify-center items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +98,7 @@ export function Dashboard() {
             </div>
 
             {/* Barang Kadaluwarsa */}
-            <div className="bg-white p-4 mt-3 h-[130px] w-[375px] rounded-md shadow-md overflow-hidden">
+            <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
               <div className="flex flex-row gap-2 justify-center items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -127,9 +127,9 @@ export function Dashboard() {
           </div>
 
           {/* Charts */}
-          <div className="flex flex-row justify-center gap-5 ml-8 overflow-hidden">
+          <div className="flex flex-row justify-center ml-2 gap-4">
             {/* Bar Chart */}
-            <div className="md:w-[950px] sm:w-[500px] bg-white px-5 py-3 rounded-md shadow-lg">
+            <div className="md:w-[850px] sm:w-[500px] bg-white px-10 py-3 rounded-md shadow-lg">
               <h1 className="mt-3 mb-5 text-center font-semibold">
                 Jumlah Barang Masuk & Barang Keluar Per Bulan
               </h1>
@@ -142,7 +142,7 @@ export function Dashboard() {
                 Barang Terlaris
               </h1>
               <PieChart chartData={dataPie} />
-              <p className="flex justify-center items-center mt-5 font-semibold">
+              <p className="flex justify-center items-center mt-7 font-semibold">
                 Oktober 2022
               </p>
             </div>

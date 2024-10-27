@@ -182,7 +182,7 @@ export default function TabelProduk() {
   const header = renderHeader();
 
   return (
-    <div className="card ml-8 mt-5">
+    <div className="card ml-1 mt-5 rounded-lg shadow-lg">
       <DataTable
         value={customers}
         paginator
@@ -198,7 +198,6 @@ export default function TabelProduk() {
         stateKey="dt-state-demo-local"
         emptyMessage="No customers found."
         tableStyle={{ minWidth: "50rem" }}
-        tableClassName="p-7"
       >
         <Column
           field="name"
