@@ -8,10 +8,11 @@ import { BarangMasuk } from "./pages/BarangMasuk.jsx";
 import { BarangKeluar } from "./pages/BarangKeluar.jsx";
 import { BarangKadaluwarsa } from "./pages/BarangKadaluwarsa.jsx";
 import { RiwayatBarang } from "./pages/RiwayatBarang.jsx";
-import "primereact/resources/themes/saga-blue/theme.css"; // atau tema lain
-import "primereact/resources/primereact.min.css"; // CSS PrimeReact
-import "primeicons/primeicons.css"; // PrimeIcons
-import "primeflex/primeflex.css"; // PrimeFlex untuk utilitas CSS opsional
+import { PrimeReactProvider } from "primereact/api";
+import "primeflex/primeflex.css";
+import "primeicons/primeicons.css";
+import "primereact/resources/primereact.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <PrimeReactProvider>
+      <RouterProvider router={router} />
+    </PrimeReactProvider>
   </StrictMode>
 );

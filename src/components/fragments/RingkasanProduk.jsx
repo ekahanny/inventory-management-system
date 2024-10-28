@@ -10,7 +10,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
 import { CustomerService } from "../../services/CustomerService";
 
-export default function TabelProduk() {
+export default function RingkasanProduk() {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -173,7 +173,7 @@ export default function TabelProduk() {
           value={value || ""}
           onChange={(e) => onGlobalFilterChange(e)}
           placeholder="Search"
-          className="ml-5 p-3 border-none"
+          className="p-inputtext-sm ml-5 p-3 border-none"
         />
       </IconField>
     );

@@ -5,7 +5,7 @@ import { VerticalTabs } from "../components/elements/VerticalTabs";
 import { DataBar } from "../utils/DataBar";
 import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";
-import TabelProduk from "../components/fragments/TabelProduk";
+import RingkasanProduk from "../components/fragments/RingkasanProduk";
 
 export function Dashboard() {
   const [dataBar, setDataBar] = useState({
@@ -142,14 +142,14 @@ export function Dashboard() {
                 Barang Terlaris
               </h1>
               <PieChart chartData={dataPie} />
-              <p className="flex justify-center items-center mt-7 font-semibold">
+              <p className="flex justify-center items-center mt-3 font-semibold">
                 Oktober 2022
               </p>
             </div>
           </div>
 
           <div>
-            <TabelProduk />
+            <RingkasanProduk />
           </div>
         </div>
       </div>
