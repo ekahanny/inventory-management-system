@@ -11,6 +11,7 @@ import { RiwayatBarang } from "./pages/RiwayatBarang.jsx";
 import { PrimeReactProvider } from "primereact/api";
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
+// import "primeicons/raw-svg/"
 import "primereact/resources/primereact.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 

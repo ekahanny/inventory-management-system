@@ -24,7 +24,7 @@ export default function ProductsDemo() {
     image: null,
     description: "",
     category: null,
-    price: 0,
+    harga: 0,
     quantity: 0,
     rating: 0,
     inventoryStatus: "INSTOCK",
@@ -206,19 +206,11 @@ export default function ProductsDemo() {
     return (
       <div className="flex flex-wrap gap-2">
         <Button
-          label="New"
+          label="Tambah"
           icon="pi pi-plus"
           severity="success"
           onClick={openNew}
-          className="bg-green-400 px-3 py-2"
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          severity="danger"
-          onClick={confirmDeleteSelected}
-          disabled={!selectedProducts || !selectedProducts.length}
-          className="bg-red-400 px-3 py-2 ml-2"
+          className="bg-sky-600 text-white px-3 py-2"
         />
       </div>
     );
@@ -229,26 +221,25 @@ export default function ProductsDemo() {
       <Button
         label="Export"
         icon="pi pi-upload"
-        className="p-button-help"
         onClick={exportCSV}
-        className="bg-orange-400 px-3 py-2"
+        className="bg-sky-600 text-white px-3 py-2"
       />
     );
   };
 
-  const imageBodyTemplate = (rowData) => {
-    return (
-      <img
-        src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`}
-        alt={rowData.image}
-        className="shadow-2 border-round"
-        style={{ width: "64px" }}
-      />
-    );
-  };
+  // const imageBodyTemplate = (rowData) => {
+  //   return (
+  //     <img
+  //       src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`}
+  //       alt={rowData.image}
+  //       className="shadow-2 border-round"
+  //       style={{ width: "64px" }}
+  //     />
+  //   );
+  // };
 
   const priceBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.price);
+    return formatCurrency(rowData.harga);
   };
 
   const ratingBodyTemplate = (rowData) => {
@@ -266,22 +257,25 @@ export default function ProductsDemo() {
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
+      <div className="flex justify-center">
         <Button
           icon="pi pi-pencil"
           rounded
           outlined
-          className="mr-2"
+          size="small"
+          className="mr-2 bg-green-300"
           onClick={() => editProduct(rowData)}
         />
         <Button
           icon="pi pi-trash"
           rounded
           outlined
-          severity="danger"
+          // severity="danger"
+          className="bg-red-300"
           onClick={() => confirmDeleteProduct(rowData)}
+          size="small"
         />
-      </React.Fragment>
+      </div>
     );
   };
 
@@ -302,19 +296,20 @@ export default function ProductsDemo() {
   };
 
   const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h4 className="ml-4 my-3">Barang Masuk</h4>
+    <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
+      <h4 className="ml-4 my-3 text-2xl text-sky-700">Barang Masuk</h4>
       <IconField iconPosition="left">
         <InputIcon className="pi pi-search" />
         <InputText
           type="search"
           onInput={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search..."
-          className="ml-6"
+          className="mr-3 pl-5 py-2 border border-slate-300"
         />
       </IconField>
     </div>
   );
+
   const productDialogFooter = (
     <React.Fragment>
       <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
@@ -357,7 +352,7 @@ export default function ProductsDemo() {
   return (
     <div>
       <Toast ref={toast} />
-      <div className="card ">
+      <div className="card ml-1 mt-5 rounded-lg shadow-lg ">
         <Toolbar
           className="mb-4"
           left={leftToolbarTemplate}
@@ -367,66 +362,86 @@ export default function ProductsDemo() {
         <DataTable
           ref={dt}
           value={products}
-          selection={selectedProducts}
-          onSelectionChange={(e) => setSelectedProducts(e.value)}
+          // selection={selectedProducts}
+          // onSelectionChange={(e) => setSelectedProducts(e.value)}
           dataKey="id"
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          pt={{
+            paginator: {
+              root: { className: "bg-gray-100 p-2" },
+              pageButton: ({ context }) =>
+                context.active
+                  ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
+                  : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
+            },
+          }}
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           globalFilter={globalFilter}
           header={header}
+          // className="border border-slate-300 px-3"
+          tableClassName="border border-slate-300"
+          tableStyle={{ maxWidth: "100%" }}
         >
-          <Column selectionMode="multiple" exportable={false}></Column>
+          {/* Header Kolom */}
           <Column
-            field="code"
-            header="Code"
-            sortable
+            field="kode_produk"
+            header="Kode Produk"
             style={{ minWidth: "12rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="name"
-            header="Name"
+            field="nama_produk"
+            header="Nama Produk"
             sortable
             style={{ minWidth: "16rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="image"
-            header="Image"
-            body={imageBodyTemplate}
-          ></Column>
-          <Column
-            field="price"
-            header="Price"
+            field="harga"
+            header="Harga"
             body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
+          {/* <Column
+            field="jenis_satuan"
+            header="Jenis Satuan"
+            style={{ minWidth: "10rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column> */}
           <Column
-            field="category"
-            header="Category"
+            field="tanggal_masuk"
+            header="Tanggal Masuk"
+            // body={ratingBodyTemplate}
             sortable
             style={{ minWidth: "10rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="rating"
-            header="Reviews"
-            body={ratingBodyTemplate}
+            field="stok_masuk"
+            header="Stok (pcs)"
+            // body={statusBodyTemplate}
             sortable
-            style={{ minWidth: "12rem" }}
+            style={{ minWidth: "8rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="inventoryStatus"
-            header="Status"
-            body={statusBodyTemplate}
-            sortable
-            style={{ minWidth: "12rem" }}
-          ></Column>
-          <Column
+            header="Action"
             body={actionBodyTemplate}
             exportable={false}
-            style={{ minWidth: "12rem" }}
+            style={{ minWidth: "5rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
           ></Column>
         </DataTable>
       </div>

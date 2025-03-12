@@ -201,27 +201,21 @@ export default function RingkasanProduk() {
       >
         <Column
           field="name"
-          header="Name"
-          sortable
-          filter
-          filterPlaceholder="Search"
+          header="Kode Produk"
           style={{ width: "25%" }}
           className="border border-slate-300"
           headerClassName="border border-slate-300"
         ></Column>
         <Column
-          header="Country"
+          header="Nama Produk"
           body={countryBodyTemplate}
           sortable
           sortField="country.name"
-          filter
-          filterField="country.name"
-          filterPlaceholder="Search"
           style={{ width: "25%" }}
           className="border border-slate-300"
           headerClassName="border border-gray-300"
         ></Column>
-        <Column
+        {/* <Column
           header="Agent"
           body={representativeBodyTemplate}
           sortable
@@ -234,15 +228,12 @@ export default function RingkasanProduk() {
           style={{ width: "25%" }}
           className="border border-slate-300"
           headerClassName="border border-gray-300"
-        ></Column>
+        ></Column> */}
         <Column
           field="status"
-          header="Status"
+          header="Stok Produk"
           body={statusBodyTemplate}
           sortable
-          filter
-          filterElement={statusFilterTemplate}
-          filterMenuStyle={{ width: "14rem" }}
           style={{ width: "25%" }}
           className="border border-slate-300"
           headerClassName="border border-gray-300"
