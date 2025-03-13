@@ -5,17 +5,16 @@ import { Column } from "primereact/column";
 import { ProductService } from "../../services/ProductService";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
-import { FileUpload } from "primereact/fileupload";
 import { Rating } from "primereact/rating";
 import { Toolbar } from "primereact/toolbar";
 import { InputTextarea } from "primereact/inputtextarea";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
-import { RadioButton } from "primereact/radiobutton";
 import { InputNumber } from "primereact/inputnumber";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
+import { Dropdown } from "primereact/dropdown";
 
 export default function ProductsDemo() {
   let emptyProduct = {
@@ -34,6 +33,7 @@ export default function ProductsDemo() {
   const [productDialog, setProductDialog] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [submitted, setSubmitted] = useState(false);
@@ -56,6 +56,7 @@ export default function ProductsDemo() {
     setProduct(emptyProduct);
     setSubmitted(false);
     setProductDialog(true);
+    // isEditMode(false);
   };
 
   const hideDialog = () => {
@@ -108,6 +109,8 @@ export default function ProductsDemo() {
 
   const editProduct = (product) => {
     setProduct({ ...product });
+    setSubmitted(false);
+    setIsEditMode(true);
     setProductDialog(true);
   };
 
@@ -208,7 +211,6 @@ export default function ProductsDemo() {
         <Button
           label="Tambah"
           icon="pi pi-plus"
-          severity="success"
           onClick={openNew}
           className="bg-sky-600 text-white px-3 py-2"
         />
@@ -295,6 +297,15 @@ export default function ProductsDemo() {
     }
   };
 
+  const [selectedCity, setSelectedCity] = useState(null);
+  const cities = [
+    { name: "New York", code: "NY" },
+    { name: "Rome", code: "RM" },
+    { name: "London", code: "LDN" },
+    { name: "Istanbul", code: "IST" },
+    { name: "Paris", code: "PRS" },
+  ];
+
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
       <h4 className="ml-4 my-3 text-2xl text-sky-700">Barang Masuk</h4>
@@ -312,8 +323,20 @@ export default function ProductsDemo() {
 
   const productDialogFooter = (
     <React.Fragment>
-      <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-      <Button label="Save" icon="pi pi-check" onClick={saveProduct} />
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        style={{ fontSize: "0.5rem" }}
+        className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
+        onClick={hideDialog}
+      />
+      <Button
+        label={isEditMode ? "Update" : "Save"}
+        icon="pi pi-check"
+        style={{ fontSize: "0.5rem" }}
+        className="px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
+        onClick={saveProduct}
+      />
     </React.Fragment>
   );
   const deleteProductDialogFooter = (
@@ -323,12 +346,14 @@ export default function ProductsDemo() {
         icon="pi pi-times"
         outlined
         onClick={hideDeleteProductDialog}
+        className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
       />
       <Button
         label="Yes"
         icon="pi pi-check"
         severity="danger"
         onClick={deleteProduct}
+        className="px-2.5 py-1.5 text-sm border-1 border-red-400 text-white bg-red-400"
       />
     </React.Fragment>
   );
@@ -450,117 +475,89 @@ export default function ProductsDemo() {
         visible={productDialog}
         style={{ width: "32rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Product Details"
+        header={isEditMode ? "Edit Barang Masuk" : "Tambah Barang Masuk"}
         modal
         className="p-fluid"
         footer={productDialogFooter}
         onHide={hideDialog}
       >
-        {product.image && (
-          <img
-            src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`}
-            alt={product.image}
-            className="product-image block m-auto pb-3"
-          />
-        )}
         <div className="field">
-          <label htmlFor="name" className="font-bold">
-            Name
+          <label htmlFor="kode_produk" className="font-bold">
+            Kode Produk
           </label>
           <InputText
+            id="kode_produk"
+            value={product.kode_produk}
+            onChange={(e) => onInputChange(e, "kode_produk")}
+            required
+            autoFocus
+            className={classNames("border border-slate-400 rounded-md p-2", {
+              "p-invalid border-red-500": submitted && !product.kode_produk,
+            })}
+          />
+          {submitted && !product.kode_produk && (
+            <small className="p-error">Product code is required.</small>
+          )}
+        </div>
+
+        <div className="field">
+          <label htmlFor="name" className="font-bold">
+            Nama Produk
+          </label>
+          <InputTextarea
             id="name"
             value={product.name}
             onChange={(e) => onInputChange(e, "name")}
             required
-            autoFocus
-            className={classNames({ "p-invalid": submitted && !product.name })}
+            rows={3}
+            cols={15}
+            className={classNames("border border-slate-400 rounded-md p-2", {
+              "p-invalid border-red-500": submitted && !product.name,
+            })}
           />
           {submitted && !product.name && (
             <small className="p-error">Name is required.</small>
           )}
         </div>
-        <div className="field">
-          <label htmlFor="description" className="font-bold">
-            Description
-          </label>
-          <InputTextarea
-            id="description"
-            value={product.description}
-            onChange={(e) => onInputChange(e, "description")}
-            required
-            rows={3}
-            cols={20}
-          />
-        </div>
 
         <div className="field">
-          <label className="mb-3 font-bold">Category</label>
-          <div className="formgrid grid">
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category1"
-                name="category"
-                value="Accessories"
-                onChange={onCategoryChange}
-                checked={product.category === "Accessories"}
-              />
-              <label htmlFor="category1">Accessories</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category2"
-                name="category"
-                value="Clothing"
-                onChange={onCategoryChange}
-                checked={product.category === "Clothing"}
-              />
-              <label htmlFor="category2">Clothing</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category3"
-                name="category"
-                value="Electronics"
-                onChange={onCategoryChange}
-                checked={product.category === "Electronics"}
-              />
-              <label htmlFor="category3">Electronics</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category4"
-                name="category"
-                value="Fitness"
-                onChange={onCategoryChange}
-                checked={product.category === "Fitness"}
-              />
-              <label htmlFor="category4">Fitness</label>
-            </div>
-          </div>
+          <label className=" font-bold">Kategori</label>
+          <Dropdown
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.value)}
+            options={cities}
+            optionLabel="name"
+            placeholder="Pilih Kategori"
+            className="w-full border border-slate-400"
+            showClear
+            required
+          />
         </div>
 
         <div className="formgrid grid">
           <div className="field col">
-            <label htmlFor="price" className="font-bold">
-              Price
+            <label htmlFor="harga" className="font-bold">
+              Harga
             </label>
             <InputNumber
-              id="price"
-              value={product.price}
-              onValueChange={(e) => onInputNumberChange(e, "price")}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
+              id="harga"
+              value={product.harga}
+              onValueChange={(e) => onInputNumberChange(e, "harga")}
+              // mode="currency"
+              // currency="USD"
+              // locale="en-US"
+              inputClassName="p-2 border border-slate-400 rounded-md"
             />
           </div>
           <div className="field col">
-            <label htmlFor="quantity" className="font-bold">
-              Quantity
+            <label htmlFor="stok" className="font-bold">
+              Stok Masuk
             </label>
             <InputNumber
-              id="quantity"
-              value={product.quantity}
-              onValueChange={(e) => onInputNumberChange(e, "quantity")}
+              id="stok"
+              value={product.stok}
+              onValueChange={(e) => onInputNumberChange(e, "stok")}
+              inputClassName="p-2 border border-slate-400 rounded-md"
             />
           </div>
         </div>
@@ -570,7 +567,7 @@ export default function ProductsDemo() {
         visible={deleteProductDialog}
         style={{ width: "32rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirm"
+        header="Konfirmasi Penghapusan"
         modal
         footer={deleteProductDialogFooter}
         onHide={hideDeleteProductDialog}
@@ -578,17 +575,17 @@ export default function ProductsDemo() {
         <div className="confirmation-content">
           <i
             className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
+            style={{ fontSize: "1.5rem" }}
           />
           {product && (
             <span>
-              Are you sure you want to delete <b>{product.name}</b>?
+              Apakah anda yakin ingin menghapus <b>{product.name}</b>?
             </span>
           )}
         </div>
       </Dialog>
 
-      <Dialog
+      {/* <Dialog
         visible={deleteProductsDialog}
         style={{ width: "32rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
@@ -606,7 +603,7 @@ export default function ProductsDemo() {
             <span>Are you sure you want to delete the selected products?</span>
           )}
         </div>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }
