@@ -4,11 +4,11 @@ import TabelBrgMasuk from "../components/fragments/TabelBrgMasuk";
 
 export function BarangMasuk() {
   return (
-    <div>
+    <div className="bg-slate-200 min-h-screen">
       <NavBar />
-      <div className="flex flex-row bg-slate-200">
+      <div className="flex flex-row flex-grow h-screen">
         <VerticalTabs />
-        <div className="mx-6 mt-5 w-5/6">
+        <div className="flex-grow overflow-y-auto p-4">
           <TabelBrgMasuk />
         </div>
       </div>

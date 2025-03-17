@@ -249,7 +249,7 @@ export const ProductService = {
       {
         id: "1000",
         code: "f230fh0g3",
-        name: "Bamboo Watch",
+        nama_produk: "Bamboo Watch",
         description: "Product Description",
         image: "bamboo-watch.jpg",
         price: 65,
@@ -299,7 +299,7 @@ export const ProductService = {
       {
         id: "1001",
         code: "nvklal433",
-        name: "Black Watch",
+        nama_produk: "Black Watch",
         description: "Product Description",
         image: "black-watch.jpg",
         price: 72,
@@ -331,7 +331,7 @@ export const ProductService = {
       {
         id: "1002",
         code: "zz21cz3c1",
-        name: "Blue Band",
+        nama_produk: "Blue Band",
         description: "Product Description",
         image: "blue-band.jpg",
         price: 79,
@@ -363,7 +363,7 @@ export const ProductService = {
       {
         id: "1003",
         code: "244wgerg2",
-        name: "Blue T-Shirt",
+        nama_produk: "Blue T-Shirt",
         description: "Product Description",
         image: "blue-t-shirt.jpg",
         price: 29,
@@ -376,7 +376,7 @@ export const ProductService = {
       {
         id: "1004",
         code: "h456wer53",
-        name: "Bracelet",
+        nama_produk: "Bracelet",
         description: "Product Description",
         image: "bracelet.jpg",
         price: 15,
@@ -408,7 +408,7 @@ export const ProductService = {
       {
         id: "1005",
         code: "av2231fwg",
-        name: "Brown Purse",
+        nama_produk: "Brown Purse",
         description: "Product Description",
         image: "brown-purse.jpg",
         price: 120,
@@ -449,7 +449,7 @@ export const ProductService = {
       {
         id: "1006",
         code: "bib36pfvm",
-        name: "Chakra Bracelet",
+        nama_produk: "Chakra Bracelet",
         description: "Product Description",
         image: "chakra-bracelet.jpg",
         price: 32,
@@ -481,7 +481,7 @@ export const ProductService = {
       {
         id: "1007",
         code: "mbvjkgip5",
-        name: "Galaxy Earrings",
+        nama_produk: "Galaxy Earrings",
         description: "Product Description",
         image: "galaxy-earrings.jpg",
         price: 34,
@@ -504,7 +504,7 @@ export const ProductService = {
       {
         id: "1008",
         code: "vbb124btr",
-        name: "Game Controller",
+        nama_produk: "Game Controller",
         description: "Product Description",
         image: "game-controller.jpg",
         price: 99,
@@ -536,7 +536,7 @@ export const ProductService = {
       {
         id: "1009",
         code: "cm230f032",
-        name: "Gaming Set",
+        nama_produk: "Gaming Set",
         description: "Product Description",
         image: "gaming-set.jpg",
         price: 299,
@@ -586,7 +586,7 @@ export const ProductService = {
       {
         id: "1010",
         code: "plb34234v",
-        name: "Gold Phone Case",
+        nama_produk: "Gold Phone Case",
         description: "Product Description",
         image: "gold-phone-case.jpg",
         price: 24,
@@ -618,7 +618,7 @@ export const ProductService = {
       {
         id: "1011",
         code: "4920nnc2d",
-        name: "Green Earbuds",
+        nama_produk: "Green Earbuds",
         description: "Product Description",
         image: "green-earbuds.jpg",
         price: 89,
@@ -641,7 +641,7 @@ export const ProductService = {
       {
         id: "1012",
         code: "250vm23cc",
-        name: "Green T-Shirt",
+        nama_produk: "Green T-Shirt",
         description: "Product Description",
         image: "green-t-shirt.jpg",
         price: 49,
@@ -673,7 +673,7 @@ export const ProductService = {
       {
         id: "1013",
         code: "fldsmn31b",
-        name: "Grey T-Shirt",
+        nama_produk: "Grey T-Shirt",
         description: "Product Description",
         image: "grey-t-shirt.jpg",
         price: 48,
@@ -696,7 +696,7 @@ export const ProductService = {
       {
         id: "1014",
         code: "waas1x2as",
-        name: "Headphones",
+        nama_produk: "Headphones",
         description: "Product Description",
         image: "headphones.jpg",
         price: 175,
@@ -728,7 +728,7 @@ export const ProductService = {
       {
         id: "1015",
         code: "vb34btbg5",
-        name: "Light Green T-Shirt",
+        nama_produk: "Light Green T-Shirt",
         description: "Product Description",
         image: "light-green-t-shirt.jpg",
         price: 49,
@@ -751,7 +751,7 @@ export const ProductService = {
       {
         id: "1016",
         code: "k8l6j58jl",
-        name: "Lime Band",
+        nama_produk: "Lime Band",
         description: "Product Description",
         image: "lime-band.jpg",
         price: 79,
@@ -764,7 +764,7 @@ export const ProductService = {
       {
         id: "1017",
         code: "v435nn85n",
-        name: "Mini Speakers",
+        nama_produk: "Mini Speakers",
         description: "Product Description",
         image: "mini-speakers.jpg",
         price: 85,
@@ -787,7 +787,7 @@ export const ProductService = {
       {
         id: "1018",
         code: "09zx9c0zc",
-        name: "Painted Phone Case",
+        nama_produk: "Painted Phone Case",
         description: "Product Description",
         image: "painted-phone-case.jpg",
         price: 56,
@@ -819,7 +819,7 @@ export const ProductService = {
       {
         id: "1019",
         code: "mnb5mb2m5",
-        name: "Pink Band",
+        nama_produk: "Pink Band",
         description: "Product Description",
         image: "pink-band.jpg",
         price: 79,
@@ -832,7 +832,7 @@ export const ProductService = {
       {
         id: "1020",
         code: "r23fwf2w3",
-        name: "Pink Purse",
+        nama_produk: "Pink Purse",
         description: "Product Description",
         image: "pink-purse.jpg",
         price: 110,
@@ -864,7 +864,7 @@ export const ProductService = {
       {
         id: "1021",
         code: "pxpzczo23",
-        name: "Purple Band",
+        nama_produk: "Purple Band",
         description: "Product Description",
         image: "purple-band.jpg",
         price: 79,
@@ -887,7 +887,7 @@ export const ProductService = {
       {
         id: "1022",
         code: "2c42cb5cb",
-        name: "Purple Gemstone Necklace",
+        nama_produk: "Purple Gemstone Necklace",
         description: "Product Description",
         image: "purple-gemstone-necklace.jpg",
         price: 45,
@@ -919,7 +919,7 @@ export const ProductService = {
       {
         id: "1023",
         code: "5k43kkk23",
-        name: "Purple T-Shirt",
+        nama_produk: "Purple T-Shirt",
         description: "Product Description",
         image: "purple-t-shirt.jpg",
         price: 49,
@@ -942,7 +942,7 @@ export const ProductService = {
       {
         id: "1024",
         code: "lm2tny2k4",
-        name: "Shoes",
+        nama_produk: "Shoes",
         description: "Product Description",
         image: "shoes.jpg",
         price: 64,
@@ -955,7 +955,7 @@ export const ProductService = {
       {
         id: "1025",
         code: "nbm5mv45n",
-        name: "Sneakers",
+        nama_produk: "Sneakers",
         description: "Product Description",
         image: "sneakers.jpg",
         price: 78,
@@ -987,7 +987,7 @@ export const ProductService = {
       {
         id: "1026",
         code: "zx23zc42c",
-        name: "Teal T-Shirt",
+        nama_produk: "Teal T-Shirt",
         description: "Product Description",
         image: "teal-t-shirt.jpg",
         price: 49,
@@ -1010,7 +1010,7 @@ export const ProductService = {
       {
         id: "1027",
         code: "acvx872gc",
-        name: "Yellow Earbuds",
+        nama_produk: "Yellow Earbuds",
         description: "Product Description",
         image: "yellow-earbuds.jpg",
         price: 89,
@@ -1042,7 +1042,7 @@ export const ProductService = {
       {
         id: "1028",
         code: "tx125ck42",
-        name: "Yoga Mat",
+        nama_produk: "Yoga Mat",
         description: "Product Description",
         image: "yoga-mat.jpg",
         price: 20,
@@ -1055,7 +1055,7 @@ export const ProductService = {
       {
         id: "1029",
         code: "gwuby345v",
-        name: "Yoga Set",
+        nama_produk: "Yoga Set",
         description: "Product Description",
         image: "yoga-set.jpg",
         price: 20,

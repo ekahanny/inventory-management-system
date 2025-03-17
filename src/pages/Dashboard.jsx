@@ -43,7 +43,7 @@ export function Dashboard() {
   });
 
   return (
-    <>
+    <div>
       <NavBar />
       <div className="flex flex-row bg-slate-200">
         <VerticalTabs />
@@ -153,6 +153,6 @@ export function Dashboard() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

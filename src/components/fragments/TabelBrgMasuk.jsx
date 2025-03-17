@@ -15,6 +15,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
+import { Calendar } from "primereact/calendar";
 
 export default function ProductsDemo() {
   let emptyProduct = {
@@ -38,6 +39,7 @@ export default function ProductsDemo() {
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
+  const [date, setDate] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -392,7 +394,7 @@ export default function ProductsDemo() {
           dataKey="id"
           paginator
           rows={10}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 15]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           pt={{
             paginator: {
@@ -501,23 +503,40 @@ export default function ProductsDemo() {
         </div>
 
         <div className="field">
-          <label htmlFor="name" className="font-bold">
+          <label htmlFor="nama_produk" className="font-bold">
             Nama Produk
           </label>
           <InputTextarea
-            id="name"
-            value={product.name}
-            onChange={(e) => onInputChange(e, "name")}
+            id="nama_produk"
+            value={product.nama_produk}
+            onChange={(e) => onInputChange(e, "nama_produk")}
             required
             rows={3}
             cols={15}
             className={classNames("border border-slate-400 rounded-md p-2", {
-              "p-invalid border-red-500": submitted && !product.name,
+              "p-invalid border-red-500": submitted && !product.nama_produk,
             })}
           />
-          {submitted && !product.name && (
+          {submitted && !product.nama_produk && (
             <small className="p-error">Name is required.</small>
           )}
+        </div>
+
+        <div className="field">
+          <label htmlFor="nama_produk" className="font-bold">
+            Tanggal Masuk
+          </label>
+          <Calendar
+            inputClassName="p-2 border border-slate-400 rounded-md"
+            // clearButtonClassName="bg-sky-400"
+            className="bg-sky-300 rounded-md"
+            value={date}
+            onChange={(e) => setDate(e.value)}
+            showIcon
+          />
+          {/* {submitted && !product.nama_produk && (
+            <small className="p-error">Name is required.</small>
+          )} */}
         </div>
 
         <div className="field">
@@ -550,13 +569,13 @@ export default function ProductsDemo() {
             />
           </div>
           <div className="field col">
-            <label htmlFor="stok" className="font-bold">
+            <label htmlFor="stok_masuk" className="font-bold">
               Stok Masuk
             </label>
             <InputNumber
               id="stok"
-              value={product.stok}
-              onValueChange={(e) => onInputNumberChange(e, "stok")}
+              value={product.stok_masuk}
+              onValueChange={(e) => onInputNumberChange(e, "stok_masuk")}
               inputClassName="p-2 border border-slate-400 rounded-md"
             />
           </div>
