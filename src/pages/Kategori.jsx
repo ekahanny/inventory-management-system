@@ -1,7 +1,7 @@
 import { NavBar } from "../components/elements/NavBar";
 import SidebarComponent from "../components/elements/Sidebar";
 
-export function BarangKeluar() {
+export function Kategori() {
   return (
     <div className="flex bg-slate-200">
       <SidebarComponent />
@@ -9,9 +9,9 @@ export function BarangKeluar() {
         <div className="ml-[210px] mt-[60px] p-4">
           <NavBar />
 
-          {/* Konten Barang Keluar */}
+          {/* Konten Kategori Barang */}
           <div className="min-h-screen">
-            <h1>Barang Keluar</h1>
+            <h1>Kategori</h1>
           </div>
         </div>
       </div>

@@ -1,9 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "primereact/resources/themes/lara-light-blue/theme.css"; /* atau tema lain */
-@import "primereact/resources/primereact.min.css";
-@import "primeicons/primeicons.css";
 
 .p-sidebar-left .p-sidebar {
   width: 0rem !important;

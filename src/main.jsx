@@ -6,14 +6,15 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dashboard } from "./pages/Dashboard.jsx";
 import { BarangMasuk } from "./pages/BarangMasuk.jsx";
 import { BarangKeluar } from "./pages/BarangKeluar.jsx";
-import { BarangKadaluwarsa } from "./pages/BarangKadaluwarsa.jsx";
-import { RiwayatBarang } from "./pages/RiwayatBarang.jsx";
+import { RiwayatBarangMasuk } from "./pages/RiwayatBarangMasuk.jsx";
 import { PrimeReactProvider } from "primereact/api";
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
 // import "primeicons/raw-svg/"
 import "primereact/resources/primereact.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
+import { Kategori } from "./pages/Kategori.jsx";
+import { RiwayatBarangKeluar } from "./pages/RiwayatBarangKeluar.jsx";
 
 const router = createBrowserRouter([
   {
@@ -29,12 +30,16 @@ const router = createBrowserRouter([
     element: <BarangKeluar />,
   },
   {
-    path: "/barang-kadaluwarsa",
-    element: <BarangKadaluwarsa />,
+    path: "/kategori",
+    element: <Kategori />,
   },
   {
-    path: "/riwayat-barang",
-    element: <RiwayatBarang />,
+    path: "/riwayat-barang-masuk",
+    element: <RiwayatBarangMasuk />,
+  },
+  {
+    path: "/riwayat-barang-keluar",
+    element: <RiwayatBarangKeluar />,
   },
 ]);
 

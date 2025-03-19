@@ -104,49 +104,52 @@ export default function SidebarComponent() {
                           <NavLink
                             to="/"
                             className={({ isActive }) =>
-                              `p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full ${
-                                isActive ? " bg-blue-200" : "text-slate-500"
+                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                isActive ? " bg-blue-300" : "bg-white"
                               }`
                             }
                           >
                             <i className="pi pi-home mr-2"></i>
                             <span className="font-medium">Dashboard</span>
-                            <Ripple />
                           </NavLink>
                         </li>
                         <li>
                           <NavLink
                             to="/barang-masuk"
-                            // className="p-ripple flex align-items-center cusor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             className={({ isActive }) =>
-                              `p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full ${
-                                isActive ? " bg-blue-200" : "text-slate-500"
+                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                isActive ? " bg-blue-300" : "bg-white"
                               }`
                             }
                           >
                             <i className="pi pi-shopping-cart mr-2"></i>
                             <span className="font-medium">Barang Masuk</span>
-                            <Ripple />
                           </NavLink>
                         </li>
                         <li>
                           <NavLink
                             to="/barang-keluar"
-                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                            className={({ isActive }) =>
+                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                isActive ? " bg-blue-300" : "bg-white"
+                              }`
+                            }
                           >
                             <i className="pi pi-shop mr-2"></i>
                             <span className="font-medium">Barang Keluar</span>
-                            <Ripple />
                           </NavLink>
                         </li>
                         <li>
                           <NavLink
-                            to="/barang-kadaluwarsa"
-                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                            to="/kategori"
+                            className={({ isActive }) =>
+                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                isActive ? " bg-blue-300" : "bg-white"
+                              }`
+                            }
                           >
                             <i className="pi pi-box mr-2"></i>
                             <span className="font-medium">Kategori</span>
-                            <Ripple />
                           </NavLink>
                         </li>
                         <li>
@@ -160,35 +163,43 @@ export default function SidebarComponent() {
                           >
                             <a
                               ref={btnRef2}
-                              className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                              className="flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200"
                             >
                               <i className="pi pi-history mr-2"></i>
                               <span className="font-medium">Riwayat</span>
                               <i className="pi pi-chevron-down ml-auto mr-1"></i>
-                              <Ripple />
                             </a>
                           </StyleClass>
                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                             <li>
                               <NavLink
-                                to="/riwayat"
-                                className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                                to="/riwayat-barang-masuk"
+                                className={({ isActive }) =>
+                                  `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                    isActive ? " bg-blue-300" : "bg-white"
+                                  }`
+                                }
                               >
                                 <i className="pi pi-chart-line mr-3"></i>
                                 <span className="font-medium text-sm">
-                                  Riwayat Barang Masuk
+                                  Barang Masuk
                                 </span>
-                                <Ripple />
                               </NavLink>
                             </li>
                             <li>
-                              <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                              <NavLink
+                                to="/riwayat-barang-keluar"
+                                className={({ isActive }) =>
+                                  `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                    isActive ? " bg-blue-300" : "bg-white"
+                                  }`
+                                }
+                              >
                                 <i className="pi pi-chart-bar mr-3"></i>
                                 <span className="font-medium text-sm">
-                                  Riwayat Barang Keluar
+                                  Barang Keluar
                                 </span>
-                                <Ripple />
-                              </a>
+                              </NavLink>
                             </li>
                           </ul>
                         </li>
@@ -198,12 +209,13 @@ export default function SidebarComponent() {
                 </div>
                 <div className="mt-auto">
                   <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
-                  <a className="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                    <Avatar
-                      image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-                      shape="circle"
-                    />
-                    <span className="font-bold">Amy Elsner</span>
+                  <a
+                    href=""
+                    className="flex m-2 align-items-center cursor-pointer p-3 gap-2 border-round text-900 hover:surface-200"
+                  >
+                    <i className="pi pi-sign-out ml-5"></i>
+
+                    <span className="font-bold">Sign Out</span>
                   </a>
                 </div>
               </div>
