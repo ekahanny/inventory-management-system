@@ -379,7 +379,7 @@ export default function ProductsDemo() {
   return (
     <div>
       <Toast ref={toast} />
-      <div className="card ml-1 mt-5 rounded-lg shadow-lg ">
+      <div className="card ml-1 my-3 rounded-lg shadow-lg ">
         <Toolbar
           className="mb-4"
           left={leftToolbarTemplate}

@@ -4,13 +4,13 @@ export function VerticalTabs() {
   return (
     <div className="drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-      <div className="border-y border-x-2 min-h-screen">
+      <div className="border-y border-x-2 min-h-screen flex flex-col">
         <label
           htmlFor="my-drawer-2"
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-white h-screen w-70 !p-0 sticky top-0 overflow-y-auto">
+        <ul className="menu bg-white h-full !p-0">
           {/* Sidebar content here */}
           <li>
             <NavLink
@@ -34,7 +34,6 @@ export function VerticalTabs() {
               Dashboard
             </NavLink>
           </li>
-          {/* Other NavLinks */}
           <li>
             <NavLink
               to="/barang-masuk"
