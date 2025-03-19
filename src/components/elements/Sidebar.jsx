@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
+import { NavLink } from "react-router-dom";
 
 export default function SidebarComponent() {
   const [visible, setVisible] = useState(false);
@@ -19,15 +20,15 @@ export default function SidebarComponent() {
         dismissable={false} // Sidebar tidak bisa ditutup dengan klik di luar
         showCloseIcon={false} // Menyembunyikan tombol close
         modal={false} // Menghindari efek modal
-        content={({ closeIconRef, hide }) => (
+        content={() => (
           <div className="min-h-screen flex relative lg:static surface-ground">
             <div
               id="app-sidebar-2"
               className="surface-section h-screen block flex-shrink-0 lg:static left-0 top-0 z-1 border-right-1 surface-border select-none"
-              style={{ width: "280px" }}
+              style={{ width: "210px" }}
             >
               <div className="flex flex-column h-full">
-                <div className="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
+                {/* <div className="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
                   <span className="inline-flex align-items-center gap-2">
                     <svg
                       width="35"
@@ -89,56 +90,64 @@ export default function SidebarComponent() {
                         fill="var(--primary-color)"
                       />
                     </svg>
-                    <span className="font-semibold text-2xl text-primary">
-                      Your Logo
+                    <span className="font-semibold text-xs text-primary">
+                    IMS
                     </span>
                   </span>
-                  <span>
-                    <Button
-                      type="button"
-                      ref={closeIconRef}
-                      onClick={(e) => hide(e)}
-                      icon="pi pi-times"
-                      rounded
-                      outlined
-                      className="h-2rem w-2rem"
-                    ></Button>
-                  </span>
-                </div>
+                  <span></span>
+                </div> */}
                 <div className="overflow-y-auto">
                   <ul className="list-none p-3 m-0">
                     <li>
-                      <StyleClass
-                        nodeRef={btnRef1}
-                        selector="@next"
-                        enterFromClassName="hidden"
-                        enterActiveClassName="slidedown"
-                        leaveToClassName="hidden"
-                        leaveActiveClassName="slideup"
-                      >
-                        <div
-                          ref={btnRef1}
-                          className="p-ripple p-3 flex align-items-center justify-content-between text-600 cursor-pointer"
-                        >
-                          <span className="font-medium">FAVORITES</span>
-                          <i className="pi pi-chevron-down"></i>
-                          <Ripple />
-                        </div>
-                      </StyleClass>
                       <ul className="list-none p-0 m-0 overflow-hidden">
                         <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                          <NavLink
+                            to="/"
+                            className={({ isActive }) =>
+                              `p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full ${
+                                isActive ? " bg-blue-200" : "text-slate-500"
+                              }`
+                            }
+                          >
                             <i className="pi pi-home mr-2"></i>
                             <span className="font-medium">Dashboard</span>
                             <Ripple />
-                          </a>
+                          </NavLink>
                         </li>
                         <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-bookmark mr-2"></i>
-                            <span className="font-medium">Bookmarks</span>
+                          <NavLink
+                            to="/barang-masuk"
+                            // className="p-ripple flex align-items-center cusor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                            className={({ isActive }) =>
+                              `p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full ${
+                                isActive ? " bg-blue-200" : "text-slate-500"
+                              }`
+                            }
+                          >
+                            <i className="pi pi-shopping-cart mr-2"></i>
+                            <span className="font-medium">Barang Masuk</span>
                             <Ripple />
-                          </a>
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/barang-keluar"
+                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                          >
+                            <i className="pi pi-shop mr-2"></i>
+                            <span className="font-medium">Barang Keluar</span>
+                            <Ripple />
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
+                            to="/barang-kadaluwarsa"
+                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                          >
+                            <i className="pi pi-box mr-2"></i>
+                            <span className="font-medium">Kategori</span>
+                            <Ripple />
+                          </NavLink>
                         </li>
                         <li>
                           <StyleClass
@@ -153,135 +162,35 @@ export default function SidebarComponent() {
                               ref={btnRef2}
                               className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                             >
-                              <i className="pi pi-chart-line mr-2"></i>
-                              <span className="font-medium">Reports</span>
+                              <i className="pi pi-history mr-2"></i>
+                              <span className="font-medium">Riwayat</span>
                               <i className="pi pi-chevron-down ml-auto mr-1"></i>
                               <Ripple />
                             </a>
                           </StyleClass>
                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                             <li>
-                              <StyleClass
-                                nodeRef={btnRef3}
-                                selector="@next"
-                                enterFromClassName="hidden"
-                                enterActiveClassName="slidedown"
-                                leaveToClassName="hidden"
-                                leaveActiveClassName="slideup"
+                              <NavLink
+                                to="/riwayat"
+                                className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                               >
-                                <a
-                                  ref={btnRef3}
-                                  className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
-                                >
-                                  <i className="pi pi-chart-line mr-2"></i>
-                                  <span className="font-medium">Revenue</span>
-                                  <i className="pi pi-chevron-down ml-auto mr-1"></i>
-                                  <Ripple />
-                                </a>
-                              </StyleClass>
-                              <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                <li>
-                                  <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-table mr-2"></i>
-                                    <span className="font-medium">View</span>
-                                    <Ripple />
-                                  </a>
-                                </li>
-                                <li>
-                                  <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-search mr-2"></i>
-                                    <span className="font-medium">Search</span>
-                                    <Ripple />
-                                  </a>
-                                </li>
-                              </ul>
+                                <i className="pi pi-chart-line mr-3"></i>
+                                <span className="font-medium text-sm">
+                                  Riwayat Barang Masuk
+                                </span>
+                                <Ripple />
+                              </NavLink>
                             </li>
                             <li>
-                              <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                <i className="pi pi-chart-line mr-2"></i>
-                                <span className="font-medium">Expenses</span>
+                              <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                <i className="pi pi-chart-bar mr-3"></i>
+                                <span className="font-medium text-sm">
+                                  Riwayat Barang Keluar
+                                </span>
                                 <Ripple />
                               </a>
                             </li>
                           </ul>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-users mr-2"></i>
-                            <span className="font-medium">Team</span>
-                            <Ripple />
-                          </a>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-comments mr-2"></i>
-                            <span className="font-medium">Messages</span>
-                            <span
-                              className="inline-flex align-items-center justify-content-center ml-auto bg-blue-500 text-0 border-circle"
-                              style={{ minWidth: "1.5rem", height: "1.5rem" }}
-                            >
-                              3
-                            </span>
-                            <Ripple />
-                          </a>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-calendar mr-2"></i>
-                            <span className="font-medium">Calendar</span>
-                            <Ripple />
-                          </a>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-cog mr-2"></i>
-                            <span className="font-medium">Settings</span>
-                            <Ripple />
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                  <ul className="list-none p-3 m-0">
-                    <li>
-                      <StyleClass
-                        nodeRef={btnRef4}
-                        selector="@next"
-                        enterFromClassName="hidden"
-                        enterActiveClassName="slidedown"
-                        leaveToClassName="hidden"
-                        leaveActiveClassName="slideup"
-                      >
-                        <div
-                          ref={btnRef4}
-                          className="p-ripple p-3 flex align-items-center justify-content-between text-600 cursor-pointer"
-                        >
-                          <span className="font-medium">APPLICATION</span>
-                          <i className="pi pi-chevron-down"></i>
-                          <Ripple />
-                        </div>
-                      </StyleClass>
-                      <ul className="list-none p-0 m-0 overflow-hidden">
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-folder mr-2"></i>
-                            <span className="font-medium">Projects</span>
-                            <Ripple />
-                          </a>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-chart-bar mr-2"></i>
-                            <span className="font-medium">Performance</span>
-                            <Ripple />
-                          </a>
-                        </li>
-                        <li>
-                          <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                            <i className="pi pi-cog mr-2"></i>
-                            <span className="font-medium">Settings</span>
-                            <Ripple />
-                          </a>
                         </li>
                       </ul>
                     </li>
