@@ -16,18 +16,18 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
+import CategoryService from "../../services/CategoryService";
+import InProdService from "../../services/InProdService";
 
-export default function ProductsDemo() {
+export default function TabelBrgMasuk() {
   let emptyProduct = {
-    id: null,
-    name: "",
-    image: null,
-    description: "",
-    category: null,
+    kode_produk: "",
+    nama_produk: "",
+    tanggal_masuk: "",
+    kategori: "",
     harga: 0,
-    quantity: 0,
-    rating: 0,
-    inventoryStatus: "INSTOCK",
+    stok: 0,
+    isProdukMasuk: true,
   };
 
   const [products, setProducts] = useState(null);
@@ -43,8 +43,34 @@ export default function ProductsDemo() {
   const toast = useRef(null);
   const dt = useRef(null);
 
+  // Ambil daftar produk dari API
+  const fetchProducts = async () => {
+    try {
+      const data = await ProductService.getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("❌ Gagal mengambil produk:", error);
+    }
+  };
+
+  // Ambil daftar kategori dari API
+  const fetchCategories = async () => {
+    try {
+      const response = await CategoryService.getCategories();
+      const kategoriArray = response.KategoriProduk || [];
+      const formattedCategories = kategoriArray.map((item) => ({
+        name: item.nama,
+        id: item._id,
+      }));
+      setCategories(formattedCategories);
+    } catch (error) {
+      console.error("❌ Error fetching categories:", error);
+    }
+  };
+
   useEffect(() => {
-    ProductService.getProducts().then((data) => setProducts(data));
+    fetchProducts();
+    fetchCategories();
   }, []);
 
   const formatCurrency = (value) => {
@@ -56,9 +82,10 @@ export default function ProductsDemo() {
 
   const openNew = () => {
     setProduct(emptyProduct);
+    setSelectedCategory(null);
     setSubmitted(false);
+    setIsEditMode(false);
     setProductDialog(true);
-    // isEditMode(false);
   };
 
   const hideDialog = () => {
@@ -74,38 +101,60 @@ export default function ProductsDemo() {
     setDeleteProductsDialog(false);
   };
 
-  const saveProduct = () => {
+  const saveProduct = async () => {
     setSubmitted(true);
 
-    if (product.name.trim()) {
-      let _products = [...products];
-      let _product = { ...product };
+    if (
+      !product.nama_produk.trim() ||
+      !selectedCategory ||
+      !product.tanggal_masuk
+    ) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Nama produk, kategori, dan tanggal masuk harus diisi",
+        life: 3000,
+      });
+      return;
+    }
 
-      if (product.id) {
-        const index = findIndexById(product.id);
+    let newProduct = {
+      kode_produk: product.kode_produk,
+      nama_produk: product.nama_produk,
+      tanggal_masuk: new Date(product.tanggal_masuk), // Pastikan nilai ini terisi
+      kategori: selectedCategory.id,
+      harga: product.harga,
+      stok: product.stok || 0,
+      isProdukMasuk: true,
+    };
 
-        _products[index] = _product;
-        toast.current.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Updated",
-          life: 3000,
-        });
-      } else {
-        _product.id = createId();
-        _product.image = "product-placeholder.svg";
-        _products.push(_product);
-        toast.current.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Created",
-          life: 3000,
-        });
-      }
+    console.log("Data yang dikirim:", newProduct); // Periksa data sebelum dikirim
 
-      setProducts(_products);
+    try {
+      const addedProduct = await InProdService.addProduct(newProduct);
+      setProducts((prevProducts) => [...prevProducts, addedProduct]);
+
+      toast.current.show({
+        severity: "success",
+        summary: "Berhasil",
+        detail: "Produk berhasil ditambahkan",
+        life: 3000,
+      });
+
       setProductDialog(false);
       setProduct(emptyProduct);
+      fetchProducts();
+    } catch (error) {
+      console.error(
+        "❌ Gagal menambahkan produk:",
+        error.response?.data || error.message
+      );
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: error.response?.data?.message || "Gagal menambahkan produk",
+        life: 3000,
+      });
     }
   };
 
@@ -191,20 +240,18 @@ export default function ProductsDemo() {
 
   const onInputChange = (e, name) => {
     const val = (e.target && e.target.value) || "";
-    let _product = { ...product };
-
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: val,
+    }));
   };
 
   const onInputNumberChange = (e, name) => {
     const val = e.value || 0;
-    let _product = { ...product };
-
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: val,
+    }));
   };
 
   const leftToolbarTemplate = () => {
@@ -299,14 +346,8 @@ export default function ProductsDemo() {
     }
   };
 
-  const [selectedCity, setSelectedCity] = useState(null);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
@@ -389,8 +430,6 @@ export default function ProductsDemo() {
         <DataTable
           ref={dt}
           value={products}
-          // selection={selectedProducts}
-          // onSelectionChange={(e) => setSelectedProducts(e.value)}
           dataKey="id"
           paginator
           rows={10}
@@ -408,7 +447,6 @@ export default function ProductsDemo() {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           globalFilter={globalFilter}
           header={header}
-          // className="border border-slate-300 px-3"
           tableClassName="border border-slate-300"
           tableStyle={{ maxWidth: "100%" }}
         >
@@ -437,13 +475,6 @@ export default function ProductsDemo() {
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
-          {/* <Column
-            field="jenis_satuan"
-            header="Jenis Satuan"
-            style={{ minWidth: "10rem" }}
-            className="border border-slate-300"
-            headerClassName="border border-slate-300"
-          ></Column> */}
           <Column
             field="tanggal_masuk"
             header="Tanggal Masuk"
@@ -454,7 +485,7 @@ export default function ProductsDemo() {
             headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="stok_masuk"
+            field="stok"
             header="Stok (pcs)"
             // body={statusBodyTemplate}
             sortable
@@ -527,28 +558,25 @@ export default function ProductsDemo() {
             Tanggal Masuk
           </label>
           <Calendar
+            id="tanggal_masuk"
             inputClassName="p-2 border border-slate-400 rounded-md"
-            // clearButtonClassName="bg-sky-400"
-            className="bg-sky-300 rounded-md"
-            value={date}
-            onChange={(e) => setDate(e.value)}
+            value={product.tanggal_masuk}
+            onChange={(e) => setProduct({ ...product, tanggal_masuk: e.value })}
             showIcon
+            dateFormat="yy-mm-dd"
+            required
           />
-          {/* {submitted && !product.nama_produk && (
-            <small className="p-error">Name is required.</small>
-          )} */}
         </div>
 
         <div className="field">
           <label className=" font-bold">Kategori</label>
           <Dropdown
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.value)}
-            options={cities}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.value)}
+            options={categories}
             optionLabel="name"
             placeholder="Pilih Kategori"
             className="w-full border border-slate-400"
-            showClear
             required
           />
         </div>
@@ -561,21 +589,18 @@ export default function ProductsDemo() {
             <InputNumber
               id="harga"
               value={product.harga}
-              onValueChange={(e) => onInputNumberChange(e, "harga")}
-              // mode="currency"
-              // currency="USD"
-              // locale="en-US"
+              onChange={(e) => onInputNumberChange(e, "harga")}
               inputClassName="p-2 border border-slate-400 rounded-md"
             />
           </div>
           <div className="field col">
-            <label htmlFor="stok_masuk" className="font-bold">
+            <label htmlFor="stok" className="font-bold">
               Stok Masuk
             </label>
             <InputNumber
               id="stok"
-              value={product.stok_masuk}
-              onValueChange={(e) => onInputNumberChange(e, "stok_masuk")}
+              value={product.stok}
+              onChange={(e) => onInputNumberChange(e, "stok")}
               inputClassName="p-2 border border-slate-400 rounded-md"
             />
           </div>
@@ -603,26 +628,6 @@ export default function ProductsDemo() {
           )}
         </div>
       </Dialog>
-
-      {/* <Dialog
-        visible={deleteProductsDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirm"
-        modal
-        footer={deleteProductsDialogFooter}
-        onHide={hideDeleteProductsDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {product && (
-            <span>Are you sure you want to delete the selected products?</span>
-          )}
-        </div>
-      </Dialog> */}
     </div>
   );
 }
