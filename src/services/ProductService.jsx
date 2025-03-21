@@ -6,7 +6,7 @@ export const ProductService = {
         nama_produk: "Bamboo Watch",
         harga: 65,
         jenis_satuan: "Pcs",
-        stok_masuk: 24,
+        stok: 24,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -14,7 +14,7 @@ export const ProductService = {
         nama_produk: "Black Watch",
         harga: 72,
         jenis_satuan: "Pcs",
-        stok_masuk: 61,
+        stok: 61,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -22,7 +22,7 @@ export const ProductService = {
         nama_produk: "Blue Band",
         harga: 79,
         jenis_satuan: "Pack",
-        stok_masuk: 2,
+        stok: 2,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -30,7 +30,7 @@ export const ProductService = {
         nama_produk: "Blue T-Shirt",
         harga: 29,
         jenis_satuan: "Lusin",
-        stok_masuk: 25,
+        stok: 25,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -38,7 +38,7 @@ export const ProductService = {
         nama_produk: "Bracelet",
         harga: 15,
         jenis_satuan: "Pcs",
-        stok_masuk: 73,
+        stok: 73,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -46,7 +46,7 @@ export const ProductService = {
         nama_produk: "Brown Purse",
         harga: 120,
         jenis_satuan: "Pcs",
-        stok_masuk: 0,
+        stok: 0,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -54,7 +54,7 @@ export const ProductService = {
         nama_produk: "Chakra Bracelet",
         harga: 32,
         jenis_satuan: "Pcs",
-        stok_masuk: 5,
+        stok: 5,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -62,7 +62,7 @@ export const ProductService = {
         nama_produk: "Galaxy Earrings",
         harga: 34,
         jenis_satuan: "Pcs",
-        stok_masuk: 23,
+        stok: 23,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -70,7 +70,7 @@ export const ProductService = {
         nama_produk: "Game Controller",
         harga: 99,
         jenis_satuan: "Pack",
-        stok_masuk: 2,
+        stok: 2,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -78,7 +78,7 @@ export const ProductService = {
         nama_produk: "Gaming Set",
         harga: 299,
         jenis_satuan: "Pack",
-        stok_masuk: 63,
+        stok: 63,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -86,7 +86,7 @@ export const ProductService = {
         nama_produk: "Gold Phone Case",
         harga: 24,
         jenis_satuan: "Pcs",
-        stok_masuk: 0,
+        stok: 0,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -94,7 +94,7 @@ export const ProductService = {
         nama_produk: "Green Earbuds",
         harga: 89,
         jenis_satuan: "Pack",
-        stok_masuk: 23,
+        stok: 23,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -102,7 +102,7 @@ export const ProductService = {
         nama_produk: "Green T-Shirt",
         harga: 49,
         jenis_satuan: "Lusin",
-        stok_masuk: 74,
+        stok: 74,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -110,7 +110,7 @@ export const ProductService = {
         nama_produk: "Grey T-Shirt",
         harga: 48,
         jenis_satuan: "Lusin",
-        stok_masuk: 0,
+        stok: 0,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -118,7 +118,7 @@ export const ProductService = {
         nama_produk: "Headphones",
         harga: 175,
         jenis_satuan: "Pack",
-        stok_masuk: 8,
+        stok: 8,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -126,7 +126,7 @@ export const ProductService = {
         nama_produk: "Light Green T-Shirt",
         harga: 49,
         jenis_satuan: "Lusin",
-        stok_masuk: 34,
+        stok: 34,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -134,7 +134,7 @@ export const ProductService = {
         nama_produk: "Lime Band",
         harga: 79,
         jenis_satuan: "Pack",
-        stok_masuk: 12,
+        stok: 12,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -142,7 +142,7 @@ export const ProductService = {
         nama_produk: "Mini Speakers",
         harga: 85,
         jenis_satuan: "Lusin",
-        stok_masuk: 42,
+        stok: 42,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -150,7 +150,7 @@ export const ProductService = {
         nama_produk: "Painted Phone Case",
         harga: 56,
         jenis_satuan: "Pcs",
-        stok_masuk: 41,
+        stok: 41,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -158,7 +158,7 @@ export const ProductService = {
         nama_produk: "Pink Band",
         harga: 79,
         jenis_satuan: "Pack",
-        stok_masuk: 63,
+        stok: 63,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -166,7 +166,7 @@ export const ProductService = {
         nama_produk: "Pink Purse",
         harga: 110,
         jenis_satuan: "Pcs",
-        stok_masuk: 0,
+        stok: 0,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -174,7 +174,7 @@ export const ProductService = {
         nama_produk: "Purple Band",
         harga: 79,
         jenis_satuan: "Pack",
-        stok_masuk: 6,
+        stok: 6,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -182,7 +182,7 @@ export const ProductService = {
         nama_produk: "Purple Gemstone Necklace",
         harga: 45,
         jenis_satuan: "Pcs",
-        stok_masuk: 62,
+        stok: 62,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -190,7 +190,7 @@ export const ProductService = {
         nama_produk: "Purple T-Shirt",
         harga: 49,
         jenis_satuan: "Lusin",
-        stok_masuk: 2,
+        stok: 2,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -198,7 +198,7 @@ export const ProductService = {
         nama_produk: "Shoes",
         harga: 64,
         jenis_satuan: "Lusin",
-        stok_masuk: 0,
+        stok: 0,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -206,7 +206,7 @@ export const ProductService = {
         nama_produk: "Sneakers",
         harga: 78,
         jenis_satuan: "Lusin",
-        stok_masuk: 52,
+        stok: 52,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -214,7 +214,7 @@ export const ProductService = {
         nama_produk: "Teal T-Shirt",
         harga: 49,
         jenis_satuan: "Lusin",
-        stok_masuk: 3,
+        stok: 3,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -222,7 +222,7 @@ export const ProductService = {
         nama_produk: "Yellow Earbuds",
         harga: 89,
         jenis_satuan: "Pack",
-        stok_masuk: 35,
+        stok: 35,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -230,7 +230,7 @@ export const ProductService = {
         nama_produk: "Yoga Mat",
         harga: 20,
         jenis_satuan: "Pack",
-        stok_masuk: 15,
+        stok: 15,
         tanggal_masuk: "dd/mm/yyyy",
       },
       {
@@ -238,7 +238,7 @@ export const ProductService = {
         nama_produk: "Yoga Set",
         harga: 20,
         jenis_satuan: "Pack",
-        stok_masuk: 25,
+        stok: 25,
         tanggal_masuk: "dd/mm/yyyy",
       },
     ];

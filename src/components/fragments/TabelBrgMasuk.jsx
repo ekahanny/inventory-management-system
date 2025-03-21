@@ -5,7 +5,6 @@ import { Column } from "primereact/column";
 import { ProductService } from "../../services/ProductService";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
-import { Rating } from "primereact/rating";
 import { Toolbar } from "primereact/toolbar";
 import { InputTextarea } from "primereact/inputtextarea";
 import { IconField } from "primereact/iconfield";
@@ -39,21 +38,21 @@ export default function TabelBrgMasuk() {
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [date, setDate] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
 
-  // Ambil daftar produk dari API
   const fetchProducts = async () => {
     try {
       const data = await ProductService.getProducts();
       setProducts(data);
     } catch (error) {
-      console.error("❌ Gagal mengambil produk:", error);
+      console.error("Gagal mengambil produk:", error);
     }
   };
 
-  // Ambil daftar kategori dari API
   const fetchCategories = async () => {
     try {
       const response = await CategoryService.getCategories();
@@ -64,7 +63,7 @@ export default function TabelBrgMasuk() {
       }));
       setCategories(formattedCategories);
     } catch (error) {
-      console.error("❌ Error fetching categories:", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -107,12 +106,15 @@ export default function TabelBrgMasuk() {
     if (
       !product.nama_produk.trim() ||
       !selectedCategory ||
-      !product.tanggal_masuk
+      !product.tanggal_masuk ||
+      !product.kategori ||
+      !product.harga ||
+      !product.stok
     ) {
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
-        detail: "Nama produk, kategori, dan tanggal masuk harus diisi",
+        detail: "Isi seluruh data terlebih dahulu!",
         life: 3000,
       });
       return;
@@ -121,14 +123,12 @@ export default function TabelBrgMasuk() {
     let newProduct = {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
-      tanggal_masuk: new Date(product.tanggal_masuk), // Pastikan nilai ini terisi
+      tanggal_masuk: new Date(product.tanggal_masuk),
       kategori: selectedCategory.id,
       harga: product.harga,
       stok: product.stok || 0,
       isProdukMasuk: true,
     };
-
-    console.log("Data yang dikirim:", newProduct); // Periksa data sebelum dikirim
 
     try {
       const addedProduct = await InProdService.addProduct(newProduct);
@@ -146,7 +146,7 @@ export default function TabelBrgMasuk() {
       fetchProducts();
     } catch (error) {
       console.error(
-        "❌ Gagal menambahkan produk:",
+        "Gagal menambahkan produk:",
         error.response?.data || error.message
       );
       toast.current.show({
@@ -184,37 +184,8 @@ export default function TabelBrgMasuk() {
     });
   };
 
-  const findIndexById = (id) => {
-    let index = -1;
-
-    for (let i = 0; i < products.length; i++) {
-      if (products[i].id === id) {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
-  };
-
-  const createId = () => {
-    let id = "";
-    let chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return id;
-  };
-
   const exportCSV = () => {
     dt.current.exportCSV();
-  };
-
-  const confirmDeleteSelected = () => {
-    setDeleteProductsDialog(true);
   };
 
   const deleteSelectedProducts = () => {
@@ -229,13 +200,6 @@ export default function TabelBrgMasuk() {
       detail: "Products Deleted",
       life: 3000,
     });
-  };
-
-  const onCategoryChange = (e) => {
-    let _product = { ...product };
-
-    _product["category"] = e.value;
-    setProduct(_product);
   };
 
   const onInputChange = (e, name) => {
@@ -278,23 +242,8 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  // const imageBodyTemplate = (rowData) => {
-  //   return (
-  //     <img
-  //       src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`}
-  //       alt={rowData.image}
-  //       className="shadow-2 border-round"
-  //       style={{ width: "64px" }}
-  //     />
-  //   );
-  // };
-
   const priceBodyTemplate = (rowData) => {
     return formatCurrency(rowData.harga);
-  };
-
-  const ratingBodyTemplate = (rowData) => {
-    return <Rating value={rowData.rating} readOnly cancel={false} />;
   };
 
   const statusBodyTemplate = (rowData) => {
@@ -345,9 +294,6 @@ export default function TabelBrgMasuk() {
         return null;
     }
   };
-
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
@@ -478,7 +424,6 @@ export default function TabelBrgMasuk() {
           <Column
             field="tanggal_masuk"
             header="Tanggal Masuk"
-            // body={ratingBodyTemplate}
             sortable
             style={{ minWidth: "10rem" }}
             className="border border-slate-300"
@@ -529,7 +474,7 @@ export default function TabelBrgMasuk() {
             })}
           />
           {submitted && !product.kode_produk && (
-            <small className="p-error">Product code is required.</small>
+            <small className="p-error">Kode produk harus diisi</small>
           )}
         </div>
 
@@ -549,7 +494,7 @@ export default function TabelBrgMasuk() {
             })}
           />
           {submitted && !product.nama_produk && (
-            <small className="p-error">Name is required.</small>
+            <small className="p-error">Nama produk harus diisi</small>
           )}
         </div>
 
@@ -559,15 +504,23 @@ export default function TabelBrgMasuk() {
           </label>
           <Calendar
             id="tanggal_masuk"
-            inputClassName="p-2 border border-slate-400 rounded-md"
+            inputClassName={classNames(
+              "border border-slate-400 rounded-md p-2",
+              {
+                "p-invalid border-red-500": submitted && !product.tanggal_masuk,
+              }
+            )}
+            className="bg-sky-300 rounded-md"
             value={product.tanggal_masuk}
             onChange={(e) => setProduct({ ...product, tanggal_masuk: e.value })}
             showIcon
             dateFormat="yy-mm-dd"
             required
           />
+          {submitted && !product.tanggal_masuk && (
+            <small className="p-error">Tanggal masuk harus diisi</small>
+          )}
         </div>
-
         <div className="field">
           <label className=" font-bold">Kategori</label>
           <Dropdown
@@ -576,11 +529,15 @@ export default function TabelBrgMasuk() {
             options={categories}
             optionLabel="name"
             placeholder="Pilih Kategori"
-            className="w-full border border-slate-400"
+            className={classNames("border border-slate-400 w-full", {
+              "p-invalid border-red-500": submitted && !product.kategori,
+            })}
             required
           />
+          {submitted && !product.kategori && (
+            <small className="p-error">Pilih kategori terlebih dahulu</small>
+          )}
         </div>
-
         <div className="formgrid grid">
           <div className="field col">
             <label htmlFor="harga" className="font-bold">
@@ -590,8 +547,16 @@ export default function TabelBrgMasuk() {
               id="harga"
               value={product.harga}
               onChange={(e) => onInputNumberChange(e, "harga")}
-              inputClassName="p-2 border border-slate-400 rounded-md"
+              inputClassName={classNames(
+                "border border-slate-400 p-2 rounded-md",
+                {
+                  "p-invalid border-red-500": submitted && !product.harga,
+                }
+              )}
             />
+            {submitted && !product.harga && (
+              <small className="p-error">Harga harus diisi</small>
+            )}
           </div>
           <div className="field col">
             <label htmlFor="stok" className="font-bold">
@@ -601,8 +566,16 @@ export default function TabelBrgMasuk() {
               id="stok"
               value={product.stok}
               onChange={(e) => onInputNumberChange(e, "stok")}
-              inputClassName="p-2 border border-slate-400 rounded-md"
+              inputClassName={classNames(
+                "border border-slate-400 p-2 rounded-md",
+                {
+                  "p-invalid border-red-500": submitted && !product.stok,
+                }
+              )}
             />
+            {submitted && !product.stok && (
+              <small className="p-error">Stok masuk harus diisi</small>
+            )}
           </div>
         </div>
       </Dialog>
