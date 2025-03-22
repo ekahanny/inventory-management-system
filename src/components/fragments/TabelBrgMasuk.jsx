@@ -104,10 +104,10 @@ export default function TabelBrgMasuk() {
     setSubmitted(true);
 
     if (
+      !product.kode_produk ||
       !product.nama_produk.trim() ||
       !selectedCategory ||
       !product.tanggal_masuk ||
-      !product.kategori ||
       !product.harga ||
       !product.stok
     ) {
@@ -200,6 +200,15 @@ export default function TabelBrgMasuk() {
       detail: "Products Deleted",
       life: 3000,
     });
+  };
+
+  const onCategoryChange = (e) => {
+    setSelectedCategory(e.value);
+    setProduct((prev) => ({
+      ...prev,
+      kategori: e.value.nama_kategori,
+    }));
+    console.log(selectedCategory);
   };
 
   const onInputChange = (e, name) => {
@@ -530,11 +539,11 @@ export default function TabelBrgMasuk() {
             optionLabel="name"
             placeholder="Pilih Kategori"
             className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !product.kategori,
+              "p-invalid border-red-500": submitted && !selectedCategory,
             })}
             required
           />
-          {submitted && !product.kategori && (
+          {submitted && !selectedCategory && (
             <small className="p-error">Pilih kategori terlebih dahulu</small>
           )}
         </div>
