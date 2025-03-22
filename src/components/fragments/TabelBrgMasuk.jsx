@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { ProductService } from "../../services/ProductService";
+import ProductService from "../../services/ProductService";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
@@ -46,8 +46,22 @@ export default function TabelBrgMasuk() {
 
   const fetchProducts = async () => {
     try {
-      const data = await ProductService.getProducts();
-      setProducts(data);
+      const logResponse = await InProdService.getProducts();
+      const logData = logResponse.LogProduk || [];
+
+      const productResponse = await ProductService.getProducts();
+      const productData = productResponse.Produk || [];
+
+      // Mengambil data dari produk dan log produk
+      const combinedData = logData.map((log) => {
+        const productInfo = productData.find((prod) => prod._id === log.Produk);
+        return {
+          ...log,
+          kode_produk: productInfo ? productInfo.kode_produk : "N/A",
+          nama_produk: productInfo ? productInfo.nama_produk : "N/A",
+        };
+      });
+      setProducts(combinedData);
     } catch (error) {
       console.error("Gagal mengambil produk:", error);
     }
@@ -388,7 +402,7 @@ export default function TabelBrgMasuk() {
           dataKey="id"
           paginator
           rows={10}
-          rowsPerPageOptions={[10, 15]}
+          rowsPerPageOptions={[5, 10, 25]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           pt={{
             paginator: {
@@ -410,8 +424,8 @@ export default function TabelBrgMasuk() {
             field="kode_produk"
             header="Kode Produk"
             style={{ minWidth: "12rem" }}
-            className="border border-slate-300"
-            headerClassName="border border-slate-300"
+            className="border border-slate-300 text-black"
+            headerClassName="border border-slate-300 text-black"
           ></Column>
           <Column
             field="nama_produk"
@@ -431,7 +445,7 @@ export default function TabelBrgMasuk() {
             headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field="tanggal_masuk"
+            field="tanggal"
             header="Tanggal Masuk"
             sortable
             style={{ minWidth: "10rem" }}

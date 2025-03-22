@@ -15,10 +15,10 @@ const InProdService = {
   // Fungsi untuk mengambil daftar produk
   getProducts: async () => {
     try {
-      const response = await axiosInstance.get("/produk"); // Sesuaikan endpoint jika perlu
-      return response.data; // Pastikan ini sesuai dengan format respons API
+      const response = await axiosInstance.get("/produk/log");
+      return response.data;
     } catch (error) {
-      console.error("Gagal mengambil produk:", error);
+      console.error("Gagal mengambil log produk:", error);
       return [];
     }
   },
