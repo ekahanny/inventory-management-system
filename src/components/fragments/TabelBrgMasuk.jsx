@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import ProductService from "../../services/ProductService";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
@@ -40,7 +39,6 @@ export default function TabelBrgMasuk() {
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [date, setDate] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -121,7 +119,7 @@ export default function TabelBrgMasuk() {
       !product.harga ||
       !product.stok
     ) {
-      setSubmitted(true); // Hanya jalankan jika ada error
+      setSubmitted(true); // Dijalankan jika ada error
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -134,7 +132,7 @@ export default function TabelBrgMasuk() {
     let newProduct = {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
-      tanggal: new Date(product.tanggal),
+      tanggal: new Date(product.tanggal).toISOString(),
       kategori: selectedCategory.id,
       harga: product.harga,
       stok: product.stok || 0,
@@ -235,6 +233,14 @@ export default function TabelBrgMasuk() {
       ...prevProduct,
       [name]: val,
     }));
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
   };
 
   const leftToolbarTemplate = () => {
@@ -432,19 +438,20 @@ export default function TabelBrgMasuk() {
             headerClassName="border border-slate-300"
           ></Column>
           <Column
+            field="tanggal"
+            header="Tanggal Masuk"
+            body={(rowData) => formatDate(rowData.tanggal)}
+            sortable
+            style={{ minWidth: "10rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
             field="harga"
             header="Harga"
             // body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
-            className="border border-slate-300"
-            headerClassName="border border-slate-300"
-          ></Column>
-          <Column
-            field="tanggal"
-            header="Tanggal Masuk"
-            sortable
-            style={{ minWidth: "10rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
