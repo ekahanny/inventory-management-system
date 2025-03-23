@@ -22,7 +22,7 @@ export default function TabelBrgMasuk() {
   let emptyProduct = {
     kode_produk: "",
     nama_produk: "",
-    tanggal_masuk: "",
+    tanggal: "",
     kategori: "",
     harga: 0,
     stok: 0,
@@ -46,22 +46,18 @@ export default function TabelBrgMasuk() {
 
   const fetchProducts = async () => {
     try {
-      const logResponse = await InProdService.getProducts();
-      const logData = logResponse.LogProduk || [];
-
-      const productResponse = await ProductService.getProducts();
-      const productData = productResponse.Produk || [];
-
-      // Mengambil data dari produk dan log produk
-      const combinedData = logData.map((log) => {
-        const productInfo = productData.find((prod) => prod._id === log.Produk);
-        return {
-          ...log,
-          kode_produk: productInfo ? productInfo.kode_produk : "N/A",
-          nama_produk: productInfo ? productInfo.nama_produk : "N/A",
-        };
-      });
-      setProducts(combinedData);
+      const response = await InProdService.getProducts();
+      const productList = response.LogProduk || [];
+      const products = productList.map((item) => ({
+        kode_produk: item.produk ? item.produk.kode_produk : "N/A",
+        nama_produk: item.produk ? item.produk.nama_produk : "N/A",
+        tanggal: item.tanggal,
+        kategori: item.kategori,
+        harga: item.harga,
+        stok: item.stok,
+      }));
+      console.log(response.LogProduk);
+      setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil produk:", error);
     }
@@ -86,12 +82,12 @@ export default function TabelBrgMasuk() {
     fetchCategories();
   }, []);
 
-  const formatCurrency = (value) => {
-    return value.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-  };
+  // const formatCurrency = (value) => {
+  //   return value.toLocaleString("en-US", {
+  //     style: "currency",
+  //     currency: "USD",
+  //   });
+  // };
 
   const openNew = () => {
     setProduct(emptyProduct);
@@ -121,7 +117,7 @@ export default function TabelBrgMasuk() {
       !product.kode_produk ||
       !product.nama_produk.trim() ||
       !selectedCategory ||
-      !product.tanggal_masuk ||
+      !product.tanggal ||
       !product.harga ||
       !product.stok
     ) {
@@ -137,7 +133,7 @@ export default function TabelBrgMasuk() {
     let newProduct = {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
-      tanggal_masuk: new Date(product.tanggal_masuk),
+      tanggal: new Date(product.tanggal),
       kategori: selectedCategory.id,
       harga: product.harga,
       stok: product.stok || 0,
@@ -154,7 +150,6 @@ export default function TabelBrgMasuk() {
         detail: "Produk berhasil ditambahkan",
         life: 3000,
       });
-
       setProductDialog(false);
       setProduct(emptyProduct);
       fetchProducts();
@@ -265,9 +260,9 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  const priceBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.harga);
-  };
+  // const priceBodyTemplate = (rowData) => {
+  //   return formatCurrency(rowData.harga);
+  // };
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -438,7 +433,7 @@ export default function TabelBrgMasuk() {
           <Column
             field="harga"
             header="Harga"
-            body={priceBodyTemplate}
+            // body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
@@ -526,21 +521,21 @@ export default function TabelBrgMasuk() {
             Tanggal Masuk
           </label>
           <Calendar
-            id="tanggal_masuk"
+            id="tanggal"
             inputClassName={classNames(
               "border border-slate-400 rounded-md p-2",
               {
-                "p-invalid border-red-500": submitted && !product.tanggal_masuk,
+                "p-invalid border-red-500": submitted && !product.tanggal,
               }
             )}
             className="bg-sky-300 rounded-md"
-            value={product.tanggal_masuk}
-            onChange={(e) => setProduct({ ...product, tanggal_masuk: e.value })}
+            value={product.tanggal}
+            onChange={(e) => setProduct({ ...product, tanggal: e.value })}
             showIcon
             dateFormat="yy-mm-dd"
             required
           />
-          {submitted && !product.tanggal_masuk && (
+          {submitted && !product.tanggal && (
             <small className="p-error">Tanggal masuk harus diisi</small>
           )}
         </div>
