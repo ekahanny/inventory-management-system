@@ -7,7 +7,7 @@ export function BarangMasuk() {
     <div className="flex bg-slate-200">
       <SidebarComponent />
       <div className="flex-1">
-        <div className="ml-[210px] mt-[60px] p-4">
+        <div className="ml-[210px] mt-[60px] p-4 min-h-screen">
           <NavBar />
           <TabelBrgMasuk />
         </div>

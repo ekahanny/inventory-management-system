@@ -121,6 +121,7 @@ export default function TabelBrgMasuk() {
       !product.harga ||
       !product.stok
     ) {
+      setSubmitted(true); // Hanya jalankan jika ada error
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -129,7 +130,7 @@ export default function TabelBrgMasuk() {
       });
       return;
     }
-
+    setSubmitted(false); // Reset state submitted sebelum menyimpan data
     let newProduct = {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
