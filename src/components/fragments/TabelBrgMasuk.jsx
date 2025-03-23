@@ -80,12 +80,14 @@ export default function TabelBrgMasuk() {
     fetchCategories();
   }, []);
 
-  // const formatCurrency = (value) => {
-  //   return value.toLocaleString("en-US", {
-  //     style: "currency",
-  //     currency: "USD",
-  //   });
-  // };
+  const formatCurrency = (value) => {
+    return value.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0, 
+    });
+  };
 
   const openNew = () => {
     setProduct(emptyProduct);
@@ -267,9 +269,9 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  // const priceBodyTemplate = (rowData) => {
-  //   return formatCurrency(rowData.harga);
-  // };
+  const priceBodyTemplate = (rowData) => {
+    return formatCurrency(rowData.harga);
+  };
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -449,7 +451,7 @@ export default function TabelBrgMasuk() {
           <Column
             field="harga"
             header="Harga"
-            // body={priceBodyTemplate}
+            body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
