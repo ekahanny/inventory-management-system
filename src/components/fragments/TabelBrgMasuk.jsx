@@ -47,6 +47,7 @@ export default function TabelBrgMasuk() {
       const response = await InProdService.getProducts();
       const productList = response.LogProduk || [];
       const products = productList.map((item) => ({
+        _id: item._id,
         kode_produk: item.produk ? item.produk.kode_produk : "N/A",
         nama_produk: item.produk ? item.produk.nama_produk : "N/A",
         tanggal: item.tanggal,
@@ -85,7 +86,7 @@ export default function TabelBrgMasuk() {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0, 
+      maximumFractionDigits: 0,
     });
   };
 
@@ -180,18 +181,38 @@ export default function TabelBrgMasuk() {
     setDeleteProductDialog(true);
   };
 
-  const deleteProduct = () => {
-    let _products = products.filter((val) => val.id !== product.id);
+  // const deleteProduct = () => {
+  //   let _products = products.filter((val) => val.id !== product.id);
 
-    setProducts(_products);
-    setDeleteProductDialog(false);
-    setProduct(emptyProduct);
-    toast.current.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Product Deleted",
-      life: 3000,
-    });
+  //   setProducts(_products);
+  //   setDeleteProductDialog(false);
+  //   setProduct(emptyProduct);
+  //   toast.current.show({
+  //     severity: "success",
+  //     summary: "Successful",
+  //     detail: "Product Deleted",
+  //     life: 3000,
+  //   });
+  // };
+
+  const deleteProduct = async () => {
+    try {
+      await InProdService.deleteProduct(product._id); // Pastikan ini sesuai dengan API
+      setProducts((prevProducts) =>
+        prevProducts.filter((val) => val._id !== product._id)
+      );
+
+      setDeleteProductDialog(false);
+      setProduct(products);
+      toast.current.show({
+        severity: "success",
+        summary: "Berhasil",
+        detail: "Produk berhasil dihapus",
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("Gagal menghapus produk:", error);
+    }
   };
 
   const exportCSV = () => {
@@ -624,7 +645,7 @@ export default function TabelBrgMasuk() {
           />
           {product && (
             <span>
-              Apakah anda yakin ingin menghapus <b>{product.name}</b>?
+              Apakah anda yakin ingin menghapus <b>{product.nama_produk}</b>?
             </span>
           )}
         </div>
