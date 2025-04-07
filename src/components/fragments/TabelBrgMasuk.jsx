@@ -38,7 +38,7 @@ export default function TabelBrgMasuk() {
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  // const [selectedCategory, setSelectedCategory] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -55,7 +55,7 @@ export default function TabelBrgMasuk() {
         harga: item.harga,
         stok: item.stok,
       }));
-      console.log(response.LogProduk);
+      // console.log(response.LogProduk);
       setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil produk:", error);
@@ -81,18 +81,18 @@ export default function TabelBrgMasuk() {
     fetchCategories();
   }, []);
 
-  const formatCurrency = (value) => {
-    return value.toLocaleString("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  };
+  // const formatCurrency = (value) => {
+  //   return value.toLocaleString("id-ID", {
+  //     style: "currency",
+  //     currency: "IDR",
+  //     minimumFractionDigits: 0,
+  //     maximumFractionDigits: 0,
+  //   });
+  // };
 
   const openNew = () => {
-    setProduct(emptyProduct);
-    setSelectedCategory(null);
+    setProduct({ ...emptyProduct });
+    // setSelectedCategory(null);
     setSubmitted(false);
     setIsEditMode(false);
     setProductDialog(true);
@@ -117,7 +117,7 @@ export default function TabelBrgMasuk() {
     if (
       !product.kode_produk ||
       !product.nama_produk.trim() ||
-      !selectedCategory ||
+      !product.kategori ||
       !product.tanggal ||
       !product.harga ||
       !product.stok
@@ -136,7 +136,7 @@ export default function TabelBrgMasuk() {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
       tanggal: new Date(product.tanggal).toISOString(),
-      kategori: selectedCategory.id,
+      kategori: product.kategori,
       harga: product.harga,
       stok: product.stok || 0,
       isProdukMasuk: true,
@@ -145,6 +145,7 @@ export default function TabelBrgMasuk() {
     try {
       const addedProduct = await InProdService.addProduct(newProduct);
       setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      console.log("product ditambahkan: ", product);
 
       toast.current.show({
         severity: "success",
@@ -234,12 +235,10 @@ export default function TabelBrgMasuk() {
   };
 
   const onCategoryChange = (e) => {
-    setSelectedCategory(e.value);
     setProduct((prev) => ({
       ...prev,
-      kategori: e.value.nama_kategori,
+      kategori: e.value,
     }));
-    console.log(selectedCategory);
   };
 
   const onInputChange = (e, name) => {
@@ -290,9 +289,9 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  const priceBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.harga);
-  };
+  // const priceBodyTemplate = (rowData) => {
+  //   return formatCurrency(rowData.harga);
+  // };
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -472,7 +471,7 @@ export default function TabelBrgMasuk() {
           <Column
             field="harga"
             header="Harga"
-            body={priceBodyTemplate}
+            // body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
@@ -573,17 +572,18 @@ export default function TabelBrgMasuk() {
         <div className="field">
           <label className=" font-bold">Kategori</label>
           <Dropdown
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.value)}
+            value={product.kategori}
+            onChange={onCategoryChange}
             options={categories}
             optionLabel="name"
+            optionValue="id"
             placeholder="Pilih Kategori"
             className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !selectedCategory,
+              "p-invalid border-red-500": submitted && !product.kategori,
             })}
             required
           />
-          {submitted && !selectedCategory && (
+          {submitted && !product.kategori && (
             <small className="p-error">Pilih kategori terlebih dahulu</small>
           )}
         </div>
