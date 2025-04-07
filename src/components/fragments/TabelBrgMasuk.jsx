@@ -50,10 +50,11 @@ export default function TabelBrgMasuk() {
         kode_produk: item.produk ? item.produk.kode_produk : "N/A",
         nama_produk: item.produk ? item.produk.nama_produk : "N/A",
         tanggal: item.tanggal,
-        kategori: item.kategori,
+        kategori: item.produk.kategori,
         harga: item.harga,
         stok: item.stok,
       }));
+      console.log("products: ", products);
       // console.log(response.LogProduk);
       setProducts(products);
     } catch (error) {
@@ -171,7 +172,8 @@ export default function TabelBrgMasuk() {
   const editProduct = (product) => {
     setProduct({
       ...product,
-      tanggal: new Date(product.tanggal), // Tambahkan ini untuk tampilkan tanggal di field edit
+      tanggal: new Date(product.tanggal),
+      kategori: product.kategori?.id || product.kategori,
     });
     console.log("product diedit: ", product);
 
@@ -184,20 +186,6 @@ export default function TabelBrgMasuk() {
     setProduct(product);
     setDeleteProductDialog(true);
   };
-
-  // const deleteProduct = () => {
-  //   let _products = products.filter((val) => val.id !== product.id);
-
-  //   setProducts(_products);
-  //   setDeleteProductDialog(false);
-  //   setProduct(emptyProduct);
-  //   toast.current.show({
-  //     severity: "success",
-  //     summary: "Successful",
-  //     detail: "Product Deleted",
-  //     life: 3000,
-  //   });
-  // };
 
   const deleteProduct = async () => {
     try {
