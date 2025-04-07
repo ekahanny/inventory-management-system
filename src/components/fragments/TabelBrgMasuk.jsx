@@ -38,7 +38,6 @@ export default function TabelBrgMasuk() {
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
-  // const [selectedCategory, setSelectedCategory] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -92,7 +91,6 @@ export default function TabelBrgMasuk() {
 
   const openNew = () => {
     setProduct({ ...emptyProduct });
-    // setSelectedCategory(null);
     setSubmitted(false);
     setIsEditMode(false);
     setProductDialog(true);
@@ -171,7 +169,12 @@ export default function TabelBrgMasuk() {
   };
 
   const editProduct = (product) => {
-    setProduct({ ...product });
+    setProduct({
+      ...product,
+      tanggal: new Date(product.tanggal), // Tambahkan ini untuk tampilkan tanggal di field edit
+    });
+    console.log("product diedit: ", product);
+
     setSubmitted(false);
     setIsEditMode(true);
     setProductDialog(true);
