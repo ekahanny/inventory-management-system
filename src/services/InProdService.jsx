@@ -21,9 +21,12 @@ const InProdService = {
     }
   },
 
-  updateProduct: async (id_produk) => {
+  updateProduct: async (id_produk, updatedData) => {
     try {
-      const response = await axiosInstance.put(`/produk/log/${id_produk}`);
+      const response = await axiosInstance.put(
+        `/produk/log/${id_produk}`,
+        updatedData
+      );
       return response.data;
     } catch (error) {
       console.error("Gagal menghapus log produk:", error);

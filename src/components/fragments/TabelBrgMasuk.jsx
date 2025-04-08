@@ -120,7 +120,6 @@ export default function TabelBrgMasuk() {
       !product.harga ||
       !product.stok
     ) {
-      setSubmitted(true); // Dijalankan jika ada error
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -129,8 +128,10 @@ export default function TabelBrgMasuk() {
       });
       return;
     }
-    setSubmitted(false); // Reset state submitted sebelum menyimpan data
-    let newProduct = {
+
+    setSubmitted(false);
+
+    const productData = {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
       tanggal: new Date(product.tanggal).toISOString(),
@@ -141,28 +142,54 @@ export default function TabelBrgMasuk() {
     };
 
     try {
-      const addedProduct = await InProdService.addProduct(newProduct);
-      setProducts((prevProducts) => [...prevProducts, addedProduct]);
-      console.log("Product ditambahkan: ", addedProduct);
+      if (isEditMode) {
+        // Mode edit - gunakan endpoint update
+        const updatedProduct = await InProdService.updateProduct(
+          product._id,
+          productData
+        );
 
-      toast.current.show({
-        severity: "success",
-        summary: "Berhasil",
-        detail: "Produk berhasil ditambahkan",
-        life: 3000,
-      });
+        // Update state produk
+        setProducts((prevProducts) =>
+          prevProducts.map((item) =>
+            item._id === product._id ? updatedProduct : item
+          )
+        );
+
+        toast.current.show({
+          severity: "success",
+          summary: "Berhasil",
+          detail: "Produk berhasil diperbarui",
+          life: 3000,
+        });
+      } else {
+        // Mode tambah baru - gunakan endpoint create
+        const addedProduct = await InProdService.addProduct(productData);
+        setProducts((prevProducts) => [...prevProducts, addedProduct]);
+
+        toast.current.show({
+          severity: "success",
+          summary: "Berhasil",
+          detail: "Produk berhasil ditambahkan",
+          life: 3000,
+        });
+      }
+
       setProductDialog(false);
       setProduct(emptyProduct);
-      fetchProducts();
+      fetchProducts(); // Refresh data dari server
     } catch (error) {
       console.error(
-        "Gagal menambahkan produk:",
+        isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
         error.response?.data || error.message
       );
+
       toast.current.show({
         severity: "error",
         summary: "Gagal",
-        detail: error.response?.data?.message || "Gagal menambahkan produk",
+        detail:
+          error.response?.data?.message ||
+          (isEditMode ? "Gagal mengupdate produk" : "Gagal menambahkan produk"),
         life: 3000,
       });
     }
