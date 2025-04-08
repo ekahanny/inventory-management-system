@@ -54,8 +54,7 @@ export default function TabelBrgMasuk() {
         harga: item.harga,
         stok: item.stok,
       }));
-      console.log("products: ", products);
-      // console.log(response.LogProduk);
+      console.log("Response dari API : ", response.LogProduk);
       setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil produk:", error);
@@ -81,14 +80,14 @@ export default function TabelBrgMasuk() {
     fetchCategories();
   }, []);
 
-  // const formatCurrency = (value) => {
-  //   return value.toLocaleString("id-ID", {
-  //     style: "currency",
-  //     currency: "IDR",
-  //     minimumFractionDigits: 0,
-  //     maximumFractionDigits: 0,
-  //   });
-  // };
+  const formatCurrency = (value) => {
+    return (value || 0).toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  };
 
   const openNew = () => {
     setProduct({ ...emptyProduct });
@@ -144,7 +143,7 @@ export default function TabelBrgMasuk() {
     try {
       const addedProduct = await InProdService.addProduct(newProduct);
       setProducts((prevProducts) => [...prevProducts, addedProduct]);
-      console.log("product ditambahkan: ", product);
+      console.log("Product ditambahkan: ", addedProduct);
 
       toast.current.show({
         severity: "success",
@@ -189,7 +188,7 @@ export default function TabelBrgMasuk() {
 
   const deleteProduct = async () => {
     try {
-      await InProdService.deleteProduct(product._id); // Pastikan ini sesuai dengan API
+      await InProdService.deleteProduct(product._id);
       setProducts((prevProducts) =>
         prevProducts.filter((val) => val._id !== product._id)
       );
@@ -280,9 +279,9 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  // const priceBodyTemplate = (rowData) => {
-  //   return formatCurrency(rowData.harga);
-  // };
+  const priceBodyTemplate = (rowData) => {
+    return formatCurrency(rowData?.harga);
+  };
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -462,7 +461,7 @@ export default function TabelBrgMasuk() {
           <Column
             field="harga"
             header="Harga"
-            // body={priceBodyTemplate}
+            body={priceBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
@@ -553,7 +552,7 @@ export default function TabelBrgMasuk() {
             value={product.tanggal}
             onChange={(e) => setProduct({ ...product, tanggal: e.value })}
             showIcon
-            dateFormat="yy-mm-dd"
+            dateFormat="dd-mm-yy"
             required
           />
           {submitted && !product.tanggal && (
