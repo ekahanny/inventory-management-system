@@ -579,6 +579,26 @@ export default function TabelBrgMasuk() {
         </div>
 
         <div className="field">
+          <label className=" font-bold">Kategori</label>
+          <Dropdown
+            value={product.kategori}
+            onChange={onCategoryChange}
+            options={categories}
+            optionLabel="name"
+            optionValue="id"
+            showClear
+            placeholder="Pilih Kategori"
+            className={classNames("border border-slate-400 w-full", {
+              "p-invalid border-red-500": submitted && !product.kategori,
+            })}
+            required
+          />
+          {submitted && !product.kategori && (
+            <small className="p-error">Pilih kategori terlebih dahulu</small>
+          )}
+        </div>
+
+        <div className="field">
           <label htmlFor="nama_produk" className="font-bold">
             Tanggal Masuk
           </label>
@@ -601,24 +621,7 @@ export default function TabelBrgMasuk() {
             <small className="p-error">Tanggal masuk harus diisi</small>
           )}
         </div>
-        <div className="field">
-          <label className=" font-bold">Kategori</label>
-          <Dropdown
-            value={product.kategori}
-            onChange={onCategoryChange}
-            options={categories}
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Pilih Kategori"
-            className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !product.kategori,
-            })}
-            required
-          />
-          {submitted && !product.kategori && (
-            <small className="p-error">Pilih kategori terlebih dahulu</small>
-          )}
-        </div>
+
         <div className="formgrid grid">
           <div className="field col">
             <label htmlFor="harga" className="font-bold">
