@@ -28,7 +28,7 @@ export default function TabelBrgMasuk() {
     isProdukMasuk: true,
   };
 
-  const [products, setProducts] = useState(null);
+  const [products, setProducts] = useState([]);
   const [productDialog, setProductDialog] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
@@ -543,13 +543,33 @@ export default function TabelBrgMasuk() {
           <label htmlFor="kode_produk" className="font-bold">
             Kode Produk
           </label>
-          <InputText
+          {/* <InputText
             id="kode_produk"
             value={product.kode_produk}
             onChange={(e) => onInputChange(e, "kode_produk")}
             required
             autoFocus
             className={classNames("border border-slate-400 rounded-md p-2", {
+              "p-invalid border-red-500": submitted && !product.kode_produk,
+            })}
+          />
+          {submitted && !product.kode_produk && (
+            <small className="p-error">Kode produk harus diisi</small>
+          )} */}
+          <Dropdown
+            value={product.kode_produk}
+            onChange={(e) =>
+              setProduct((prev) => ({ ...prev, kode_produk: e.value }))
+            }
+            options={products?.map((p) => ({
+              label: `${p.kode_produk} - ${p.nama_produk}`,
+              value: p.kode_produk,
+            }))}
+            filter
+            showClear
+            optionLabel="label"
+            placeholder="Pilih Produk..."
+            className={classNames("border border-slate-400 w-full", {
               "p-invalid border-red-500": submitted && !product.kode_produk,
             })}
           />
