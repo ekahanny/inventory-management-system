@@ -310,6 +310,13 @@ export default function TabelBrgMasuk() {
     return formatCurrency(rowData?.harga);
   };
 
+  const categoryBodyTemplate = (rowData) => {
+    const category = categories.find((cat) => {
+      return cat.id === rowData.kategori;
+    });
+    return category ? category.name : "Unknown";
+  };
+
   const statusBodyTemplate = (rowData) => {
     return (
       <Tag
@@ -473,6 +480,14 @@ export default function TabelBrgMasuk() {
             header="Nama Produk"
             sortable
             style={{ minWidth: "16rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
+            field="kategori"
+            header="Kategori"
+            body={categoryBodyTemplate}
+            style={{ minWidth: "8rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
