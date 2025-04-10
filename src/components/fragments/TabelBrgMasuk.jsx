@@ -38,6 +38,7 @@ export default function TabelBrgMasuk() {
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [showNewProductFields, setShowNewProductFields] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -93,12 +94,14 @@ export default function TabelBrgMasuk() {
     setProduct({ ...emptyProduct });
     setSubmitted(false);
     setIsEditMode(false);
+    setShowNewProductFields(false);
     setProductDialog(true);
   };
 
   const hideDialog = () => {
     setSubmitted(false);
     setProductDialog(false);
+    setShowNewProductFields(false);
   };
 
   const hideDeleteProductDialog = () => {
@@ -114,8 +117,6 @@ export default function TabelBrgMasuk() {
 
     if (
       !product.kode_produk ||
-      !product.nama_produk.trim() ||
-      !product.kategori ||
       !product.tanggal ||
       !product.harga ||
       !product.stok
@@ -123,7 +124,17 @@ export default function TabelBrgMasuk() {
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
-        detail: "Isi seluruh data terlebih dahulu!",
+        detail: "Lengkapi data terlebih dahulu!",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!product.nama_produk || !product.kategori) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Lengkapi data terlebih dahulu!",
         life: 3000,
       });
       return;
@@ -143,7 +154,6 @@ export default function TabelBrgMasuk() {
 
     try {
       if (isEditMode) {
-        // Mode edit - gunakan endpoint update
         const updatedProduct = await InProdService.updateProduct(
           product._id,
           productData
@@ -177,7 +187,8 @@ export default function TabelBrgMasuk() {
 
       setProductDialog(false);
       setProduct(emptyProduct);
-      fetchProducts(); // Refresh data dari server
+      setShowNewProductFields(false);
+      fetchProducts();
     } catch (error) {
       console.error(
         isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
@@ -206,6 +217,7 @@ export default function TabelBrgMasuk() {
     setSubmitted(false);
     setIsEditMode(true);
     setProductDialog(true);
+    setShowNewProductFields(true);
   };
 
   const confirmDeleteProduct = (product) => {
@@ -237,18 +249,32 @@ export default function TabelBrgMasuk() {
     dt.current.exportCSV();
   };
 
-  const deleteSelectedProducts = () => {
-    let _products = products.filter((val) => !selectedProducts.includes(val));
+  // const deleteSelectedProducts = () => {
+  //   let _products = products.filter((val) => !selectedProducts.includes(val));
 
-    setProducts(_products);
-    setDeleteProductsDialog(false);
-    setSelectedProducts(null);
-    toast.current.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Products Deleted",
-      life: 3000,
-    });
+  //   setProducts(_products);
+  //   setDeleteProductsDialog(false);
+  //   setSelectedProducts(null);
+  //   toast.current.show({
+  //     severity: "success",
+  //     summary: "Successful",
+  //     detail: "Products Deleted",
+  //     life: 3000,
+  //   });
+  // };
+
+  const onProductCodeChange = (e) => {
+    const selectedCode = e.value;
+    const selectedProduct = products.find(
+      (p) => p.kode_produk === selectedCode
+    );
+
+    setProduct((prev) => ({
+      ...prev,
+      kode_produk: selectedCode,
+      nama_produk: selectedProduct?.nama_produk || "",
+      kategori: selectedProduct?.kategori || "",
+    }));
   };
 
   const onCategoryChange = (e) => {
@@ -280,6 +306,18 @@ export default function TabelBrgMasuk() {
       month: "2-digit",
       day: "2-digit",
     });
+  };
+
+  const toggleNewProductFields = () => {
+    setShowNewProductFields(!showNewProductFields);
+    // Reset nama_produk & kategori ketika field tdk ditampilkan
+    if (showNewProductFields) {
+      setProduct((prev) => ({
+        ...prev,
+        nama_produk: "",
+        kategori: "",
+      }));
+    }
   };
 
   const leftToolbarTemplate = () => {
@@ -317,14 +355,14 @@ export default function TabelBrgMasuk() {
     return category ? category.name : "Unknown";
   };
 
-  const statusBodyTemplate = (rowData) => {
-    return (
-      <Tag
-        value={rowData.inventoryStatus}
-        severity={getSeverity(rowData)}
-      ></Tag>
-    );
-  };
+  // const statusBodyTemplate = (rowData) => {
+  //   return (
+  //     <Tag
+  //       value={rowData.inventoryStatus}
+  //       severity={getSeverity(rowData)}
+  //     ></Tag>
+  //   );
+  // };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -341,7 +379,6 @@ export default function TabelBrgMasuk() {
           icon="pi pi-trash"
           rounded
           outlined
-          // severity="danger"
           className="bg-red-300"
           onClick={() => confirmDeleteProduct(rowData)}
           size="small"
@@ -350,21 +387,21 @@ export default function TabelBrgMasuk() {
     );
   };
 
-  const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
-      case "INSTOCK":
-        return "success";
+  // const getSeverity = (product) => {
+  //   switch (product.inventoryStatus) {
+  //     case "INSTOCK":
+  //       return "success";
 
-      case "LOWSTOCK":
-        return "warning";
+  //     case "LOWSTOCK":
+  //       return "warning";
 
-      case "OUTOFSTOCK":
-        return "danger";
+  //     case "OUTOFSTOCK":
+  //       return "danger";
 
-      default:
-        return null;
-    }
-  };
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
@@ -417,22 +454,22 @@ export default function TabelBrgMasuk() {
       />
     </React.Fragment>
   );
-  const deleteProductsDialogFooter = (
-    <React.Fragment>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        outlined
-        onClick={hideDeleteProductsDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        severity="danger"
-        onClick={deleteSelectedProducts}
-      />
-    </React.Fragment>
-  );
+  // const deleteProductsDialogFooter = (
+  //   <React.Fragment>
+  //     <Button
+  //       label="No"
+  //       icon="pi pi-times"
+  //       outlined
+  //       onClick={hideDeleteProductsDialog}
+  //     />
+  //     <Button
+  //       label="Yes"
+  //       icon="pi pi-check"
+  //       severity="danger"
+  //       onClick={deleteSelectedProducts}
+  //     />
+  //   </React.Fragment>
+  // );
 
   return (
     <div>
@@ -512,7 +549,6 @@ export default function TabelBrgMasuk() {
           <Column
             field="stok"
             header="Stok (pcs)"
-            // body={statusBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
@@ -543,83 +579,100 @@ export default function TabelBrgMasuk() {
           <label htmlFor="kode_produk" className="font-bold">
             Kode Produk
           </label>
-          {/* <InputText
-            id="kode_produk"
-            value={product.kode_produk}
-            onChange={(e) => onInputChange(e, "kode_produk")}
-            required
-            autoFocus
-            className={classNames("border border-slate-400 rounded-md p-2", {
-              "p-invalid border-red-500": submitted && !product.kode_produk,
-            })}
-          />
+          {showNewProductFields ? (
+            <InputText
+              id="kode_produk"
+              value={product.kode_produk}
+              onChange={(e) => onInputChange(e, "kode_produk")}
+              required
+              autoFocus
+              className={classNames("border border-slate-400 rounded-md p-2", {
+                "p-invalid border-red-500": submitted && !product.kode_produk,
+              })}
+            />
+          ) : (
+            <Dropdown
+              value={product.kode_produk}
+              onChange={onProductCodeChange}
+              options={products?.map((p) => ({
+                label: `${p.kode_produk} - ${p.nama_produk}`,
+                value: p.kode_produk,
+              }))}
+              filter
+              showClear
+              optionLabel="label"
+              placeholder="Pilih Produk..."
+              className={classNames("border border-slate-400 w-full", {
+                "p-invalid border-red-500": submitted && !product.kode_produk,
+              })}
+            />
+          )}
           {submitted && !product.kode_produk && (
             <small className="p-error">Kode produk harus diisi</small>
-          )} */}
-          <Dropdown
-            value={product.kode_produk}
-            onChange={(e) =>
-              setProduct((prev) => ({ ...prev, kode_produk: e.value }))
-            }
-            options={products?.map((p) => ({
-              label: `${p.kode_produk} - ${p.nama_produk}`,
-              value: p.kode_produk,
-            }))}
-            filter
-            showClear
-            optionLabel="label"
-            placeholder="Pilih Produk..."
-            className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !product.kode_produk,
-            })}
-          />
-          {submitted && !product.kode_produk && (
-            <small className="p-error">Kode produk harus diisi</small>
           )}
         </div>
 
-        <div className="field">
-          <label htmlFor="nama_produk" className="font-bold">
-            Nama Produk
-          </label>
-          <InputTextarea
-            id="nama_produk"
-            value={product.nama_produk}
-            onChange={(e) => onInputChange(e, "nama_produk")}
-            required
-            rows={3}
-            cols={15}
-            className={classNames("border border-slate-400 rounded-md p-2", {
-              "p-invalid border-red-500": submitted && !product.nama_produk,
-            })}
-          />
-          {submitted && !product.nama_produk && (
-            <small className="p-error">Nama produk harus diisi</small>
-          )}
-        </div>
+        {!showNewProductFields && !isEditMode && (
+          <div className="field mb-4">
+            <Button
+              label="Tambah Produk Baru"
+              icon="pi pi-plus"
+              className="p-button-text p-button-sm px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
+              onClick={toggleNewProductFields}
+            />
+          </div>
+        )}
+
+        {showNewProductFields && (
+          <>
+            <div className="field">
+              <label htmlFor="nama_produk" className="font-bold">
+                Nama Produk
+              </label>
+              <InputText
+                id="nama_produk"
+                value={product.nama_produk}
+                onChange={(e) => onInputChange(e, "nama_produk")}
+                required
+                className={classNames(
+                  "border border-slate-400 rounded-md p-2",
+                  {
+                    "p-invalid border-red-500":
+                      submitted && !product.nama_produk,
+                  }
+                )}
+              />
+              {submitted && !product.nama_produk && (
+                <small className="p-error">Nama produk harus diisi</small>
+              )}
+            </div>
+
+            <div className="field">
+              <label className="font-bold">Kategori</label>
+              <Dropdown
+                value={product.kategori}
+                onChange={onCategoryChange}
+                options={categories}
+                optionLabel="name"
+                optionValue="id"
+                showClear
+                placeholder="Pilih Kategori"
+                className={classNames("border border-slate-400 w-full", {
+                  "p-invalid border-red-500": submitted && !product.kategori,
+                })}
+                required
+              />
+              {submitted && !product.kategori && (
+                <small className="p-error">
+                  Pilih kategori terlebih dahulu
+                </small>
+              )}
+            </div>
+          </>
+        )}
 
         <div className="field">
-          <label className=" font-bold">Kategori</label>
-          <Dropdown
-            value={product.kategori}
-            onChange={onCategoryChange}
-            options={categories}
-            optionLabel="name"
-            optionValue="id"
-            showClear
-            placeholder="Pilih Kategori"
-            className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !product.kategori,
-            })}
-            required
-          />
-          {submitted && !product.kategori && (
-            <small className="p-error">Pilih kategori terlebih dahulu</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="nama_produk" className="font-bold">
+          <label htmlFor="tanggal" className="font-bold">
             Tanggal Masuk
           </label>
           <Calendar
