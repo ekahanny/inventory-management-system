@@ -29,7 +29,7 @@ const InProdService = {
       );
       return response.data;
     } catch (error) {
-      console.error("Gagal menghapus log produk:", error);
+      console.error("Gagal mengupdate log produk:", error);
       return [];
     }
   },
