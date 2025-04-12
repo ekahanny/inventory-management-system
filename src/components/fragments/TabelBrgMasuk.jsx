@@ -15,7 +15,8 @@ import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import CategoryService from "../../services/CategoryService";
-import InProdService from "../../services/InProdService";
+import InLogProdService from "../../services/InLogProdService";
+import ProductService from "../../services/ProductService";
 
 export default function TabelBrgMasuk() {
   let emptyProduct = {
@@ -28,37 +29,48 @@ export default function TabelBrgMasuk() {
     isProdukMasuk: true,
   };
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // products log
+  const [product, setProduct] = useState(emptyProduct); // product log
+  const [productList, setProductList] = useState([]); // product
   const [productDialog, setProductDialog] = useState(false);
-  const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-  const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
+  const [deleteLogProductDialog, setdeleteLogProductDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [product, setProduct] = useState(emptyProduct);
-  const [selectedProducts, setSelectedProducts] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
   const [showNewProductFields, setShowNewProductFields] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
+  // const [selectedProducts, setSelectedProducts] = useState(null);
+  // const [deleteLogProductsDialog, setdeleteLogProductsDialog] = useState(false);
 
-  const fetchProducts = async () => {
+  const fetchLogProducts = async () => {
     try {
-      const response = await InProdService.getProducts();
+      const response = await InLogProdService.getLogProducts();
       const productList = response.LogProduk || [];
       const products = productList.map((item) => ({
         _id: item._id,
         kode_produk: item.produk ? item.produk.kode_produk : "N/A",
         nama_produk: item.produk ? item.produk.nama_produk : "N/A",
+        kategori: item.produk ? item.produk.kategori : "Unknown",
         tanggal: item.tanggal,
-        kategori: item.produk.kategori,
         harga: item.harga,
         stok: item.stok,
       }));
-      console.log("Response dari API : ", response.LogProduk);
+      console.log("Response dari API Log Produk : ", response.LogProduk);
       setProducts(products);
     } catch (error) {
-      console.error("Gagal mengambil produk:", error);
+      console.error("Gagal mengambil log produk:", error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await ProductService.getProducts();
+      setProductList(response.Produk);
+      console.log("Response API Produk: ", response.Produk);
+    } catch (error) {
+      console.error("Gagal mengambil produk: ", error);
     }
   };
 
@@ -77,8 +89,9 @@ export default function TabelBrgMasuk() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchLogProducts();
     fetchCategories();
+    fetchProducts();
   }, []);
 
   const formatCurrency = (value) => {
@@ -104,13 +117,13 @@ export default function TabelBrgMasuk() {
     setShowNewProductFields(false);
   };
 
-  const hideDeleteProductDialog = () => {
-    setDeleteProductDialog(false);
+  const hidedeleteLogProductDialog = () => {
+    setdeleteLogProductDialog(false);
   };
 
-  const hideDeleteProductsDialog = () => {
-    setDeleteProductsDialog(false);
-  };
+  // const hidedeleteLogProductsDialog = () => {
+  //   setdeleteLogProductsDialog(false);
+  // };
 
   const saveProduct = async () => {
     setSubmitted(true);
@@ -154,7 +167,7 @@ export default function TabelBrgMasuk() {
 
     try {
       if (isEditMode) {
-        const updatedProduct = await InProdService.updateProduct(
+        const updatedProduct = await InLogProdService.updateLogProduct(
           product._id,
           productData
         );
@@ -173,8 +186,7 @@ export default function TabelBrgMasuk() {
           life: 3000,
         });
       } else {
-        // Mode tambah baru - gunakan endpoint create
-        const addedProduct = await InProdService.addProduct(productData);
+        const addedProduct = await InLogProdService.addLogProduct(productData);
         setProducts((prevProducts) => [...prevProducts, addedProduct]);
 
         toast.current.show({
@@ -188,7 +200,7 @@ export default function TabelBrgMasuk() {
       setProductDialog(false);
       setProduct(emptyProduct);
       setShowNewProductFields(false);
-      fetchProducts();
+      fetchLogProducts();
     } catch (error) {
       console.error(
         isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
@@ -217,22 +229,21 @@ export default function TabelBrgMasuk() {
     setSubmitted(false);
     setIsEditMode(true);
     setProductDialog(true);
-    setShowNewProductFields(true);
   };
 
-  const confirmDeleteProduct = (product) => {
+  const confirmdeleteLogProduct = (product) => {
     setProduct(product);
-    setDeleteProductDialog(true);
+    setdeleteLogProductDialog(true);
   };
 
-  const deleteProduct = async () => {
+  const deleteLogProduct = async () => {
     try {
-      await InProdService.deleteProduct(product._id);
+      await InLogProdService.deleteLogProduct(product._id);
       setProducts((prevProducts) =>
         prevProducts.filter((val) => val._id !== product._id)
       );
 
-      setDeleteProductDialog(false);
+      setdeleteLogProductDialog(false);
       setProduct(products);
       toast.current.show({
         severity: "success",
@@ -253,7 +264,7 @@ export default function TabelBrgMasuk() {
   //   let _products = products.filter((val) => !selectedProducts.includes(val));
 
   //   setProducts(_products);
-  //   setDeleteProductsDialog(false);
+  //   setdeleteLogProductsDialog(false);
   //   setSelectedProducts(null);
   //   toast.current.show({
   //     severity: "success",
@@ -265,7 +276,7 @@ export default function TabelBrgMasuk() {
 
   const onProductCodeChange = (e) => {
     const selectedCode = e.value;
-    const selectedProduct = products.find(
+    const selectedProduct = productList.find(
       (p) => p.kode_produk === selectedCode
     );
 
@@ -309,15 +320,15 @@ export default function TabelBrgMasuk() {
   };
 
   const toggleNewProductFields = () => {
+    // Reset semua field dari produk sebelum toggle ditampilkan
+    setProduct((prev) => ({
+      ...emptyProduct,
+      tanggal: prev.tanggal,
+      harga: prev.harga,
+      stok: prev.stok,
+    }));
+
     setShowNewProductFields(!showNewProductFields);
-    // Reset nama_produk & kategori ketika field tdk ditampilkan
-    if (showNewProductFields) {
-      setProduct((prev) => ({
-        ...prev,
-        nama_produk: "",
-        kategori: "",
-      }));
-    }
   };
 
   const leftToolbarTemplate = () => {
@@ -380,7 +391,7 @@ export default function TabelBrgMasuk() {
           rounded
           outlined
           className="bg-red-300"
-          onClick={() => confirmDeleteProduct(rowData)}
+          onClick={() => confirmdeleteLogProduct(rowData)}
           size="small"
         />
       </div>
@@ -436,31 +447,31 @@ export default function TabelBrgMasuk() {
       />
     </React.Fragment>
   );
-  const deleteProductDialogFooter = (
+  const deleteLogProductDialogFooter = (
     <React.Fragment>
       <Button
         label="No"
         icon="pi pi-times"
         outlined
-        onClick={hideDeleteProductDialog}
+        onClick={hidedeleteLogProductDialog}
         className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
       />
       <Button
         label="Yes"
         icon="pi pi-check"
         severity="danger"
-        onClick={deleteProduct}
+        onClick={deleteLogProduct}
         className="px-2.5 py-1.5 text-sm border-1 border-red-400 text-white bg-red-400"
       />
     </React.Fragment>
   );
-  // const deleteProductsDialogFooter = (
+  // const deleteLogProductsDialogFooter = (
   //   <React.Fragment>
   //     <Button
   //       label="No"
   //       icon="pi pi-times"
   //       outlined
-  //       onClick={hideDeleteProductsDialog}
+  //       onClick={hidedeleteLogProductsDialog}
   //     />
   //     <Button
   //       label="Yes"
@@ -594,7 +605,7 @@ export default function TabelBrgMasuk() {
             <Dropdown
               value={product.kode_produk}
               onChange={onProductCodeChange}
-              options={products?.map((p) => ({
+              options={productList?.map((p) => ({
                 label: `${p.kode_produk} - ${p.nama_produk}`,
                 value: p.kode_produk,
               }))}
@@ -738,13 +749,13 @@ export default function TabelBrgMasuk() {
       </Dialog>
 
       <Dialog
-        visible={deleteProductDialog}
+        visible={deleteLogProductDialog}
         style={{ width: "32rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
         header="Konfirmasi Penghapusan"
         modal
-        footer={deleteProductDialogFooter}
-        onHide={hideDeleteProductDialog}
+        footer={deleteLogProductDialogFooter}
+        onHide={hidedeleteLogProductDialog}
       >
         <div className="confirmation-content">
           <i

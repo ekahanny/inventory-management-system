@@ -1,7 +1,7 @@
 import axiosInstance from "../utils/api";
 
-const InProdService = {
-  addProduct: async (productData) => {
+const InLogProdService = {
+  addLogProduct: async (productData) => {
     try {
       const response = await axiosInstance.post("/produk/log", productData);
       return response.data;
@@ -11,7 +11,7 @@ const InProdService = {
     }
   },
 
-  getProducts: async () => {
+  getLogProducts: async () => {
     try {
       const response = await axiosInstance.get("/produk/log");
       return response.data;
@@ -21,7 +21,7 @@ const InProdService = {
     }
   },
 
-  updateProduct: async (id_produk, updatedData) => {
+  updateLogProduct: async (id_produk, updatedData) => {
     try {
       const response = await axiosInstance.put(
         `/produk/log/${id_produk}`,
@@ -34,7 +34,7 @@ const InProdService = {
     }
   },
 
-  deleteProduct: async (id_produk) => {
+  deleteLogProduct: async (id_produk) => {
     try {
       const response = await axiosInstance.delete(`/produk/log/${id_produk}`);
       return response.data;
@@ -45,4 +45,4 @@ const InProdService = {
   },
 };
 
-export default InProdService;
+export default InLogProdService;
