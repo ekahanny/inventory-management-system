@@ -5,13 +5,11 @@ import { Column } from "primereact/column";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import { InputTextarea } from "primereact/inputtextarea";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputNumber } from "primereact/inputnumber";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import CategoryService from "../../services/CategoryService";
@@ -35,6 +33,7 @@ export default function TabelBrgMasuk() {
   const [productDialog, setProductDialog] = useState(false);
   const [deleteLogProductDialog, setdeleteLogProductDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isProductExist, setIsProductExist] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -108,6 +107,7 @@ export default function TabelBrgMasuk() {
     setSubmitted(false);
     setIsEditMode(false);
     setShowNewProductFields(false);
+    setIsProductExist(false);
     setProductDialog(true);
   };
 
@@ -127,6 +127,20 @@ export default function TabelBrgMasuk() {
 
   const saveProduct = async () => {
     setSubmitted(true);
+
+    // Validasi apakah produk sudah ada
+    if (
+      showNewProductFields &&
+      validateProductExists(product.kode_produk, product.nama_produk)
+    ) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Produk dengan kode tersebut sudah tersedia!",
+        life: 3000,
+      });
+      return;
+    }
 
     if (
       !product.kode_produk ||
@@ -295,8 +309,23 @@ export default function TabelBrgMasuk() {
     }));
   };
 
+  const validateProductExists = (kode_produk, nama_produk) => {
+    const exists = productList.some(
+      (p) => p.kode_produk === kode_produk || p.nama_produk === nama_produk
+    );
+    setIsProductExist(exists);
+    return exists;
+  };
+
   const onInputChange = (e, name) => {
     const val = (e.target && e.target.value) || "";
+
+    // Jika mengubah kode_produk atau nama_produk, validasi
+    if (name === "kode_produk" || name === "nama_produk") {
+      const newProduct = { ...product, [name]: val };
+      validateProductExists(newProduct.kode_produk, newProduct.nama_produk);
+    }
+
     setProduct((prevProduct) => ({
       ...prevProduct,
       [name]: val,
@@ -591,16 +620,28 @@ export default function TabelBrgMasuk() {
             Kode Produk
           </label>
           {showNewProductFields ? (
-            <InputText
-              id="kode_produk"
-              value={product.kode_produk}
-              onChange={(e) => onInputChange(e, "kode_produk")}
-              required
-              autoFocus
-              className={classNames("border border-slate-400 rounded-md p-2", {
-                "p-invalid border-red-500": submitted && !product.kode_produk,
-              })}
-            />
+            <>
+              <InputText
+                id="kode_produk"
+                value={product.kode_produk}
+                onChange={(e) => onInputChange(e, "kode_produk")}
+                required
+                autoFocus
+                className={classNames(
+                  "border border-slate-400 rounded-md p-2",
+                  {
+                    "p-invalid border-red-500":
+                      submitted && !product.kode_produk,
+                  }
+                )}
+              />
+              {submitted && !product.kode_produk && (
+                <small className="p-error">Kode produk harus diisi</small>
+              )}
+              {isProductExist && (
+                <small className="p-error">Produk telah tersedia</small>
+              )}
+            </>
           ) : (
             <Dropdown
               value={product.kode_produk}
@@ -617,9 +658,6 @@ export default function TabelBrgMasuk() {
                 "p-invalid border-red-500": submitted && !product.kode_produk,
               })}
             />
-          )}
-          {submitted && !product.kode_produk && (
-            <small className="p-error">Kode produk harus diisi</small>
           )}
         </div>
 
