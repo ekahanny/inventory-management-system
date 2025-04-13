@@ -15,6 +15,7 @@ import { Calendar } from "primereact/calendar";
 import CategoryService from "../../services/CategoryService";
 import InLogProdService from "../../services/InLogProdService";
 import ProductService from "../../services/ProductService";
+import * as XLSX from "xlsx";
 
 export default function TabelBrgMasuk() {
   let emptyProduct = {
@@ -274,6 +275,30 @@ export default function TabelBrgMasuk() {
     dt.current.exportCSV();
   };
 
+  const exportExcel = () => {
+    // Format data untuk Excel (hanya kolom yang ditampilkan di DataTable)
+    const excelData = products.map((product) => ({
+      "Kode Produk": product.kode_produk,
+      "Nama Produk": product.nama_produk,
+      Kategori:
+        categories.find((cat) => cat.id === product.kategori)?.name ||
+        product.kategori,
+      "Tanggal Masuk": formatDate(product.tanggal),
+      Harga: formatCurrency(product.harga),
+      "Stok (pcs)": product.stok,
+    }));
+
+    // Buat worksheet dari data
+    const ws = XLSX.utils.json_to_sheet(excelData);
+
+    // Buat workbook dan tambahkan worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Barang Masuk");
+
+    // Export ke file Excel (.xlsx)
+    XLSX.writeFile(wb, "Data_Barang_Masuk.xlsx");
+  };
+
   // const deleteSelectedProducts = () => {
   //   let _products = products.filter((val) => !selectedProducts.includes(val));
 
@@ -378,7 +403,7 @@ export default function TabelBrgMasuk() {
       <Button
         label="Export"
         icon="pi pi-upload"
-        onClick={exportCSV}
+        onClick={exportExcel}
         className="bg-sky-600 text-white px-3 py-2"
       />
     );
