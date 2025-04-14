@@ -16,6 +16,7 @@ import CategoryService from "../../../../services/CategoryService";
 import InLogProdService from "../../../../services/InLogProdService";
 import ProductService from "../../../../services/ProductService";
 import * as XLSX from "xlsx";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
 
 export default function TabelLogMasuk() {
   let emptyProduct = {
@@ -271,10 +272,6 @@ export default function TabelLogMasuk() {
     }
   };
 
-  const exportCSV = () => {
-    dt.current.exportCSV();
-  };
-
   const exportExcel = () => {
     // Format data untuk Excel (hanya kolom yang ditampilkan di DataTable)
     const excelData = products.map((product) => ({
@@ -468,20 +465,50 @@ export default function TabelLogMasuk() {
   //   }
   // };
 
-  const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
-      <h4 className="ml-4 my-3 text-2xl text-sky-700">Barang Masuk</h4>
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
-        <InputText
-          type="search"
-          onInput={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search..."
-          className="mr-3 pl-5 pr-2 py-2 border border-slate-300"
-        />
-      </IconField>
-    </div>
-  );
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    "products.nama_produk": {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    representative: { value: null, matchMode: FilterMatchMode.IN },
+    status: {
+      operator: FilterOperator.OR,
+      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+    },
+  });
+
+  const onGlobalFilterChange = (event) => {
+    const value = event.target.value;
+    let _filters = { ...filters };
+    _filters["global"].value = value;
+    setFilters(_filters);
+  };
+
+  const renderHeader = () => {
+    const value = filters["global"] ? filters["global"].value : "";
+    return (
+      <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
+        <h4 className="ml-4 my-3 text-2xl text-sky-700">Barang Masuk</h4>
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search" />
+          <InputText
+            type="search"
+            value={value || ""}
+            onInput={(e) => onGlobalFilterChange(e)}
+            placeholder="Search..."
+            className="mr-3 pl-5 pr-2 py-2 border border-slate-300"
+          />
+        </IconField>
+      </div>
+    );
+  };
+
+  const header = renderHeader();
 
   const productDialogFooter = (
     <React.Fragment>
@@ -564,7 +591,9 @@ export default function TabelLogMasuk() {
             },
           }}
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-          globalFilter={globalFilter}
+          // globalFilter={globalFilter}
+          filters={filters}
+          onFilter={(e) => setFilters(e.filters)}
           header={header}
           tableClassName="border border-slate-300"
           tableStyle={{ maxWidth: "100%" }}
