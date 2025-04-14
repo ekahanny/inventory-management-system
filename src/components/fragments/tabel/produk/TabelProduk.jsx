@@ -114,7 +114,7 @@ export default function TabelProduk() {
           value={value || ""}
           onChange={(e) => onGlobalFilterChange(e)}
           placeholder="Search"
-          className="p-inputtext-sm ml-5 p-3 border-none"
+          className="p-inputtext-sm w-full mr-3 pl-6 pr-2 py-1.5 border border-slate-300"
         />
       </IconField>
     );

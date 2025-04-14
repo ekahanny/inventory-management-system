@@ -477,7 +477,7 @@ export default function TabelLogMasuk() {
           type="search"
           onInput={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search..."
-          className="mr-3 pl-5 py-2 border border-slate-300"
+          className="mr-3 pl-5 pr-2 py-2 border border-slate-300"
         />
       </IconField>
     </div>
