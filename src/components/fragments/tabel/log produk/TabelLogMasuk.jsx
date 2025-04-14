@@ -12,12 +12,12 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
-import CategoryService from "../../services/CategoryService";
-import InLogProdService from "../../services/InLogProdService";
-import ProductService from "../../services/ProductService";
+import CategoryService from "../../../../services/CategoryService";
+import InLogProdService from "../../../../services/InLogProdService";
+import ProductService from "../../../../services/ProductService";
 import * as XLSX from "xlsx";
 
-export default function TabelBrgMasuk() {
+export default function TabelLogMasuk() {
   let emptyProduct = {
     kode_produk: "",
     nama_produk: "",

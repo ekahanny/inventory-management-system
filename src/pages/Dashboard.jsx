@@ -5,8 +5,8 @@ import { VerticalTabs } from "../components/elements/VerticalTabs";
 import { DataBar } from "../utils/DataBar";
 import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";
-import RingkasanProduk from "../components/fragments/RingkasanProduk";
 import SidebarComponent from "../components/elements/Sidebar";
+import TabelProduk from "../components/fragments/tabel/produk/TabelProduk";
 
 export function Dashboard() {
   const [dataBar, setDataBar] = useState({
@@ -150,7 +150,7 @@ export function Dashboard() {
             </div>
 
             <div className="ml-2">
-              <RingkasanProduk />
+              <TabelProduk />
             </div>
           </div>
         </div>

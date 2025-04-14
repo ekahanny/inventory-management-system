@@ -8,9 +8,9 @@ import { InputIcon } from "primereact/inputicon";
 import { MultiSelect } from "primereact/multiselect";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
-import { CustomerService } from "../../services/CustomerService";
+import { CustomerService } from "../../../../services/CustomerService";
 
-export default function RingkasanProduk() {
+export default function TabelProduk() {
   const [customers, setCustomers] = useState(null);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },

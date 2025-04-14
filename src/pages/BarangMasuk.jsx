@@ -1,6 +1,6 @@
 import { NavBar } from "../components/elements/NavBar";
 import SidebarComponent from "../components/elements/Sidebar";
-import TabelBrgMasuk from "../components/fragments/TabelBrgMasuk";
+import TabelLogMasuk from "../components/fragments/tabel/log produk/TabelLogMasuk";
 
 export function BarangMasuk() {
   return (
@@ -9,7 +9,7 @@ export function BarangMasuk() {
       <div className="flex-1">
         <div className="ml-[210px] mt-[60px] p-4 min-h-screen">
           <NavBar />
-          <TabelBrgMasuk />
+          <TabelLogMasuk />
         </div>
       </div>
     </div>
