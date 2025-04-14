@@ -5,13 +5,13 @@ import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
-import { MultiSelect } from "primereact/multiselect";
-import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
-import { CustomerService } from "../../../../services/CustomerService";
+import ProductService from "../../../../services/ProductService";
+import { Button } from "primereact/button";
 
 export default function TabelProduk() {
-  const [customers, setCustomers] = useState(null);
+  const [products, setProducts] = useState([]);
+
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: {
@@ -29,136 +29,77 @@ export default function TabelProduk() {
     },
   });
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const representatives = [
-    { name: "Amy Elsner", image: "amyelsner.png" },
-    { name: "Anna Fali", image: "annafali.png" },
-    { name: "Asiya Javayant", image: "asiyajavayant.png" },
-    { name: "Bernardo Dominic", image: "bernardodominic.png" },
-    { name: "Elwin Sharvill", image: "elwinsharvill.png" },
-    { name: "Ioni Bowcher", image: "ionibowcher.png" },
-    { name: "Ivan Magalhaes", image: "ivanmagalhaes.png" },
-    { name: "Onyama Limba", image: "onyamalimba.png" },
-    { name: "Stephen Shaw", image: "stephenshaw.png" },
-    { name: "XuXue Feng", image: "xuxuefeng.png" },
-  ];
-  const statuses = [
-    "unqualified",
-    "qualified",
-    "new",
-    "negotiation",
-    "renewal",
-  ];
-
-  const getSeverity = (status) => {
-    switch (status) {
-      case "unqualified":
-        return "danger";
-
-      case "qualified":
-        return "success";
-
-      case "new":
-        return "info";
-
-      case "negotiation":
-        return "warning";
-
-      case "renewal":
-        return null;
+  const fetchProducts = async () => {
+    try {
+      const response = await ProductService.getProducts();
+      const productList = response.Produk || [];
+      const products = productList.map((item) => ({
+        _id: item._id,
+        kode_produk: item ? item.kode_produk : "N/A",
+        nama_produk: item ? item.nama_produk : "N/A",
+        stok: item.stok,
+      }));
+      console.log("Response API Produk: ", productList);
+      setProducts(products);
+    } catch (error) {
+      console.error("Gagal mengambil produk: ", error);
     }
   };
 
   useEffect(() => {
-    CustomerService.getCustomersSmall().then((data) => setCustomers(data));
+    fetchProducts();
   }, []);
 
-  const countryBodyTemplate = (rowData) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={rowData.country.code}
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`flag flag-${rowData.country.code}`}
-          style={{ width: "24px" }}
-        />
-        <span>{rowData.country.name}</span>
-      </div>
-    );
+  const getSeverity = (stok) => {
+    switch (true) {
+      case stok <= 10:
+        return "danger";
+      case stok <= 50:
+        return "warning";
+      default:
+        return "success";
+    }
   };
 
-  const representativeBodyTemplate = (rowData) => {
-    const representative = rowData.representative;
-
+  const actionBodyTemplate = (rowData) => {
     return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={representative.name}
-          src={`https://primefaces.org/cdn/primereact/images/avatar/${representative.image}`}
-          width="32"
+      <div className="flex justify-center">
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          outlined
+          size="small"
+          className="mr-2 bg-green-300"
+          // onClick={() => editProduct(rowData)}
         />
-        <span>{representative.name}</span>
-      </div>
-    );
-  };
-
-  const representativeFilterTemplate = (options) => {
-    return (
-      <MultiSelect
-        value={options.value}
-        options={representatives}
-        itemTemplate={representativesItemTemplate}
-        onChange={(e) => options.filterCallback(e.value)}
-        optionLabel="name"
-        placeholder="Any"
-        className="p-column-filter"
-      />
-    );
-  };
-
-  const representativesItemTemplate = (option) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt={option.name}
-          src={`https://primefaces.org/cdn/primereact/images/avatar/${option.image}`}
-          width="32"
+        <Button
+          icon="pi pi-trash"
+          rounded
+          outlined
+          className="bg-red-300"
+          // onClick={() => confirmdeleteLogProduct(rowData)}
+          size="small"
         />
-        <span>{option.name}</span>
       </div>
     );
   };
 
   const statusBodyTemplate = (rowData) => {
     return (
-      <Tag value={rowData.status} severity={getSeverity(rowData.status)} />
+      <div className="flex justify-center">
+        <Tag
+          value={rowData.stok}
+          severity={getSeverity(rowData.stok)}
+          style={{ fontSize: "1rem" }}
+        />
+      </div>
     );
-  };
-
-  const statusFilterTemplate = (options) => {
-    return (
-      <Dropdown
-        value={options.value}
-        options={statuses}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        itemTemplate={statusItemTemplate}
-        placeholder="Select One"
-        className="p-column-filter"
-        showClear
-      />
-    );
-  };
-
-  const statusItemTemplate = (option) => {
-    return <Tag value={option} severity={getSeverity(option)} />;
   };
 
   const onGlobalFilterChange = (event) => {
     const value = event.target.value;
     let _filters = { ...filters };
-
     _filters["global"].value = value;
-
     setFilters(_filters);
   };
 
@@ -184,59 +125,63 @@ export default function TabelProduk() {
   return (
     <div className="card ml-1 mt-5 rounded-lg shadow-lg">
       <DataTable
-        value={customers}
+        value={products}
+        dataKey="id"
         paginator
         rows={5}
-        header={header}
+        rowsPerPageOptions={[5, 10, 25]}
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        pt={{
+          paginator: {
+            root: { className: "bg-gray-100 p-2" },
+            pageButton: ({ context }) =>
+              context.active
+                ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
+                : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
+          },
+        }}
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
         filters={filters}
+        header={header}
+        tableClassName="border border-slate-300"
+        tableStyle={{ minWidth: "50rem" }}
         onFilter={(e) => setFilters(e.filters)}
-        selection={selectedCustomer}
-        onSelectionChange={(e) => setSelectedCustomer(e.value)}
-        selectionMode="single"
-        dataKey="id"
         stateStorage="session"
         stateKey="dt-state-demo-local"
-        emptyMessage="No customers found."
-        tableStyle={{ minWidth: "50rem" }}
+        emptyMessage="Tidak ada data ditemukan."
+        // selectionMode="single"
       >
         <Column
-          field="name"
+          field="kode_produk"
           header="Kode Produk"
-          style={{ width: "25%" }}
+          style={{ width: "20%" }}
           className="border border-slate-300"
           headerClassName="border border-slate-300"
         ></Column>
         <Column
+          field="nama_produk"
           header="Nama Produk"
-          body={countryBodyTemplate}
           sortable
-          sortField="country.name"
           style={{ width: "25%" }}
           className="border border-slate-300"
           headerClassName="border border-gray-300"
         ></Column>
-        {/* <Column
-          header="Agent"
-          body={representativeBodyTemplate}
-          sortable
-          sortField="representative.name"
-          filter
-          filterField="representative"
-          showFilterMatchModes={false}
-          filterElement={representativeFilterTemplate}
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ width: "25%" }}
-          className="border border-slate-300"
-          headerClassName="border border-gray-300"
-        ></Column> */}
         <Column
-          field="status"
+          field="stok"
           header="Stok Produk"
           body={statusBodyTemplate}
           sortable
-          style={{ width: "25%" }}
+          style={{ width: "10%" }}
           className="border border-slate-300"
           headerClassName="border border-gray-300"
+        ></Column>
+        <Column
+          header="Action"
+          body={actionBodyTemplate}
+          exportable={false}
+          style={{ width: "15%" }}
+          className="border border-slate-300"
+          headerClassName="border border-slate-300"
         ></Column>
       </DataTable>
     </div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BarChart } from "../components/elements/BarChart";
 import { NavBar } from "../components/elements/NavBar";
-import { VerticalTabs } from "../components/elements/VerticalTabs";
 import { DataBar } from "../utils/DataBar";
 import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";

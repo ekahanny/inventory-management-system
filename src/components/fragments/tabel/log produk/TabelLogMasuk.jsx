@@ -568,6 +568,7 @@ export default function TabelLogMasuk() {
           header={header}
           tableClassName="border border-slate-300"
           tableStyle={{ maxWidth: "100%" }}
+          emptyMessage="Tidak ada data ditemukan."
         >
           {/* Header Kolom */}
           <Column
