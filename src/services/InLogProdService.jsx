@@ -6,7 +6,7 @@ const InLogProdService = {
       const response = await axiosInstance.post("/produk/log", productData);
       return response.data;
     } catch (error) {
-      console.error("Gagal menambahkan produk:", error);
+      console.error("Gagal menambahkan log produk:", error);
       throw error;
     }
   },
