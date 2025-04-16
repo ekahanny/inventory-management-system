@@ -12,17 +12,23 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
+import { Toolbar } from "primereact/toolbar";
+import { Dropdown } from "primereact/dropdown";
+import CategoryService from "../../../../services/CategoryService";
+import * as XLSX from "xlsx";
 
 export default function TabelProduk() {
   let emptyProduct = {
     _id: "",
     kode_produk: "",
     nama_produk: "",
-    stok: 0,
+    // stok: 0,
+    kategori: "",
   };
 
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(emptyProduct); // product log
+  const [categories, setCategories] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [productDialog, setProductDialog] = useState(false);
@@ -54,13 +60,37 @@ export default function TabelProduk() {
         _id: item._id,
         kode_produk: item ? item.kode_produk : "N/A",
         nama_produk: item ? item.nama_produk : "N/A",
-        stok: item.stok,
+        kategori: item ? item.kategori : "Unknown",
+        // stok: item.stok,
       }));
       console.log("Response API Produk: ", productList);
       setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil produk: ", error);
     }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await CategoryService.getCategories();
+      const kategoriArray = response.KategoriProduk || [];
+      const formattedCategories = kategoriArray.map((item) => ({
+        name: item.nama,
+        id: item._id,
+      }));
+      setCategories(formattedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const openNew = () => {
+    setProduct({ ...emptyProduct });
+    setSubmitted(false);
+    setIsEditMode(false);
+    // setShowNewProductFields(false);
+    // setIsProductExist(false);
+    setProductDialog(true);
   };
 
   const editProduct = (product) => {
@@ -122,7 +152,6 @@ export default function TabelProduk() {
         isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
         error.response?.data || error.message
       );
-
       toast.current.show({
         severity: "error",
         summary: "Gagal",
@@ -134,20 +163,42 @@ export default function TabelProduk() {
     }
   };
 
+  const exportExcel = () => {
+    // Format data untuk Excel (hanya kolom yang ditampilkan di DataTable)
+    const excelData = products.map((product) => ({
+      "Kode Produk": product.kode_produk,
+      "Nama Produk": product.nama_produk,
+      Kategori:
+        categories.find((cat) => cat.id === product.kategori)?.name ||
+        product.kategori,
+    }));
+
+    // Buat worksheet dari data
+    const ws = XLSX.utils.json_to_sheet(excelData);
+
+    // Buat workbook dan tambahkan worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Produk");
+
+    // Export ke file Excel (.xlsx)
+    XLSX.writeFile(wb, "Data_Produk.xlsx");
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
-  const getSeverity = (stok) => {
-    switch (true) {
-      case stok <= 10:
-        return "danger";
-      case stok <= 50:
-        return "warning";
-      default:
-        return "success";
-    }
-  };
+  // const getSeverity = (stok) => {
+  //   switch (true) {
+  //     case stok <= 10:
+  //       return "danger";
+  //     case stok <= 50:
+  //       return "warning";
+  //     default:
+  //       return "success";
+  //   }
+  // };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -172,17 +223,48 @@ export default function TabelProduk() {
     );
   };
 
-  const statusBodyTemplate = (rowData) => {
+  const leftToolbarTemplate = () => {
     return (
-      <div className="flex justify-center">
-        <Tag
-          value={rowData.stok}
-          severity={getSeverity(rowData.stok)}
-          style={{ fontSize: "1rem" }}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          label="Tambah"
+          icon="pi pi-plus"
+          onClick={openNew}
+          className="bg-sky-600 text-white px-3 py-2"
         />
       </div>
     );
   };
+
+  const rightToolbarTemplate = () => {
+    return (
+      <Button
+        label="Export"
+        icon="pi pi-upload"
+        onClick={exportExcel}
+        className="bg-sky-600 text-white px-3 py-2"
+      />
+    );
+  };
+
+  const categoryBodyTemplate = (rowData) => {
+    const category = categories.find((cat) => {
+      return cat.id === rowData.kategori;
+    });
+    return category ? category.name : "Unknown";
+  };
+
+  // const statusBodyTemplate = (rowData) => {
+  //   return (
+  //     <div className="flex justify-center">
+  //       <Tag
+  //         value={rowData.stok}
+  //         severity={getSeverity(rowData.stok)}
+  //         style={{ fontSize: "1rem" }}
+  //       />
+  //     </div>
+  //   );
+  // };
 
   const onGlobalFilterChange = (event) => {
     const value = event.target.value;
@@ -195,17 +277,8 @@ export default function TabelProduk() {
     const value = filters["global"] ? filters["global"].value : "";
 
     return (
-      <div className="flex justify-between items-center">
-        <Button
-          label="Tambah"
-          icon="pi pi-plus"
-          className="p-button-sm bg-sky-600 text-white px-3 py-2 hover:bg-blue-700 mx-1.5"
-          onClick={() => {
-            setProduct(emptyProduct);
-            setIsEditMode(false);
-            setProductDialog(true);
-          }}
-        />
+      <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
+        <h4 className="ml-4 my-3 text-2xl text-sky-700">Tabel Produk</h4>
         <IconField iconPosition="left" className="border border-slate-400 w-96">
           <InputIcon className="pi pi-search ml-2" />
           <InputText
@@ -264,169 +337,210 @@ export default function TabelProduk() {
     setProduct(_product);
   };
 
-  const onInputNumberChange = (e, name) => {
-    const val = e.value || 0;
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: val,
+  const onCategoryChange = (e) => {
+    setProduct((prev) => ({
+      ...prev,
+      kategori: e.value,
     }));
   };
+
+  // const onInputNumberChange = (e, name) => {
+  //   const val = e.value || 0;
+  //   setProduct((prevProduct) => ({
+  //     ...prevProduct,
+  //     [name]: val,
+  //   }));
+  // };
 
   const header = renderHeader();
 
   return (
-    <div className="card ml-1 mt-5 rounded-lg shadow-lg">
+    <div>
       <Toast ref={toast} />
-      <DataTable
-        value={products}
-        dataKey="id"
-        paginator
-        rows={5}
-        rowsPerPageOptions={[5, 10, 25]}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        pt={{
-          paginator: {
-            root: { className: "bg-gray-100 p-2" },
-            pageButton: ({ context }) =>
-              context.active
-                ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
-                : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
-          },
-        }}
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-        filters={filters}
-        header={header}
-        tableClassName="border border-slate-300"
-        tableStyle={{ minWidth: "50rem" }}
-        onFilter={(e) => setFilters(e.filters)}
-        stateStorage="session"
-        stateKey="dt-state-demo-local"
-        emptyMessage="Tidak ada data ditemukan."
-        // selectionMode="single"
-      >
-        <Column
-          field="kode_produk"
-          header="Kode Produk"
-          style={{ width: "20%" }}
-          className="border border-slate-300"
-          headerClassName="border border-slate-300"
-        ></Column>
-        <Column
-          field="nama_produk"
-          header="Nama Produk"
-          sortable
-          style={{ width: "25%" }}
-          className="border border-slate-300"
-          headerClassName="border border-gray-300"
-        ></Column>
-        <Column
-          field="stok"
-          header="Stok Produk"
-          body={statusBodyTemplate}
-          sortable
-          style={{ width: "10%" }}
-          className="border border-slate-300"
-          headerClassName="border border-gray-300"
-        ></Column>
-        <Column
-          header="Action"
-          body={actionBodyTemplate}
-          exportable={false}
-          style={{ width: "15%" }}
-          className="border border-slate-300"
-          headerClassName="border border-slate-300"
-        ></Column>
-      </DataTable>
+      <div className="card ml-1 mt-5 rounded-lg shadow-lg">
+        <Toolbar
+          className="mb-4"
+          left={leftToolbarTemplate}
+          right={rightToolbarTemplate}
+        ></Toolbar>
+        <DataTable
+          value={products}
+          dataKey="id"
+          paginator
+          rows={5}
+          rowsPerPageOptions={[5, 10, 25]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          pt={{
+            paginator: {
+              root: { className: "bg-gray-100 p-2" },
+              pageButton: ({ context }) =>
+                context.active
+                  ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
+                  : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
+            },
+          }}
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          filters={filters}
+          header={header}
+          tableClassName="border border-slate-300"
+          tableStyle={{ minWidth: "50rem" }}
+          onFilter={(e) => setFilters(e.filters)}
+          stateStorage="session"
+          stateKey="dt-state-demo-local"
+          emptyMessage="Tidak ada data ditemukan."
+          // selectionMode="single"
+        >
+          <Column
+            field="kode_produk"
+            header="Kode Produk"
+            style={{ width: "20%" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
+            field="nama_produk"
+            header="Nama Produk"
+            sortable
+            style={{ width: "25%" }}
+            className="border border-slate-300"
+            headerClassName="border border-gray-300"
+          ></Column>
+          {/* <Column
+            field="stok"
+            header="Stok Produk"
+            body={statusBodyTemplate}
+            sortable
+            style={{ width: "10%" }}
+            className="border border-slate-300"
+            headerClassName="border border-gray-300"
+          ></Column> */}
+          <Column
+            field="kategori"
+            header="Kategori Produk"
+            body={categoryBodyTemplate}
+            style={{ width: "15%" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
+            header="Action"
+            body={actionBodyTemplate}
+            exportable={false}
+            style={{ width: "10%" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+        </DataTable>
 
-      <Dialog
-        visible={productDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header={isEditMode ? "Edit Produk" : "Tambah Produk"}
-        modal
-        className="p-fluid"
-        footer={productDialogFooter}
-        onHide={() => setProductDialog(false)}
-      >
-        <div className="field">
-          <label htmlFor="kode_produk" className="font-bold">
-            Kode Produk
-          </label>
-          <InputText
-            id="kode_produk"
-            value={product.kode_produk}
-            onChange={(e) => onInputChange(e, "kode_produk")}
-            required
-            autoFocus
-            className={classNames("border border-slate-400 rounded-md p-2", {
-              "p-invalid border-red-500": submitted && !product.kode_produk,
-            })}
-            placeholder="Isi Kode Produk..."
-          />
-          {submitted && !product.kode_produk && (
-            <small className="p-error">Kode produk harus diisi.</small>
-          )}
-        </div>
-        <div className="field">
-          <label htmlFor="nama_produk" className="font-bold">
-            Nama Produk
-          </label>
-          <InputText
-            id="nama_produk"
-            value={product.nama_produk}
-            onChange={(e) => onInputChange(e, "nama_produk")}
-            required
-            className={classNames("border border-slate-400 rounded-md p-2", {
-              "p-invalid border-red-500": submitted && !product.nama_produk,
-            })}
-            placeholder="Isi Nama Produk..."
-          />
-          {submitted && !product.nama_produk && (
-            <small className="p-error">Nama produk harus diisi.</small>
-          )}
-        </div>
-        <div className="field">
-          <label htmlFor="stok" className="font-bold">
-            Stok
-          </label>
-          <InputNumber
-            id="stok"
-            value={product.stok}
-            onChange={(e) => onInputNumberChange(e, "stok")}
-            inputClassName={classNames(
-              "border border-slate-400 p-2 rounded-md",
-              {
-                "p-invalid border-red-500": submitted && !product.stok,
-              }
+        <Dialog
+          visible={productDialog}
+          style={{ width: "32rem" }}
+          breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+          header={isEditMode ? "Edit Produk" : "Tambah Produk"}
+          modal
+          className="p-fluid"
+          footer={productDialogFooter}
+          onHide={() => setProductDialog(false)}
+        >
+          <div className="field">
+            <label htmlFor="kode_produk" className="font-bold">
+              Kode Produk
+            </label>
+            <InputText
+              id="kode_produk"
+              value={product.kode_produk}
+              onChange={(e) => onInputChange(e, "kode_produk")}
+              required
+              autoFocus
+              className={classNames("border border-slate-400 rounded-md p-2", {
+                "p-invalid border-red-500": submitted && !product.kode_produk,
+              })}
+              placeholder="Isi Kode Produk..."
+            />
+            {submitted && !product.kode_produk && (
+              <small className="p-error">Kode produk harus diisi.</small>
             )}
-          />
-          {submitted && !product.stok && (
-            <small className="p-error">Stok masuk harus diisi</small>
-          )}
-        </div>
-      </Dialog>
+          </div>
+          <div className="field">
+            <label htmlFor="nama_produk" className="font-bold">
+              Nama Produk
+            </label>
+            <InputText
+              id="nama_produk"
+              value={product.nama_produk}
+              onChange={(e) => onInputChange(e, "nama_produk")}
+              required
+              className={classNames("border border-slate-400 rounded-md p-2", {
+                "p-invalid border-red-500": submitted && !product.nama_produk,
+              })}
+              placeholder="Isi Nama Produk..."
+            />
+            {submitted && !product.nama_produk && (
+              <small className="p-error">Nama produk harus diisi.</small>
+            )}
+          </div>
+          {/* <div className="field">
+            <label htmlFor="stok" className="font-bold">
+              Stok
+            </label>
+            <InputNumber
+              id="stok"
+              value={product.stok}
+              onChange={(e) => onInputNumberChange(e, "stok")}
+              inputClassName={classNames(
+                "border border-slate-400 p-2 rounded-md",
+                {
+                  "p-invalid border-red-500": submitted && !product.stok,
+                }
+              )}
+            />
+            {submitted && !product.stok && (
+              <small className="p-error">Stok masuk harus diisi</small>
+            )}
+          </div> */}
+          <div className="field">
+            <label className="font-bold">Kategori</label>
+            <Dropdown
+              value={product.kategori}
+              onChange={onCategoryChange}
+              options={categories}
+              optionLabel="name"
+              optionValue="id"
+              showClear
+              placeholder="Pilih Kategori..."
+              className={classNames("border border-slate-400 w-full", {
+                "p-invalid border-red-500": submitted && !product.kategori,
+              })}
+              required
+            />
+            {submitted && !product.kategori && (
+              <small className="p-error">Pilih kategori terlebih dahulu</small>
+            )}
+          </div>
+        </Dialog>
 
-      <Dialog
-        visible={deleteProductDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirm"
-        modal
-        footer={deleteProductDialogFooter}
-        onHide={() => setDeleteProductDialog(false)}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {product && (
-            <span>
-              Apakah Anda yakin ingin menghapus <b>{product.nama_produk}</b>?
-            </span>
-          )}
-        </div>
-      </Dialog>
+        <Dialog
+          visible={deleteProductDialog}
+          style={{ width: "32rem" }}
+          breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+          header="Confirm"
+          modal
+          footer={deleteProductDialogFooter}
+          onHide={() => setDeleteProductDialog(false)}
+        >
+          <div className="confirmation-content">
+            <i
+              className="pi pi-exclamation-triangle mr-3"
+              style={{ fontSize: "2rem" }}
+            />
+            {product && (
+              <span>
+                Apakah Anda yakin ingin menghapus <b>{product.nama_produk}</b>?
+              </span>
+            )}
+          </div>
+        </Dialog>
+      </div>
     </div>
   );
 }
