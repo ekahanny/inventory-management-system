@@ -14,6 +14,7 @@ import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
 import CategoryService from "../../../../services/CategoryService";
+import InLogProdService from "../../../../services/InLogProdService";
 
 export default function TabelProduk() {
   let emptyProduct = {
@@ -26,6 +27,7 @@ export default function TabelProduk() {
 
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(emptyProduct);
+  const [productsLog, setProductsLog] = useState([]);
   const [categories, setCategories] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [productDialog, setProductDialog] = useState(false);
@@ -80,6 +82,22 @@ export default function TabelProduk() {
     }
   };
 
+  const fetchProductsLog = async () => {
+    try {
+      const response = await InLogProdService.getLogProducts();
+      setProductsLog(response.LogProduk || []);
+      console.log("Response API Log Products: ", response);
+    } catch (error) {
+      console.error("Gagal mengambil produk dalam log:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+    fetchProductsLog();
+  }, []);
+
   const editProduct = (product) => {
     setProduct({ ...product });
     setSubmitted(false);
@@ -87,6 +105,20 @@ export default function TabelProduk() {
   };
 
   const confirmDeleteProduct = (product) => {
+    // Cek apakah produk ada di array productsLog
+    const isInLog = productsLog.some((log) => log.produk._id === product._id);
+
+    if (isInLog) {
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: "Produk tidak dapat dihapus karena digunakan pada Log",
+        life: 4000,
+      });
+      return;
+    }
+
+    // Jika tidak ada, tampilkan dialog confirm delete
     setProduct(product);
     setDeleteProductDialog(true);
   };
@@ -115,15 +147,6 @@ export default function TabelProduk() {
 
   const saveProduct = async () => {
     setSubmitted(true);
-    if (!product.kode_produk || !product.nama_produk || !product.kategori) {
-      toast.current.show({
-        severity: "warn",
-        summary: "Peringatan",
-        detail: "Lengkapi data terlebih dahulu!",
-        life: 3000,
-      });
-      return;
-    }
 
     try {
       await ProductService.updateProduct(product._id, product);
@@ -150,11 +173,6 @@ export default function TabelProduk() {
       setSubmitted(false);
     }
   };
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
 
   const getSeverity = (stok) => {
     switch (true) {
