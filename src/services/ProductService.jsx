@@ -29,7 +29,7 @@ const ProductService = {
       );
       return response.data;
     } catch (error) {
-      console.error("Gagal mengupdate produk: ", error);
+      console.error("Gagal mengupdate produk:", error);
       return [];
     }
   },

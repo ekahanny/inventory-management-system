@@ -44,19 +44,6 @@ export default function SidebarComponent() {
                         </li>
                         <li>
                           <NavLink
-                            to="/produk"
-                            className={({ isActive }) =>
-                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
-                                isActive ? " bg-blue-300" : "bg-white"
-                              }`
-                            }
-                          >
-                            <i className="pi pi-inbox mr-2"></i>
-                            <span className="font-medium">Produk</span>
-                          </NavLink>
-                        </li>
-                        <li>
-                          <NavLink
                             to="/barang-masuk"
                             className={({ isActive }) =>
                               `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${

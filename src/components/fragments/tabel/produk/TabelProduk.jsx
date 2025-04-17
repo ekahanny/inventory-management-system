@@ -12,25 +12,22 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { classNames } from "primereact/utils";
 import { InputNumber } from "primereact/inputnumber";
-import { Toolbar } from "primereact/toolbar";
 import { Dropdown } from "primereact/dropdown";
 import CategoryService from "../../../../services/CategoryService";
-import * as XLSX from "xlsx";
 
 export default function TabelProduk() {
   let emptyProduct = {
     _id: "",
     kode_produk: "",
     nama_produk: "",
-    // stok: 0,
+    stok: 0,
     kategori: "",
   };
 
   const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState(emptyProduct); // product log
+  const [product, setProduct] = useState(emptyProduct);
   const [categories, setCategories] = useState([]);
   const [submitted, setSubmitted] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [productDialog, setProductDialog] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const toast = useRef(null);
@@ -61,9 +58,8 @@ export default function TabelProduk() {
         kode_produk: item ? item.kode_produk : "N/A",
         nama_produk: item ? item.nama_produk : "N/A",
         kategori: item ? item.kategori : "Unknown",
-        // stok: item.stok,
+        stok: item.stok,
       }));
-      console.log("Response API Produk: ", productList);
       setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil produk: ", error);
@@ -84,19 +80,9 @@ export default function TabelProduk() {
     }
   };
 
-  const openNew = () => {
-    setProduct({ ...emptyProduct });
-    setSubmitted(false);
-    setIsEditMode(false);
-    // setShowNewProductFields(false);
-    // setIsProductExist(false);
-    setProductDialog(true);
-  };
-
   const editProduct = (product) => {
     setProduct({ ...product });
     setSubmitted(false);
-    setIsEditMode(true);
     setProductDialog(true);
   };
 
@@ -140,36 +126,24 @@ export default function TabelProduk() {
     }
 
     try {
-      if (isEditMode) {
-        await ProductService.updateProduct(product._id, product);
-        toast.current.show({
-          severity: "success",
-          summary: "Berhasil",
-          detail: "Produk berhasil diperbaharui",
-          life: 3000,
-        });
-      } else {
-        await ProductService.addProduct(product);
-        toast.current.show({
-          severity: "success",
-          summary: "Berhasil",
-          detail: "Produk berhasil ditambahkan",
-          life: 3000,
-        });
-      }
+      await ProductService.updateProduct(product._id, product);
+      toast.current.show({
+        severity: "success",
+        summary: "Berhasil",
+        detail: "Produk berhasil diperbaharui",
+        life: 3000,
+      });
       setProductDialog(false);
       fetchProducts();
     } catch (error) {
       console.error(
-        isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
+        "Gagal mengupdate produk:",
         error.response?.data || error.message
       );
       toast.current.show({
         severity: "error",
         summary: "Gagal",
-        detail:
-          error.response?.data?.message ||
-          (isEditMode ? "Gagal mengupdate produk" : "Gagal menambahkan produk"),
+        detail: error.response?.data?.message || "Gagal mengupdate produk",
         life: 3000,
       });
     } finally {
@@ -177,42 +151,21 @@ export default function TabelProduk() {
     }
   };
 
-  const exportExcel = () => {
-    // Format data untuk Excel (hanya kolom yang ditampilkan di DataTable)
-    const excelData = products.map((product) => ({
-      "Kode Produk": product.kode_produk,
-      "Nama Produk": product.nama_produk,
-      Kategori:
-        categories.find((cat) => cat.id === product.kategori)?.name ||
-        product.kategori,
-    }));
-
-    // Buat worksheet dari data
-    const ws = XLSX.utils.json_to_sheet(excelData);
-
-    // Buat workbook dan tambahkan worksheet
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Produk");
-
-    // Export ke file Excel (.xlsx)
-    XLSX.writeFile(wb, "Data_Produk.xlsx");
-  };
-
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, []);
 
-  // const getSeverity = (stok) => {
-  //   switch (true) {
-  //     case stok <= 10:
-  //       return "danger";
-  //     case stok <= 50:
-  //       return "warning";
-  //     default:
-  //       return "success";
-  //   }
-  // };
+  const getSeverity = (stok) => {
+    switch (true) {
+      case stok <= 10:
+        return "danger";
+      case stok <= 50:
+        return "warning";
+      default:
+        return "success";
+    }
+  };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -237,30 +190,6 @@ export default function TabelProduk() {
     );
   };
 
-  const leftToolbarTemplate = () => {
-    return (
-      <div className="flex flex-wrap gap-2">
-        <Button
-          label="Tambah"
-          icon="pi pi-plus"
-          onClick={openNew}
-          className="bg-sky-600 text-white px-3 py-2"
-        />
-      </div>
-    );
-  };
-
-  const rightToolbarTemplate = () => {
-    return (
-      <Button
-        label="Export"
-        icon="pi pi-upload"
-        onClick={exportExcel}
-        className="bg-sky-600 text-white px-3 py-2"
-      />
-    );
-  };
-
   const categoryBodyTemplate = (rowData) => {
     const category = categories.find((cat) => {
       return cat.id === rowData.kategori;
@@ -268,17 +197,17 @@ export default function TabelProduk() {
     return category ? category.name : "Unknown";
   };
 
-  // const statusBodyTemplate = (rowData) => {
-  //   return (
-  //     <div className="flex justify-center">
-  //       <Tag
-  //         value={rowData.stok}
-  //         severity={getSeverity(rowData.stok)}
-  //         style={{ fontSize: "1rem" }}
-  //       />
-  //     </div>
-  //   );
-  // };
+  const statusBodyTemplate = (rowData) => {
+    return (
+      <div className="flex justify-center">
+        <Tag
+          value={rowData.stok}
+          severity={getSeverity(rowData.stok)}
+          style={{ fontSize: "1rem" }}
+        />
+      </div>
+    );
+  };
 
   const onGlobalFilterChange = (event) => {
     const value = event.target.value;
@@ -292,7 +221,7 @@ export default function TabelProduk() {
 
     return (
       <div className="flex flex-wrap gap-2 align-items-center justify-content-between bg-slate-100 border border-slate-200">
-        <h4 className="ml-4 my-3 text-2xl text-sky-700">Tabel Produk</h4>
+        <h4 className="ml-4 my-3 text-2xl text-sky-700">Ringkasan Produk</h4>
         <IconField iconPosition="left" className="border border-slate-400 w-96">
           <InputIcon className="pi pi-search ml-2" />
           <InputText
@@ -358,25 +287,12 @@ export default function TabelProduk() {
     }));
   };
 
-  // const onInputNumberChange = (e, name) => {
-  //   const val = e.value || 0;
-  //   setProduct((prevProduct) => ({
-  //     ...prevProduct,
-  //     [name]: val,
-  //   }));
-  // };
-
   const header = renderHeader();
 
   return (
     <div>
       <Toast ref={toast} />
       <div className="card ml-1 mt-5 rounded-lg shadow-lg">
-        <Toolbar
-          className="mb-4"
-          left={leftToolbarTemplate}
-          right={rightToolbarTemplate}
-        ></Toolbar>
         <DataTable
           value={products}
           dataKey="id"
@@ -389,8 +305,8 @@ export default function TabelProduk() {
               root: { className: "bg-gray-100 p-2" },
               pageButton: ({ context }) =>
                 context.active
-                  ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
-                  : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
+                  ? { className: "bg-sky-500 text-white font-bold" }
+                  : { className: "text-gray-700 hover:bg-gray-200" },
             },
           }}
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
@@ -402,7 +318,6 @@ export default function TabelProduk() {
           stateStorage="session"
           stateKey="dt-state-demo-local"
           emptyMessage="Tidak ada data ditemukan."
-          // selectionMode="single"
         >
           <Column
             field="kode_produk"
@@ -410,7 +325,7 @@ export default function TabelProduk() {
             style={{ width: "20%" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
-          ></Column>
+          />
           <Column
             field="nama_produk"
             header="Nama Produk"
@@ -418,16 +333,7 @@ export default function TabelProduk() {
             style={{ width: "25%" }}
             className="border border-slate-300"
             headerClassName="border border-gray-300"
-          ></Column>
-          {/* <Column
-            field="stok"
-            header="Stok Produk"
-            body={statusBodyTemplate}
-            sortable
-            style={{ width: "10%" }}
-            className="border border-slate-300"
-            headerClassName="border border-gray-300"
-          ></Column> */}
+          />
           <Column
             field="kategori"
             header="Kategori Produk"
@@ -435,7 +341,16 @@ export default function TabelProduk() {
             style={{ width: "15%" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
-          ></Column>
+          />
+          <Column
+            field="stok"
+            header="Stok Produk"
+            body={statusBodyTemplate}
+            sortable
+            style={{ width: "10%" }}
+            className="border border-slate-300"
+            headerClassName="border border-gray-300"
+          />
           <Column
             header="Action"
             body={actionBodyTemplate}
@@ -443,14 +358,14 @@ export default function TabelProduk() {
             style={{ width: "10%" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
-          ></Column>
+          />
         </DataTable>
 
         <Dialog
           visible={productDialog}
           style={{ width: "32rem" }}
           breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-          header={isEditMode ? "Edit Produk" : "Tambah Produk"}
+          header="Edit Produk"
           modal
           className="p-fluid"
           footer={productDialogFooter}
@@ -493,25 +408,6 @@ export default function TabelProduk() {
               <small className="p-error">Nama produk harus diisi.</small>
             )}
           </div>
-          {/* <div className="field">
-            <label htmlFor="stok" className="font-bold">
-              Stok
-            </label>
-            <InputNumber
-              id="stok"
-              value={product.stok}
-              onChange={(e) => onInputNumberChange(e, "stok")}
-              inputClassName={classNames(
-                "border border-slate-400 p-2 rounded-md",
-                {
-                  "p-invalid border-red-500": submitted && !product.stok,
-                }
-              )}
-            />
-            {submitted && !product.stok && (
-              <small className="p-error">Stok masuk harus diisi</small>
-            )}
-          </div> */}
           <div className="field">
             <label className="font-bold">Kategori</label>
             <Dropdown
@@ -530,6 +426,17 @@ export default function TabelProduk() {
             {submitted && !product.kategori && (
               <small className="p-error">Pilih kategori terlebih dahulu</small>
             )}
+          </div>
+          <div className="field">
+            <label htmlFor="stok" className="font-bold">
+              Stok
+            </label>
+            <InputNumber
+              id="stok"
+              value={product.stok}
+              disabled
+              inputClassName="border border-slate-400 p-2 rounded-md"
+            />
           </div>
         </Dialog>
 
