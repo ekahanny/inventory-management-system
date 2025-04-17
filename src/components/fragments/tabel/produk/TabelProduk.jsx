@@ -95,6 +95,7 @@ export default function TabelProduk() {
 
   const editProduct = (product) => {
     setProduct({ ...product });
+    setSubmitted(false);
     setIsEditMode(true);
     setProductDialog(true);
   };
@@ -108,7 +109,7 @@ export default function TabelProduk() {
     try {
       await ProductService.deleteProduct(product._id);
       setDeleteProductDialog(false);
-      Toast.current.show({
+      toast.current.show({
         severity: "success",
         summary: "Berhasil",
         detail: "Produk berhasil dihapus",
@@ -127,10 +128,21 @@ export default function TabelProduk() {
   };
 
   const saveProduct = async () => {
+    setSubmitted(true);
+    if (!product.kode_produk || !product.nama_produk || !product.kategori) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Lengkapi data terlebih dahulu!",
+        life: 3000,
+      });
+      return;
+    }
+
     try {
       if (isEditMode) {
         await ProductService.updateProduct(product._id, product);
-        Toast.current.show({
+        toast.current.show({
           severity: "success",
           summary: "Berhasil",
           detail: "Produk berhasil diperbaharui",
@@ -138,7 +150,7 @@ export default function TabelProduk() {
         });
       } else {
         await ProductService.addProduct(product);
-        Toast.current.show({
+        toast.current.show({
           severity: "success",
           summary: "Berhasil",
           detail: "Produk berhasil ditambahkan",
@@ -160,6 +172,8 @@ export default function TabelProduk() {
           (isEditMode ? "Gagal mengupdate produk" : "Gagal menambahkan produk"),
         life: 3000,
       });
+    } finally {
+      setSubmitted(false);
     }
   };
 
