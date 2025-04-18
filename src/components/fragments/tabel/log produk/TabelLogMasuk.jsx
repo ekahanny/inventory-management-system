@@ -48,7 +48,8 @@ export default function TabelLogMasuk() {
   const fetchLogProducts = async () => {
     try {
       const response = await InLogProdService.getLogProducts();
-      const productList = response.LogProduk || [];
+      const productList =
+        response.LogProduk.filter((item) => item.isProdukMasuk === true) || [];
       const products = productList.map((item) => ({
         _id: item._id,
         kode_produk: item.produk ? item.produk.kode_produk : "N/A",

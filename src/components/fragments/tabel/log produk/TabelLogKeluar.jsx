@@ -39,7 +39,6 @@ export default function TabelLogKeluar() {
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [showNewProductFields, setShowNewProductFields] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -67,8 +66,9 @@ export default function TabelLogKeluar() {
   const fetchProducts = async () => {
     try {
       const response = await ProductService.getProducts();
-      setProductList(response.Produk);
-      console.log("Response API Produk: ", response.Produk);
+      const productInStock = response.Produk.filter((p) => p.stok > 0);
+      setProductList(productInStock);
+      console.log("Response API Produk: ", productInStock);
     } catch (error) {
       console.error("Gagal mengambil produk: ", error);
     }
@@ -107,7 +107,7 @@ export default function TabelLogKeluar() {
     setProduct({ ...emptyProduct });
     setSubmitted(false);
     setIsEditMode(false);
-    setShowNewProductFields(false);
+    // setShowNewProductFields(false);
     setIsProductExist(false);
     setProductDialog(true);
   };
@@ -115,7 +115,6 @@ export default function TabelLogKeluar() {
   const hideDialog = () => {
     setSubmitted(false);
     setProductDialog(false);
-    setShowNewProductFields(false);
   };
 
   const hidedeleteLogProductDialog = () => {
@@ -125,15 +124,16 @@ export default function TabelLogKeluar() {
   const saveProduct = async () => {
     setSubmitted(true);
 
-    // Validasi apakah produk sudah ada
-    if (
-      showNewProductFields &&
-      validateProductExists(product.kode_produk, product.nama_produk)
-    ) {
+    const selectedProduct = productList.find(
+      (p) => p.kode_produk === product.kode_produk
+    );
+
+    // Validasi stok
+    if (selectedProduct && product.stok > selectedProduct.stok) {
       toast.current.show({
-        severity: "warn",
-        summary: "Peringatan",
-        detail: "Produk dengan kode tersebut sudah tersedia!",
+        severity: "error",
+        summary: "Error",
+        detail: `Stok keluar melebihi stok yang tersedia (${selectedProduct.stok})`,
         life: 3000,
       });
       return;
@@ -145,16 +145,6 @@ export default function TabelLogKeluar() {
       !product.harga ||
       !product.stok
     ) {
-      toast.current.show({
-        severity: "warn",
-        summary: "Peringatan",
-        detail: "Lengkapi data terlebih dahulu!",
-        life: 3000,
-      });
-      return;
-    }
-
-    if (!product.nama_produk || !product.kategori) {
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -210,7 +200,6 @@ export default function TabelLogKeluar() {
 
       setProductDialog(false);
       setProduct(emptyProduct);
-      setShowNewProductFields(false);
       fetchLogProducts();
     } catch (error) {
       console.error(
@@ -304,6 +293,7 @@ export default function TabelLogKeluar() {
       kode_produk: selectedCode,
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
+      harga: selectedProduct?.harga || prev.harga, // Isi harga otomatis
     }));
   };
 
@@ -361,8 +351,6 @@ export default function TabelLogKeluar() {
       harga: prev.harga,
       stok: prev.stok,
     }));
-
-    setShowNewProductFields(!showNewProductFields);
   };
 
   const leftToolbarTemplate = () => {
@@ -616,106 +604,23 @@ export default function TabelLogKeluar() {
           <label htmlFor="kode_produk" className="font-bold">
             Kode Produk
           </label>
-          {showNewProductFields ? (
-            <>
-              <InputText
-                id="kode_produk"
-                value={product.kode_produk}
-                onChange={(e) => onInputChange(e, "kode_produk")}
-                required
-                autoFocus
-                className={classNames(
-                  "border border-slate-400 rounded-md p-2",
-                  {
-                    "p-invalid border-red-500":
-                      submitted && !product.kode_produk,
-                  }
-                )}
-              />
-              {submitted && !product.kode_produk && (
-                <small className="p-error">Kode produk harus diisi</small>
-              )}
-              {isProductExist && (
-                <small className="p-error">Produk telah tersedia</small>
-              )}
-            </>
-          ) : (
-            <Dropdown
-              value={product.kode_produk}
-              onChange={onProductCodeChange}
-              options={productList?.map((p) => ({
-                label: `${p.kode_produk} - ${p.nama_produk}`,
-                value: p.kode_produk,
-              }))}
-              filter
-              showClear
-              optionLabel="label"
-              placeholder="Pilih Produk..."
-              className={classNames("border border-slate-400 w-full", {
-                "p-invalid border-red-500": submitted && !product.kode_produk,
-              })}
-            />
-          )}
+          <Dropdown
+            value={product.kode_produk}
+            onChange={onProductCodeChange}
+            options={productList?.map((p) => ({
+              label: `${p.kode_produk} - ${p.nama_produk} (Stok: ${p.stok})`,
+              value: p.kode_produk,
+            }))}
+            filter
+            showClear
+            optionLabel="label"
+            placeholder="Pilih Produk..."
+            className={classNames("border border-slate-400 w-full", {
+              "p-invalid border-red-500": submitted && !product.kode_produk,
+            })}
+            disabled={productList.length === 0} // Disable jika tidak ada produk
+          />
         </div>
-
-        {!showNewProductFields && !isEditMode && (
-          <div className="field mb-4">
-            <Button
-              label="Tambah Produk Baru"
-              icon="pi pi-plus"
-              className="p-button-text p-button-sm px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
-              onClick={toggleNewProductFields}
-            />
-          </div>
-        )}
-
-        {showNewProductFields && (
-          <>
-            <div className="field">
-              <label htmlFor="nama_produk" className="font-bold">
-                Nama Produk
-              </label>
-              <InputText
-                id="nama_produk"
-                value={product.nama_produk}
-                onChange={(e) => onInputChange(e, "nama_produk")}
-                required
-                className={classNames(
-                  "border border-slate-400 rounded-md p-2",
-                  {
-                    "p-invalid border-red-500":
-                      submitted && !product.nama_produk,
-                  }
-                )}
-              />
-              {submitted && !product.nama_produk && (
-                <small className="p-error">Nama produk harus diisi</small>
-              )}
-            </div>
-
-            <div className="field">
-              <label className="font-bold">Kategori</label>
-              <Dropdown
-                value={product.kategori}
-                onChange={onCategoryChange}
-                options={categories}
-                optionLabel="name"
-                optionValue="id"
-                showClear
-                placeholder="Pilih Kategori"
-                className={classNames("border border-slate-400 w-full", {
-                  "p-invalid border-red-500": submitted && !product.kategori,
-                })}
-                required
-              />
-              {submitted && !product.kategori && (
-                <small className="p-error">
-                  Pilih kategori terlebih dahulu
-                </small>
-              )}
-            </div>
-          </>
-        )}
 
         <div className="field">
           <label htmlFor="tanggal" className="font-bold">

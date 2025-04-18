@@ -112,7 +112,7 @@ export default function TabelProduk() {
       toast.current.show({
         severity: "error",
         summary: "Gagal",
-        detail: "Produk tidak dapat dihapus karena digunakan pada Log",
+        detail: "Produk yang tersedia pada log tidak dapat dihapus",
         life: 4000,
       });
       return;
@@ -221,7 +221,7 @@ export default function TabelProduk() {
         <Tag
           value={rowData.stok}
           severity={getSeverity(rowData.stok)}
-          style={{ fontSize: "1rem" }}
+          style={{ fontSize: "1rem", minWidth: "2.5rem" }}
         />
       </div>
     );
