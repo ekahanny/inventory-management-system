@@ -35,10 +35,9 @@ export default function TabelLogKeluar() {
   const [productDialog, setProductDialog] = useState(false);
   const [deleteLogProductDialog, setdeleteLogProductDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isProductExist, setIsProductExist] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
 
@@ -65,12 +64,14 @@ export default function TabelLogKeluar() {
 
   const fetchProducts = async () => {
     try {
+      setIsLoadingProducts(true);
       const response = await ProductService.getProducts();
       const productInStock = response.Produk.filter((p) => p.stok > 0);
       setProductList(productInStock);
-      console.log("Response API Produk: ", productInStock);
     } catch (error) {
       console.error("Gagal mengambil produk: ", error);
+    } finally {
+      setIsLoadingProducts(false);
     }
   };
 
@@ -104,11 +105,10 @@ export default function TabelLogKeluar() {
   };
 
   const openNew = () => {
+    fetchProducts();
     setProduct({ ...emptyProduct });
     setSubmitted(false);
     setIsEditMode(false);
-    // setShowNewProductFields(false);
-    setIsProductExist(false);
     setProductDialog(true);
   };
 
@@ -139,82 +139,55 @@ export default function TabelLogKeluar() {
       return;
     }
 
-    if (
-      !product.kode_produk ||
-      !product.tanggal ||
-      !product.harga ||
-      !product.stok
-    ) {
-      toast.current.show({
-        severity: "warn",
-        summary: "Peringatan",
-        detail: "Lengkapi data terlebih dahulu!",
-        life: 3000,
-      });
-      return;
-    }
-
-    setSubmitted(false);
-
-    const productData = {
-      kode_produk: product.kode_produk,
-      nama_produk: product.nama_produk,
-      tanggal: new Date(product.tanggal).toISOString(),
-      kategori: product.kategori,
-      harga: product.harga,
-      stok: product.stok || 0,
-      isProdukMasuk: false,
-    };
-
     try {
-      if (isEditMode) {
-        const updatedProduct = await InLogProdService.updateLogProduct(
-          product._id,
-          productData
-        );
+      const formattedDate = new Date(product.tanggal);
+      formattedDate.setHours(formattedDate.getHours() + 8);
 
-        // Update state produk
-        setProducts((prevProducts) =>
-          prevProducts.map((item) =>
-            item._id === product._id ? updatedProduct : item
+      const productData = {
+        kode_produk: product.kode_produk,
+        nama_produk: product.nama_produk,
+        tanggal: formattedDate.toISOString(),
+        kategori: product.kategori,
+        harga: product.harga,
+        stok: product.stok,
+        isProdukMasuk: false,
+      };
+
+      if (isEditMode) {
+        await InLogProdService.updateLogProduct(product._id, productData);
+      } else {
+        await InLogProdService.addLogProduct(productData);
+
+        // Update stok di local state -> option dropdown
+        setProductList((prevList) =>
+          prevList.map((item) =>
+            item.kode_produk === product.kode_produk
+              ? { ...item, stok: item.stok - product.stok }
+              : item
           )
         );
-
-        toast.current.show({
-          severity: "success",
-          summary: "Berhasil",
-          detail: "Produk berhasil diperbarui",
-          life: 3000,
-        });
-      } else {
-        const addedProduct = await InLogProdService.addLogProduct(productData);
-        setProducts((prevProducts) => [...prevProducts, addedProduct]);
-
-        toast.current.show({
-          severity: "success",
-          summary: "Berhasil",
-          detail: "Produk berhasil ditambahkan",
-          life: 3000,
-        });
       }
+
+      toast.current.show({
+        severity: "success",
+        summary: "Berhasil",
+        detail: `Produk berhasil ${isEditMode ? "diperbarui" : "ditambahkan"}`,
+        life: 3000,
+      });
 
       setProductDialog(false);
       setProduct(emptyProduct);
       fetchLogProducts();
     } catch (error) {
-      console.error(
-        isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
-        error.response?.data || error.message
-      );
-
+      console.error("Error:", error);
       toast.current.show({
         severity: "error",
         summary: "Gagal",
-        detail:
-          error.response?.data?.message ||
-          (isEditMode ? "Gagal mengupdate produk" : "Gagal menambahkan produk"),
+        detail: error.response?.data?.message || "Terjadi kesalahan",
         life: 3000,
       });
+    } finally {
+      setSubmitted(false);
     }
   };
 
@@ -283,6 +256,7 @@ export default function TabelLogKeluar() {
   };
 
   const onProductCodeChange = (e) => {
+    fetchProducts();
     const selectedCode = e.value;
     const selectedProduct = productList.find(
       (p) => p.kode_produk === selectedCode
@@ -294,36 +268,6 @@ export default function TabelLogKeluar() {
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
       harga: selectedProduct?.harga || prev.harga, // Isi harga otomatis
-    }));
-  };
-
-  const onCategoryChange = (e) => {
-    setProduct((prev) => ({
-      ...prev,
-      kategori: e.value,
-    }));
-  };
-
-  const validateProductExists = (kode_produk, nama_produk) => {
-    const exists = productList.some(
-      (p) => p.kode_produk === kode_produk || p.nama_produk === nama_produk
-    );
-    setIsProductExist(exists);
-    return exists;
-  };
-
-  const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || "";
-
-    // Jika mengubah kode_produk atau nama_produk, validasi
-    if (name === "kode_produk" || name === "nama_produk") {
-      const newProduct = { ...product, [name]: val };
-      validateProductExists(newProduct.kode_produk, newProduct.nama_produk);
-    }
-
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: val,
     }));
   };
 
@@ -341,16 +285,6 @@ export default function TabelLogKeluar() {
       month: "2-digit",
       day: "2-digit",
     });
-  };
-
-  const toggleNewProductFields = () => {
-    // Reset semua field dari produk sebelum toggle ditampilkan
-    setProduct((prev) => ({
-      ...emptyProduct,
-      tanggal: prev.tanggal,
-      harga: prev.harga,
-      stok: prev.stok,
-    }));
   };
 
   const leftToolbarTemplate = () => {
@@ -521,7 +455,6 @@ export default function TabelLogKeluar() {
             },
           }}
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-          // globalFilter={globalFilter}
           filters={filters}
           onFilter={(e) => setFilters(e.filters)}
           header={header}
@@ -607,18 +540,22 @@ export default function TabelLogKeluar() {
           <Dropdown
             value={product.kode_produk}
             onChange={onProductCodeChange}
-            options={productList?.map((p) => ({
-              label: `${p.kode_produk} - ${p.nama_produk} (Stok: ${p.stok})`,
-              value: p.kode_produk,
-            }))}
+            options={
+              isLoadingProducts
+                ? [{ label: "Memuat data...", value: null }]
+                : productList?.map((p) => ({
+                    label: `${p.kode_produk} - ${p.nama_produk} (Stok: ${p.stok})`,
+                    value: p.kode_produk,
+                  }))
+            }
             filter
             showClear
             optionLabel="label"
-            placeholder="Pilih Produk..."
+            placeholder={isLoadingProducts ? "Memuat..." : "Pilih Produk..."}
+            disabled={isLoadingProducts}
             className={classNames("border border-slate-400 w-full", {
-              "p-invalid border-red-500": submitted && !product.kode_produk,
+              "p-invalid": submitted && !product.kode_produk,
             })}
-            disabled={productList.length === 0} // Disable jika tidak ada produk
           />
         </div>
 
