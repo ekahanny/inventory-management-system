@@ -70,6 +70,19 @@ export default function SidebarComponent() {
                         </li>
                         <li>
                           <NavLink
+                            to="/riwayat-produk"
+                            className={({ isActive }) =>
+                              `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
+                                isActive ? " bg-blue-300" : "bg-white"
+                              }`
+                            }
+                          >
+                            <i className="pi pi-history mr-2"></i>
+                            <span className="font-medium">Riwayat Produk</span>
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink
                             to="/kategori"
                             className={({ isActive }) =>
                               `flex align-items-center cursor-pointer p-3 border-round text-900 hover:surface-200 w-full ${
@@ -81,7 +94,7 @@ export default function SidebarComponent() {
                             <span className="font-medium">Kategori</span>
                           </NavLink>
                         </li>
-                        <li>
+                        {/* <li>
                           <StyleClass
                             nodeRef={btnRef2}
                             selector="@next"
@@ -131,7 +144,7 @@ export default function SidebarComponent() {
                               </NavLink>
                             </li>
                           </ul>
-                        </li>
+                        </li> */}
                       </ul>
                     </li>
                   </ul>

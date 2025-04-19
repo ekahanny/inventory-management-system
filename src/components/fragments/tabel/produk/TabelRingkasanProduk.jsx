@@ -16,7 +16,7 @@ import { Dropdown } from "primereact/dropdown";
 import CategoryService from "../../../../services/CategoryService";
 import InLogProdService from "../../../../services/InLogProdService";
 
-export default function TabelProduk() {
+export default function TabelRingkasanProduk() {
   let emptyProduct = {
     _id: "",
     kode_produk: "",
