@@ -8,10 +8,12 @@ import { useEffect, useState } from "react";
 import ProductService from "../../../../services/ProductService";
 import { Button } from "primereact/button";
 import CategoryService from "../../../../services/CategoryService";
+import { useNavigate } from "react-router-dom";
 
 export default function TabelRiwayatProduk() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -39,7 +41,6 @@ export default function TabelRiwayatProduk() {
         kode_produk: item ? item.kode_produk : "N/A",
         nama_produk: item ? item.nama_produk : "N/A",
         kategori: item ? item.kategori : "Unknown",
-        // stok: item.stok,
       }));
       setProducts(products);
     } catch (error) {
@@ -73,25 +74,24 @@ export default function TabelRiwayatProduk() {
     setFilters(_filters);
   };
 
+  const showDetailProduct = (rowData) => {
+    navigate(`/detail-riwayat/${rowData._id}`, {
+      state: { product: rowData },
+    });
+    // console.log(rowData);
+  };
+
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex justify-center">
         <Button
-          icon="pi pi-book"
           rounded
-          outlined
           size="small"
-          className="mr-2 bg-sky-300"
-          // onClick={() => editProduct(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          rounded
-          outlined
-          className="bg-red-300"
-          // onClick={() => confirmDeleteProduct(rowData)}
-          size="small"
-        />
+          className="bg-sky-400 hover:bg-sky-500 text-white text-sm px-3 py-2"
+          onClick={() => showDetailProduct(rowData)}
+        >
+          Show Detail
+        </Button>
       </div>
     );
   };

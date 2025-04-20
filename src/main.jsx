@@ -13,8 +13,7 @@ import "primereact/resources/primereact.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import { Kategori } from "./pages/Kategori.jsx";
 import RiwayatProduk from "./pages/RiwayatProduk.jsx";
-import { RiwayatBarangKeluar } from "./pages/RiwayatBarangKeluar.jsx";
-import { RiwayatBarangMasuk } from "./pages/RiwayatBarangMasuk.jsx";
+import DetailRiwayatProduk from "./pages/DetailRiwayatProduk.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,14 +36,10 @@ const router = createBrowserRouter([
     path: "/kategori",
     element: <Kategori />,
   },
-  // {
-  //   path: "/riwayat-barang-masuk",
-  //   element: <RiwayatBarangMasuk />,
-  // },
-  // {
-  //   path: "/riwayat-barang-keluar",
-  //   element: <RiwayatBarangKeluar />,
-  // },
+  {
+    path: "/detail-riwayat/:id",
+    element: <DetailRiwayatProduk />,
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
