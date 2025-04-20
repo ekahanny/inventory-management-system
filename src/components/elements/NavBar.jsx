@@ -1,7 +1,9 @@
+import logo from "../../assets/logo.png";
+
 export function NavBar() {
   return (
     <div className="navbar bg-white border-2 fixed top-0 left-0 right-0 z-50 ml-52 w-[1315px]">
-      <img src="src\assets\logo.png" alt="Logo" className="w-14 ml-4" />
+      <img src={logo} alt="Logo" className="w-14 ml-4" />
       <div className="flex-1">
         <a className="font-semibold text-2xl ml-2 text-black">Cokonuri Mart</a>
       </div>

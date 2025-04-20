@@ -47,7 +47,7 @@ export default function TabelLogMasuk() {
 
   const fetchLogProducts = async () => {
     try {
-      const response = await InLogProdService.getLogProducts();
+      const response = await InLogProdService.getAllLogProducts();
       const productList =
         response.LogProduk.filter((item) => item.isProdukMasuk === true) || [];
       const products = productList.map((item) => ({
@@ -68,7 +68,7 @@ export default function TabelLogMasuk() {
 
   const fetchProducts = async () => {
     try {
-      const response = await ProductService.getProducts();
+      const response = await ProductService.getAllProducts();
       setProductList(response.Produk);
       console.log("Response API Produk: ", response.Produk);
     } catch (error) {

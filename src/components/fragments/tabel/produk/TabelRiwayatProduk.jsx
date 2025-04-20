@@ -34,7 +34,7 @@ export default function TabelRiwayatProduk() {
 
   const fetchProducts = async () => {
     try {
-      const response = await ProductService.getProducts();
+      const response = await ProductService.getAllProducts();
       const productList = response.Produk || [];
       const products = productList.map((item) => ({
         _id: item._id,

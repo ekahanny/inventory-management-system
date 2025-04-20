@@ -11,12 +11,22 @@ const ProductService = {
     }
   },
 
-  getProducts: async () => {
+  getAllProducts: async () => {
     try {
       const response = await axiosInstance.get("/produk");
       return response.data;
     } catch (error) {
       console.error("Gagal mengambil produk", error);
+      return [];
+    }
+  },
+
+  getProductById: async (id_produk) => {
+    try {
+      const response = await axiosInstance.get(`/produk/${id_produk}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Gagal mengambil produk dengan id ${id_produk}: `, error);
       return [];
     }
   },

@@ -43,7 +43,7 @@ export default function TabelLogKeluar() {
 
   const fetchLogProducts = async () => {
     try {
-      const response = await InLogProdService.getLogProducts();
+      const response = await InLogProdService.getAllLogProducts();
       const productList =
         response.LogProduk.filter((item) => item.isProdukMasuk === false) || [];
       const products = productList.map((item) => ({
@@ -65,7 +65,7 @@ export default function TabelLogKeluar() {
   const fetchProducts = async () => {
     try {
       setIsLoadingProducts(true);
-      const response = await ProductService.getProducts();
+      const response = await ProductService.getAllProducts();
       const productInStock = response.Produk.filter((p) => p.stok > 0);
       setProductList(productInStock);
     } catch (error) {

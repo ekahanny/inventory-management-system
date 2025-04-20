@@ -53,7 +53,7 @@ export default function TabelRingkasanProduk() {
 
   const fetchProducts = async () => {
     try {
-      const response = await ProductService.getProducts();
+      const response = await ProductService.getAllProducts();
       const productList = response.Produk || [];
       const products = productList.map((item) => ({
         _id: item._id,
@@ -84,7 +84,7 @@ export default function TabelRingkasanProduk() {
 
   const fetchProductsLog = async () => {
     try {
-      const response = await InLogProdService.getLogProducts();
+      const response = await InLogProdService.getAllLogProducts();
       setProductsLog(response.LogProduk || []);
       console.log("Response API Log Products: ", response);
     } catch (error) {

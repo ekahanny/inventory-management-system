@@ -11,12 +11,22 @@ const InLogProdService = {
     }
   },
 
-  getLogProducts: async () => {
+  getAllLogProducts: async () => {
     try {
       const response = await axiosInstance.get("/produk/log");
       return response.data;
     } catch (error) {
       console.error("Gagal mengambil log produk:", error);
+      return [];
+    }
+  },
+
+  getLogProductById: async (id_produk) => {
+    try {
+      const response = await axiosInstance.get(`/produk/log/${id_produk}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Gagal mengambil produk dengan id ${id_produk}: `, error);
       return [];
     }
   },
