@@ -8,6 +8,45 @@ import { NavBar } from "../components/elements/NavBar";
 export default function DetailRiwayatProduk() {
   const { id } = useParams();
   const location = useLocation();
+  const [product, setProduct] = useState(null);
+  const [logProduct, setLogProduct] = useState([]);
+
+  const fetchDetailProduct = async () => {
+    try {
+      const response = await ProductService.getProductById(id);
+      if (response._id) {
+        setProduct(response);
+      } else if (response.Produk) {
+        setProduct(response.Produk);
+      } else {
+        throw new Error("Struktur response tidak dikenali");
+      }
+      console.log("Product data:", response);
+    } catch (error) {
+      console.error("Gagal mengambil produk:", error);
+    }
+  };
+
+  const fetchLogProduct = async () => {
+    try {
+      const response = await InLogProdService.getAllLogProducts();
+
+      const filteredLogs = response.LogProduk.filter(
+        (log) => log.produk?._id === id
+      );
+      setLogProduct(filteredLogs);
+      console.log("Response API Log Produk: ", filteredLogs);
+    } catch (error) {
+      console.error("Gagal mengambil log produk: ", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!product) {
+      fetchDetailProduct();
+    }
+    fetchLogProduct();
+  }, [id]);
 
   return (
     <div className="flex bg-slate-200">
