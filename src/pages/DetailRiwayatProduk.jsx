@@ -9,6 +9,8 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { useReactToPrint } from "react-to-print";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 
 export default function DetailRiwayatProduk() {
   const { id } = useParams();
@@ -118,7 +120,7 @@ export default function DetailRiwayatProduk() {
           <Button
             label="Kembali"
             icon="pi pi-angle-double-left"
-            className="bg-sky-600 hover:bg-sky-500 mb-3 ml-0.5 text-white text-sm px-3 py-2"
+            className="bg-sky-500 hover:bg-sky-600 mr-7 mb-3 text-white text-lg px-3 py-2"
             onClick={() => navigate(-1)}
           />
 
@@ -127,12 +129,12 @@ export default function DetailRiwayatProduk() {
             ref={componentRef}
             className="min-h-screen bg-white rounded-md shadow-lg border border-sky-200"
           >
-            <h1 className="text-2xl text-sky-700 font-bold text-center pt-7">
+            <h1 className="text-4xl text-sky-700 font-bold text-center pt-7">
               DETAIL RIWAYAT PRODUK
             </h1>
 
             {product && (
-              <div className="space-y-2 text-black text-lg ml-28 mr-16 mt-7">
+              <div className="space-y-2 text-black text-lg ml-28 mr-16 mt-5">
                 <p>
                   <span className="font-medium">Kode Produk:</span>{" "}
                   {product.kode_produk}
@@ -150,11 +152,34 @@ export default function DetailRiwayatProduk() {
                   <DataTable
                     value={logProduct}
                     tableStyle={{ minWidth: "50rem", marginTop: "0.8rem" }}
+                    showFooter
+                    footerColumnGroup={
+                      <ColumnGroup>
+                        <Row>
+                          <Column
+                            footer="Total Jumlah Produk"
+                            colSpan={3}
+                            footerStyle={{
+                              border: "1px solid #94a3b8",
+                            }}
+                            footerClassName="font-bold border border-slate-040"
+                          />
+                          <Column
+                            footer={product?.stok || 0}
+                            footerStyle={{
+                              border: "1px solid #94a3b8",
+                              textAlign: "center",
+                            }}
+                            footerClassName="font-bold"
+                          />
+                        </Row>
+                      </ColumnGroup>
+                    }
                   >
                     <Column
                       header="No."
-                      body={(rowData, options) => options.rowIndex + 1}
-                      style={{ width: "1%" }}
+                      body={(rowData, { rowIndex }) => rowIndex + 1}
+                      style={{ width: "5%", textAlign: "center" }}
                       className="border border-slate-400 text-center"
                       headerClassName="border border-slate-400 bg-slate-200"
                     />
@@ -162,7 +187,7 @@ export default function DetailRiwayatProduk() {
                       field="tanggal"
                       header="Tanggal"
                       body={(rowData) => formatDate(rowData.tanggal)}
-                      style={{ width: "10%" }}
+                      style={{ width: "15%" }}
                       className="border border-slate-400"
                       headerClassName="border border-gray-400 bg-slate-200"
                     />
@@ -170,18 +195,18 @@ export default function DetailRiwayatProduk() {
                       field="isProdukMasuk"
                       header="Jenis"
                       body={(rowData) =>
-                        typeBodyTemplate(rowData.isProdukMasuk)
+                        rowData.isProdukMasuk ? "Barang Masuk" : "Barang Keluar"
                       }
-                      style={{ width: "10%" }}
+                      style={{ width: "15%" }}
                       className="border border-slate-400"
                       headerClassName="border border-slate-400 bg-slate-200"
                     />
                     <Column
                       field="stok"
                       header="Jumlah"
-                      // body={statusBodyTemplate}
-                      style={{ width: "5%" }}
-                      className="border border-slate-400"
+                      body={(rowData) => rowData.stok}
+                      style={{ width: "10%" }}
+                      className="border border-slate-400 text-center"
                       headerClassName="border border-gray-400 bg-slate-200"
                     />
                   </DataTable>
@@ -190,7 +215,7 @@ export default function DetailRiwayatProduk() {
                 <div className="flex justify-center">
                   <Button
                     label="Cetak"
-                    // icon="pi pi-plus"
+                    icon="pi pi-print"
                     // onClick={handlePrint}
                     className="bg-sky-600 text-white text-sm px-3 py-2 mt-12"
                   />
