@@ -2,15 +2,21 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import { Dialog } from "primereact/dialog";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Toolbar } from "primereact/toolbar";
 import { useEffect, useState } from "react";
 import CategoryService from "../../../../services/CategoryService";
+import ProductService from "../../../../services/ProductService";
 
 export default function TabelKategori() {
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [categoryProducts, setCategoryProducts] = useState([]);
 
   const fetchCategories = async () => {
     try {
@@ -26,9 +32,55 @@ export default function TabelKategori() {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      const response = await ProductService.getAllProducts();
+      const productInStock = response.Produk.filter((p) => p.stok > 0);
+      setProducts(productInStock);
+    } catch (error) {
+      console.error("Gagal mengambil produk: ", error);
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
+    fetchProducts();
   }, []);
+
+  const showProductsDialog = (category) => {
+    setSelectedCategory(category);
+    const filteredProducts = products.filter(
+      (product) => product.kategori === category.id
+    );
+    setCategoryProducts(filteredProducts);
+    setDialogVisible(true);
+  };
+
+  const hideDialog = () => {
+    setDialogVisible(false);
+    setSelectedCategory(null);
+    setCategoryProducts([]);
+  };
+
+  const getProductCount = (categoryId) => {
+    return products.filter((product) => product.kategori === categoryId).length;
+  };
+
+  const productCountBodyTemplate = (rowData) => {
+    const count = getProductCount(rowData.id);
+    return (
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          showProductsDialog(rowData);
+        }}
+        className="text-blue-500 hover:text-blue-700 hover:underline"
+      >
+        {count} produk
+      </a>
+    );
+  };
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -81,7 +133,6 @@ export default function TabelKategori() {
         <Button
           label="Tambah"
           icon="pi pi-plus"
-          //   onClick={openNew}
           className="bg-sky-600 text-white px-3 py-2"
         />
       </div>
@@ -97,14 +148,12 @@ export default function TabelKategori() {
           outlined
           size="small"
           className="mr-2 bg-green-300"
-          //   onClick={() => editProduct(rowData)}
         />
         <Button
           icon="pi pi-trash"
           rounded
           outlined
           className="bg-red-300"
-          //   onClick={() => confirmdeleteLogProduct(rowData)}
           size="small"
         />
       </div>
@@ -114,14 +163,9 @@ export default function TabelKategori() {
   return (
     <div>
       <div className="card ml-1 my-3 rounded-lg shadow-lg ">
-        <Toolbar
-          className="mb-4"
-          left={leftToolbarTemplate}
-          //   right={rightToolbarTemplate}
-        ></Toolbar>
+        <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
         <DataTable
-          //   ref={dt}
           value={categories}
           dataKey="id"
           paginator
@@ -133,8 +177,8 @@ export default function TabelKategori() {
               root: { className: "bg-gray-100 p-2" },
               pageButton: ({ context }) =>
                 context.active
-                  ? { className: "bg-sky-500 text-white font-bold" } // Halaman aktif
-                  : { className: "text-gray-700 hover:bg-gray-200" }, // Halaman non-aktif
+                  ? { className: "bg-sky-500 text-white font-bold" }
+                  : { className: "text-gray-700 hover:bg-gray-200" },
             },
           }}
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
@@ -145,7 +189,6 @@ export default function TabelKategori() {
           tableStyle={{ maxWidth: "100%" }}
           emptyMessage="Tidak ada data ditemukan."
         >
-          {/* Header Kolom */}
           <Column
             field="name"
             header="Nama Kategori"
@@ -154,8 +197,8 @@ export default function TabelKategori() {
             headerClassName="border border-slate-300"
           ></Column>
           <Column
-            field=""
             header="Jumlah Produk"
+            body={productCountBodyTemplate}
             sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
@@ -171,6 +214,52 @@ export default function TabelKategori() {
           ></Column>
         </DataTable>
       </div>
+
+      <Dialog
+        visible={dialogVisible}
+        style={{ width: "50vw" }}
+        header={`Produk dalam kategori ${selectedCategory?.name || ""}`}
+        modal
+        className="p-fluid"
+        onHide={hideDialog}
+      >
+        <DataTable
+          value={categoryProducts}
+          emptyMessage="Tidak ada produk dalam kategori ini"
+          className="border border-slate-300"
+        >
+          <Column
+            field="nama_produk"
+            header="Nama Produk"
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          />
+          <Column
+            field="kode_produk"
+            header="Kode Produk"
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          />
+          <Column
+            field="harga"
+            header="Harga"
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+            body={(rowData) =>
+              new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(rowData.harga)
+            }
+          />
+          <Column
+            field="stok"
+            header="Stok"
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          />
+        </DataTable>
+      </Dialog>
     </div>
   );
 }
