@@ -7,9 +7,11 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Toolbar } from "primereact/toolbar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CategoryService from "../../../../services/CategoryService";
 import ProductService from "../../../../services/ProductService";
+import { classNames } from "primereact/utils";
+import { Toast } from "primereact/toast";
 
 export default function TabelKategori() {
   const [categories, setCategories] = useState([]);
@@ -17,6 +19,11 @@ export default function TabelKategori() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [categoryProducts, setCategoryProducts] = useState([]);
+  const [categoryDialog, setCategoryDialog] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState({ name: "" });
+  const toast = useRef(null);
 
   const fetchCategories = async () => {
     try {
@@ -25,10 +32,17 @@ export default function TabelKategori() {
       const formattedCategories = kategoriArray.map((item) => ({
         name: item.nama,
         id: item._id,
+        _id: item._id, // Pastikan _id tersedia untuk operasi edit
       }));
       setCategories(formattedCategories);
     } catch (error) {
       console.error("Error fetching categories:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Gagal memuat data kategori",
+        life: 3000,
+      });
     }
   };
 
@@ -39,6 +53,12 @@ export default function TabelKategori() {
       setProducts(productInStock);
     } catch (error) {
       console.error("Gagal mengambil produk: ", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Gagal memuat data produk",
+        life: 3000,
+      });
     }
   };
 
@@ -56,10 +76,30 @@ export default function TabelKategori() {
     setDialogVisible(true);
   };
 
-  const hideDialog = () => {
+  const hideProductsDialog = () => {
     setDialogVisible(false);
     setSelectedCategory(null);
     setCategoryProducts([]);
+  };
+
+  const hideCategoryDialog = () => {
+    setCategoryDialog(false);
+    setSubmitted(false);
+    setCurrentCategory({ name: "" });
+  };
+
+  const openNew = () => {
+    setCurrentCategory({ name: "" });
+    setIsEditMode(false);
+    setSubmitted(false);
+    setCategoryDialog(true);
+  };
+
+  const openEdit = (category) => {
+    setCurrentCategory({ ...category });
+    setIsEditMode(true);
+    setSubmitted(false);
+    setCategoryDialog(true);
   };
 
   const getProductCount = (categoryId) => {
@@ -80,6 +120,130 @@ export default function TabelKategori() {
         {count} produk
       </a>
     );
+  };
+
+  const onInputChange = (e, name) => {
+    const val = e.target.value;
+    setCurrentCategory((prev) => ({ ...prev, [name]: val }));
+  };
+
+  const saveCategory = async () => {
+    setSubmitted(true);
+
+    if (!currentCategory.name) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Nama kategori harus diisi",
+        life: 3000,
+      });
+      return;
+    }
+
+    try {
+      const categoryData = {
+        nama: currentCategory.name,
+      };
+
+      if (isEditMode) {
+        // Update kategori
+        const updatedCategory = await CategoryService.updateCategory(
+          currentCategory._id,
+          categoryData
+        );
+
+        setCategories(
+          categories.map((cat) =>
+            cat._id === currentCategory._id
+              ? { ...cat, name: updatedCategory.nama }
+              : cat
+          )
+        );
+
+        toast.current.show({
+          severity: "success",
+          summary: "Berhasil",
+          detail: "Kategori berhasil diperbarui",
+          life: 3000,
+        });
+      } else {
+        // Tambah kategori baru
+        const newCategory = await CategoryService.addCategory(categoryData);
+        setCategories([
+          ...categories,
+          {
+            name: newCategory.nama,
+            id: newCategory._id,
+            _id: newCategory._id,
+          },
+        ]);
+
+        toast.current.show({
+          severity: "success",
+          summary: "Berhasil",
+          detail: "Kategori berhasil ditambahkan",
+          life: 3000,
+        });
+      }
+
+      hideCategoryDialog();
+      fetchCategories();
+    } catch (error) {
+      console.error("Error saving category:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail:
+          error.response?.data?.message ||
+          (isEditMode
+            ? "Gagal memperbarui kategori"
+            : "Gagal menambahkan kategori"),
+        life: 3000,
+      });
+    } finally {
+      setSubmitted(false);
+    }
+  };
+
+  const deleteCategory = async (categoryId) => {
+    try {
+      await CategoryService.deleteCategory(categoryId);
+      setCategories(categories.filter((cat) => cat._id !== categoryId));
+      toast.current.show({
+        severity: "success",
+        summary: "Berhasil",
+        detail: "Kategori berhasil dihapus",
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: error.response?.data?.message || "Gagal menghapus kategori",
+        life: 3000,
+      });
+    }
+  };
+
+  const confirmDelete = (category) => {
+    if (getProductCount(category.id) > 0) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Tidak bisa menghapus kategori yang memiliki produk",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (
+      window.confirm(
+        `Apakah Anda yakin ingin menghapus kategori ${category.name}?`
+      )
+    ) {
+      deleteCategory(category._id);
+    }
   };
 
   const [filters, setFilters] = useState({
@@ -134,6 +298,7 @@ export default function TabelKategori() {
           label="Tambah"
           icon="pi pi-plus"
           className="bg-sky-600 text-white px-3 py-2"
+          onClick={openNew}
         />
       </div>
     );
@@ -148,6 +313,7 @@ export default function TabelKategori() {
           outlined
           size="small"
           className="mr-2 bg-green-300"
+          onClick={() => openEdit(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -155,13 +321,33 @@ export default function TabelKategori() {
           outlined
           className="bg-red-300"
           size="small"
+          onClick={() => confirmDelete(rowData)}
         />
       </div>
     );
   };
 
+  const categoryDialogFooter = (
+    <React.Fragment>
+      <Button
+        label="Batal"
+        icon="pi pi-times"
+        outlined
+        onClick={hideCategoryDialog}
+      />
+      <Button
+        label={isEditMode ? "Update" : "Simpan"}
+        icon="pi pi-check"
+        className="bg-sky-600 text-white"
+        onClick={saveCategory}
+      />
+    </React.Fragment>
+  );
+
   return (
     <div>
+      <Toast ref={toast} />
+
       <div className="card ml-1 my-3 rounded-lg shadow-lg ">
         <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
@@ -181,7 +367,7 @@ export default function TabelKategori() {
                   : { className: "text-gray-700 hover:bg-gray-200" },
             },
           }}
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
           filters={filters}
           onFilter={(e) => setFilters(e.filters)}
           header={header}
@@ -192,6 +378,7 @@ export default function TabelKategori() {
           <Column
             field="name"
             header="Nama Kategori"
+            sortable
             style={{ minWidth: "12rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
@@ -215,13 +402,45 @@ export default function TabelKategori() {
         </DataTable>
       </div>
 
+      {/* Dialog tambah/edit kategori */}
+      <Dialog
+        visible={categoryDialog}
+        style={{ width: "32rem" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        header={isEditMode ? "Edit Kategori" : "Tambah Kategori"}
+        modal
+        className="p-fluid"
+        footer={categoryDialogFooter}
+        onHide={hideCategoryDialog}
+      >
+        <div className="field">
+          <label htmlFor="name" className="font-bold">
+            Nama Kategori
+          </label>
+          <InputText
+            id="name"
+            value={currentCategory.name}
+            onChange={(e) => onInputChange(e, "name")}
+            required
+            autoFocus
+            className={classNames("border border-slate-400 rounded-md p-2", {
+              "p-invalid border-red-500": submitted && !currentCategory.name,
+            })}
+          />
+          {submitted && !currentCategory.name && (
+            <small className="p-error">Nama kategori harus diisi</small>
+          )}
+        </div>
+      </Dialog>
+
+      {/* Dialog daftar produk dalam kategori */}
       <Dialog
         visible={dialogVisible}
         style={{ width: "50vw" }}
         header={`Produk dalam kategori ${selectedCategory?.name || ""}`}
         modal
         className="p-fluid"
-        onHide={hideDialog}
+        onHide={hideProductsDialog}
       >
         <DataTable
           value={categoryProducts}

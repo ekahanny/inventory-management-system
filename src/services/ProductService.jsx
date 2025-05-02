@@ -16,7 +16,7 @@ const ProductService = {
       const response = await axiosInstance.get("/produk");
       return response.data;
     } catch (error) {
-      console.error("Gagal mengambil produk", error);
+      console.error("Gagal mengambil produk: ", error);
       return [];
     }
   },

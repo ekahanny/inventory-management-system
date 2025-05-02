@@ -42,8 +42,6 @@ export default function TabelLogMasuk() {
   const [showNewProductFields, setShowNewProductFields] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
-  // const [selectedProducts, setSelectedProducts] = useState(null);
-  // const [deleteLogProductsDialog, setdeleteLogProductsDialog] = useState(false);
 
   const fetchLogProducts = async () => {
     try {
@@ -123,10 +121,6 @@ export default function TabelLogMasuk() {
   const hidedeleteLogProductDialog = () => {
     setdeleteLogProductDialog(false);
   };
-
-  // const hidedeleteLogProductsDialog = () => {
-  //   setdeleteLogProductsDialog(false);
-  // };
 
   const saveProduct = async () => {
     setSubmitted(true);
@@ -297,20 +291,6 @@ export default function TabelLogMasuk() {
     XLSX.writeFile(wb, "Data_Barang_Masuk.xlsx");
   };
 
-  // const deleteSelectedProducts = () => {
-  //   let _products = products.filter((val) => !selectedProducts.includes(val));
-
-  //   setProducts(_products);
-  //   setdeleteLogProductsDialog(false);
-  //   setSelectedProducts(null);
-  //   toast.current.show({
-  //     severity: "success",
-  //     summary: "Successful",
-  //     detail: "Products Deleted",
-  //     life: 3000,
-  //   });
-  // };
-
   const onProductCodeChange = (e) => {
     const selectedCode = e.value;
     const selectedProduct = productList.find(
@@ -418,15 +398,6 @@ export default function TabelLogMasuk() {
     return category ? category.name : "Unknown";
   };
 
-  // const statusBodyTemplate = (rowData) => {
-  //   return (
-  //     <Tag
-  //       value={rowData.inventoryStatus}
-  //       severity={getSeverity(rowData)}
-  //     ></Tag>
-  //   );
-  // };
-
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex justify-center">
@@ -449,22 +420,6 @@ export default function TabelLogMasuk() {
       </div>
     );
   };
-
-  // const getSeverity = (product) => {
-  //   switch (product.inventoryStatus) {
-  //     case "INSTOCK":
-  //       return "success";
-
-  //     case "LOWSTOCK":
-  //       return "warning";
-
-  //     case "OUTOFSTOCK":
-  //       return "danger";
-
-  //     default:
-  //       return null;
-  //   }
-  // };
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -529,6 +484,7 @@ export default function TabelLogMasuk() {
       />
     </React.Fragment>
   );
+
   const deleteLogProductDialogFooter = (
     <React.Fragment>
       <Button
@@ -547,22 +503,6 @@ export default function TabelLogMasuk() {
       />
     </React.Fragment>
   );
-  // const deleteLogProductsDialogFooter = (
-  //   <React.Fragment>
-  //     <Button
-  //       label="No"
-  //       icon="pi pi-times"
-  //       outlined
-  //       onClick={hidedeleteLogProductsDialog}
-  //     />
-  //     <Button
-  //       label="Yes"
-  //       icon="pi pi-check"
-  //       severity="danger"
-  //       onClick={deleteSelectedProducts}
-  //     />
-  //   </React.Fragment>
-  // );
 
   return (
     <div>
