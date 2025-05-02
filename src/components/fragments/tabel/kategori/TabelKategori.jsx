@@ -23,6 +23,8 @@ export default function TabelKategori() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [currentCategory, setCurrentCategory] = useState({ name: "" });
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
   const toast = useRef(null);
 
   const fetchCategories = async () => {
@@ -127,6 +129,12 @@ export default function TabelKategori() {
     setCurrentCategory((prev) => ({ ...prev, [name]: val }));
   };
 
+  const isCategoryNameExists = (name) => {
+    return categories.some(
+      (category) => category.name.toLowerCase() === name.toLowerCase()
+    );
+  };
+
   const saveCategory = async () => {
     setSubmitted(true);
 
@@ -140,13 +148,40 @@ export default function TabelKategori() {
       return;
     }
 
+    // Cek apakah nama kategori sudah ada (kecuali dalam mode edit)
+    if (!isEditMode && isCategoryNameExists(currentCategory.name)) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Nama kategori sudah ada",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Jika dalam mode edit, cek apakah nama baru berbeda dengan nama lama
+    // dan nama baru tersebut sudah ada di kategori lain
+    if (
+      isEditMode &&
+      currentCategory.name !==
+        categories.find((cat) => cat._id === currentCategory._id)?.name &&
+      isCategoryNameExists(currentCategory.name)
+    ) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Nama kategori sudah ada",
+        life: 3000,
+      });
+      return;
+    }
+
     try {
       const categoryData = {
         nama: currentCategory.name,
       };
 
       if (isEditMode) {
-        // Update kategori
         const updatedCategory = await CategoryService.updateCategory(
           currentCategory._id,
           categoryData
@@ -167,7 +202,6 @@ export default function TabelKategori() {
           life: 3000,
         });
       } else {
-        // Tambah kategori baru
         const newCategory = await CategoryService.addCategory(categoryData);
         setCategories([
           ...categories,
@@ -205,10 +239,27 @@ export default function TabelKategori() {
     }
   };
 
-  const deleteCategory = async (categoryId) => {
+  const confirmDelete = (category) => {
+    if (getProductCount(category.id) > 0) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Tidak bisa menghapus kategori yang memiliki produk",
+        life: 3000,
+      });
+      return;
+    }
+
+    setCategoryToDelete(category);
+    setDeleteDialogVisible(true);
+  };
+
+  const handleDelete = async () => {
     try {
-      await CategoryService.deleteCategory(categoryId);
-      setCategories(categories.filter((cat) => cat._id !== categoryId));
+      await CategoryService.deleteCategory(categoryToDelete._id);
+      setCategories(
+        categories.filter((cat) => cat._id !== categoryToDelete._id)
+      );
       toast.current.show({
         severity: "success",
         summary: "Berhasil",
@@ -223,26 +274,9 @@ export default function TabelKategori() {
         detail: error.response?.data?.message || "Gagal menghapus kategori",
         life: 3000,
       });
-    }
-  };
-
-  const confirmDelete = (category) => {
-    if (getProductCount(category.id) > 0) {
-      toast.current.show({
-        severity: "warn",
-        summary: "Peringatan",
-        detail: "Tidak bisa menghapus kategori yang memiliki produk",
-        life: 3000,
-      });
-      return;
-    }
-
-    if (
-      window.confirm(
-        `Apakah Anda yakin ingin menghapus kategori ${category.name}?`
-      )
-    ) {
-      deleteCategory(category._id);
+    } finally {
+      setDeleteDialogVisible(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -252,7 +286,7 @@ export default function TabelKategori() {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-    "products.nama_produk": {
+    "categories.name": {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
@@ -334,11 +368,12 @@ export default function TabelKategori() {
         icon="pi pi-times"
         outlined
         onClick={hideCategoryDialog}
+        className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
       />
       <Button
         label={isEditMode ? "Update" : "Simpan"}
         icon="pi pi-check"
-        className="bg-sky-600 text-white"
+        className="px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
         onClick={saveCategory}
       />
     </React.Fragment>
@@ -386,7 +421,6 @@ export default function TabelKategori() {
           <Column
             header="Jumlah Produk"
             body={productCountBodyTemplate}
-            sortable
             style={{ minWidth: "8rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
@@ -478,6 +512,47 @@ export default function TabelKategori() {
             headerClassName="border border-slate-300"
           />
         </DataTable>
+      </Dialog>
+
+      {/* Dialog Konfirmasi Hapus */}
+      <Dialog
+        visible={deleteDialogVisible}
+        style={{ width: "32rem" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        header="Konfirmasi"
+        modal
+        footer={
+          <div>
+            <Button
+              label="Tidak"
+              icon="pi pi-times"
+              outlined
+              onClick={() => setDeleteDialogVisible(false)}
+              className="px-2 py-1.5 border-1 border-gray-400 text-sm text-gray-700 mr-2"
+            />
+            <Button
+              label="Ya"
+              icon="pi pi-check"
+              severity="danger"
+              onClick={handleDelete}
+              className="px-2.5 py-1.5 text-sm border-1 border-red-500 text-white bg-red-500"
+            />
+          </div>
+        }
+        onHide={() => setDeleteDialogVisible(false)}
+      >
+        <div className="confirmation-content flex align-items-center">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: "2rem", color: "var(--red-500)" }}
+          />
+          {categoryToDelete && (
+            <span>
+              Apakah Anda yakin ingin menghapus kategori{" "}
+              <b>{categoryToDelete.name}</b>?
+            </span>
+          )}
+        </div>
       </Dialog>
     </div>
   );

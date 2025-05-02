@@ -393,14 +393,14 @@ export default function TabelLogKeluar() {
   const productDialogFooter = (
     <React.Fragment>
       <Button
-        label="Cancel"
+        label="Batal"
         icon="pi pi-times"
         style={{ fontSize: "0.5rem" }}
         className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
         onClick={hideDialog}
       />
       <Button
-        label={isEditMode ? "Update" : "Save"}
+        label={isEditMode ? "Update" : "Simpan"}
         icon="pi pi-check"
         style={{ fontSize: "0.5rem" }}
         className="px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"

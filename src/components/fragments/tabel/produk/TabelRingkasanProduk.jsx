@@ -257,14 +257,14 @@ export default function TabelRingkasanProduk() {
   const productDialogFooter = (
     <React.Fragment>
       <Button
-        label="Cancel"
+        label="Batal"
         icon="pi pi-times"
         outlined
         onClick={() => setProductDialog(false)}
         className="px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2"
       />
       <Button
-        label="Save"
+        label="Simpan"
         icon="pi pi-check"
         className="px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
         onClick={saveProduct}
