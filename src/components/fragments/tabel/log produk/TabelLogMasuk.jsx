@@ -139,12 +139,7 @@ export default function TabelLogMasuk() {
       return;
     }
 
-    if (
-      !product.kode_produk ||
-      !product.tanggal ||
-      !product.harga ||
-      !product.stok
-    ) {
+    if (!product.kode_produk || !product.tanggal || !product.stok) {
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -302,6 +297,7 @@ export default function TabelLogMasuk() {
       kode_produk: selectedCode,
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
+      harga: selectedProduct?.harga || prev.harga || 0, // Pertahankan harga produk yang dipilih
     }));
   };
 
@@ -356,7 +352,6 @@ export default function TabelLogMasuk() {
     setProduct((prev) => ({
       ...emptyProduct,
       tanggal: prev.tanggal,
-      harga: prev.harga,
       stok: prev.stok,
     }));
 
@@ -741,25 +736,28 @@ export default function TabelLogMasuk() {
         </div>
 
         <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="harga" className="font-bold">
-              Harga
-            </label>
-            <InputNumber
-              id="harga"
-              value={product.harga}
-              onChange={(e) => onInputNumberChange(e, "harga")}
-              inputClassName={classNames(
-                "border border-slate-400 p-2 rounded-md",
-                {
-                  "p-invalid border-red-500": submitted && !product.harga,
-                }
+          {showNewProductFields && (
+            <div className="field col">
+              <label htmlFor="harga" className="font-bold">
+                Harga
+              </label>
+              <InputNumber
+                id="harga"
+                value={product.harga}
+                onChange={(e) => onInputNumberChange(e, "harga")}
+                inputClassName={classNames(
+                  "border border-slate-400 p-2 rounded-md",
+                  {
+                    "p-invalid border-red-500": submitted && !product.harga,
+                  }
+                )}
+              />
+              {submitted && !product.harga && (
+                <small className="p-error">Harga harus diisi</small>
               )}
-            />
-            {submitted && !product.harga && (
-              <small className="p-error">Harga harus diisi</small>
-            )}
-          </div>
+            </div>
+          )}
+
           <div className="field col">
             <label htmlFor="stok" className="font-bold">
               Stok Masuk
