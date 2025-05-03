@@ -124,6 +124,21 @@ export default function TabelLogKeluar() {
   const saveProduct = async () => {
     setSubmitted(true);
 
+    if (
+      !product.kode_produk ||
+      !product.tanggal ||
+      !product.harga ||
+      !product.stok
+    ) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Lengkapi data terlebih dahulu!",
+        life: 3000,
+      });
+      return;
+    }
+
     const selectedProduct = productList.find(
       (p) => p.kode_produk === product.kode_produk
     );
@@ -179,11 +194,17 @@ export default function TabelLogKeluar() {
       setProduct(emptyProduct);
       fetchLogProducts();
     } catch (error) {
-      console.error("Error:", error);
+      console.error(
+        isEditMode ? "Gagal mengupdate produk:" : "Gagal menambahkan produk:",
+        error.response?.data || error.message
+      );
+
       toast.current.show({
         severity: "error",
         summary: "Gagal",
-        detail: error.response?.data?.message || "Terjadi kesalahan",
+        detail:
+          error.response?.data?.message ||
+          (isEditMode ? "Gagal mengupdate produk" : "Gagal menambahkan produk"),
         life: 3000,
       });
     } finally {
@@ -554,9 +575,12 @@ export default function TabelLogKeluar() {
             placeholder={isLoadingProducts ? "Memuat..." : "Pilih Produk..."}
             disabled={isLoadingProducts}
             className={classNames("border border-slate-400 w-full", {
-              "p-invalid": submitted && !product.kode_produk,
+              "p-invalid border-red-500": submitted && !product.kode_produk,
             })}
           />
+          {submitted && !product.kode_produk && (
+            <small className="p-error">Pilih produk terlebih dahulu</small>
+          )}
         </div>
 
         <div className="field">
