@@ -121,6 +121,27 @@ export default function TabelLogKeluar() {
     setdeleteLogProductDialog(false);
   };
 
+  const getFirstInDate = async (kodeProduk) => {
+    try {
+      const response = await InLogProdService.getAllLogProducts();
+      const productLogs = response.LogProduk || [];
+
+      // Filter hanya log masuk untuk produk ini
+      const inLogs = productLogs.filter(
+        (log) =>
+          log.produk?.kode_produk === kodeProduk && log.isProdukMasuk === true
+      );
+      if (inLogs.length === 0) return null;
+
+      // Urutkan berdasarkan tanggal, kemudian ambil tanggal paling awal
+      inLogs.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+      return new Date(inLogs[0].tanggal);
+    } catch (error) {
+      console.error("Gagal mengambil log produk:", error);
+      return null;
+    }
+  };
+
   const saveProduct = async () => {
     setSubmitted(true);
 
@@ -150,6 +171,21 @@ export default function TabelLogKeluar() {
         summary: "Error",
         detail: `Stok keluar melebihi stok yang tersedia (${selectedProduct.stok})`,
         life: 3000,
+      });
+      return;
+    }
+
+    // Validasi tanggal keluar
+    const firstInDate = await getFirstInDate(product.kode_produk);
+    const outDate = new Date(product.tanggal);
+
+    if (firstInDate && outDate < firstInDate) {
+      const formattedFirstInDate = firstInDate.toLocaleDateString("id-ID");
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: `Tanggal keluar tidak boleh lebih awal dari tanggal masuk pertama (${formattedFirstInDate})`,
+        life: 5000,
       });
       return;
     }
