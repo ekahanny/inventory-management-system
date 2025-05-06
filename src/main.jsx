@@ -14,8 +14,13 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import { Kategori } from "./pages/Kategori.jsx";
 import RiwayatProduk from "./pages/RiwayatProduk.jsx";
 import DetailRiwayatProduk from "./pages/DetailRiwayatProduk.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
 
 const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
   {
     path: "/",
     element: <Dashboard />,
