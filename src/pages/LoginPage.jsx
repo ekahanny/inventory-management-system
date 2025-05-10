@@ -2,11 +2,61 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import backgroundPhoto from "../assets/bgblue.jpg";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import UserService from "../services/UserService";
+import { useNavigate } from "react-router-dom";
+import { Toast } from "primereact/toast";
 
 export default function LoginPage() {
-  const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const toast = useRef(null);
+
+  const handleLogin = async () => {
+    if (!username || !password) {
+      showError("Username dan Password harus diisi!");
+      return;
+    }
+
+    try {
+      const userData = { username, password };
+      const response = await UserService.userLogin(userData);
+      console.log("login response: ", response);
+
+      if (response) {
+        // Save token to localStorage or context
+        localStorage.setItem("token", response.accessToken);
+        // localStorage.setItem("user", JSON.stringify(response.user));
+
+        showSuccess("Login berhasil!");
+        navigate("/"); // Redirect to dashboard after login
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      showError(
+        error.response?.data?.message || "Login gagal. Silakan coba lagi."
+      );
+    }
+  };
+
+  const showSuccess = (message) => {
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: message,
+      life: 3000,
+    });
+  };
+
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: message,
+      life: 3000,
+    });
+  };
 
   return (
     <div
@@ -18,6 +68,7 @@ export default function LoginPage() {
         backgroundRepeat: "no-repeat",
       }}
     >
+      <Toast ref={toast} />
       <h1 className="text-white text-5xl font-bold mb-5">Welcome Back!👋🏻 </h1>
       <div
         className="card"
@@ -32,10 +83,6 @@ export default function LoginPage() {
         }}
       >
         <div className="flex flex-column align-items-center gap-4 px-3">
-          {/* <h1 className="text-4xl font-bold  text-white text-center mt-4">
-            SIGN IN
-          </h1> */}
-
           <div className="w-full">
             <label htmlFor="username" className="block text-white mb-2">
               Username
@@ -49,6 +96,7 @@ export default function LoginPage() {
                 root: { style: { borderRadius: "8px" } },
               }}
               placeholder="Masukkan Username"
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
             />
           </div>
 
@@ -67,8 +115,8 @@ export default function LoginPage() {
                 input: { style: { width: "100%" } },
               }}
               placeholder="Masukkan Password"
-              // toggleMask
               feedback={false}
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
             />
           </div>
 
@@ -76,9 +124,9 @@ export default function LoginPage() {
             label="Login"
             className="py-2 px-4 mt-2 bg-white text-blue-600 font-semibold"
             raised
-            onClick={() =>
-              console.log("Login attempt:", { username, password })
-            }
+            onClick={handleLogin}
+            // loading={loading}
+            // disabled={loading}
           />
 
           <div className="">

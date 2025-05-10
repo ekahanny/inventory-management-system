@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import App from "./App.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dashboard } from "./pages/Dashboard.jsx";
@@ -15,6 +14,7 @@ import { Kategori } from "./pages/Kategori.jsx";
 import RiwayatProduk from "./pages/RiwayatProduk.jsx";
 import DetailRiwayatProduk from "./pages/DetailRiwayatProduk.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import ProtectedRoute from "../src/components/fragments/auth/ProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,35 +22,50 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/",
-    element: <Dashboard />,
-  },
-  {
-    path: "/riwayat-produk",
-    element: <RiwayatProduk />,
-  },
-  {
-    path: "/barang-masuk",
-    element: <BarangMasuk />,
-  },
-  {
-    path: "/barang-keluar",
-    element: <BarangKeluar />,
-  },
-  {
-    path: "/kategori",
-    element: <Kategori />,
-  },
-  {
-    path: "/detail-riwayat/:id",
-    element: <DetailRiwayatProduk />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/",
+        element: <Dashboard />,
+      },
+      {
+        path: "/riwayat-produk",
+        element: <RiwayatProduk />,
+      },
+      {
+        path: "/barang-masuk",
+        element: <BarangMasuk />,
+      },
+      {
+        path: "/barang-keluar",
+        element: <BarangKeluar />,
+      },
+      {
+        path: "/kategori",
+        element: <Kategori />,
+      },
+      {
+        path: "/detail-riwayat/:id",
+        element: <DetailRiwayatProduk />,
+      },
+    ],
   },
 ]);
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <PrimeReactProvider>
-      <RouterProvider router={router} />
-    </PrimeReactProvider>
-  </StrictMode>
-);
+// Redirect root to login if not authenticated
+const root = createRoot(document.getElementById("root"));
+
+const App = () => {
+  const isAuthenticated = localStorage.getItem("token");
+  const initialPath = isAuthenticated ? "/" : "/login";
+
+  return (
+    <StrictMode>
+      <PrimeReactProvider>
+        <RouterProvider router={router} />
+      </PrimeReactProvider>
+    </StrictMode>
+  );
+};
+
+root.render(<App />);
