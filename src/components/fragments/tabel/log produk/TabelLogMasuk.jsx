@@ -159,6 +159,27 @@ export default function TabelLogMasuk() {
       return;
     }
 
+    // Validasi stok tidak boleh menyebabkan minus
+    if (isEditMode) {
+      const originalLog = products.find((p) => p._id === product._id);
+      const currentProduct = productList.find(
+        (p) => p.kode_produk === product.kode_produk
+      );
+
+      if (originalLog && currentProduct) {
+        const stokDifference = product.stok - originalLog.stok;
+        if (currentProduct.stok + stokDifference < 0) {
+          toast.current.show({
+            severity: "error",
+            summary: "Gagal",
+            detail: "Perubahan stok akan menyebabkan stok minus",
+            life: 3000,
+          });
+          return;
+        }
+      }
+    }
+
     setSubmitted(false);
 
     const productData = {
@@ -173,6 +194,7 @@ export default function TabelLogMasuk() {
 
     try {
       if (isEditMode) {
+        const originalLog = products.find((p) => p._id === product._id);
         const updatedProduct = await InLogProdService.updateLogProduct(
           product._id,
           productData
@@ -185,6 +207,20 @@ export default function TabelLogMasuk() {
           )
         );
 
+        // Update stok produk jika ada perubahan
+        if (originalLog && originalLog.stok !== product.stok) {
+          const currentProduct = productList.find(
+            (p) => p.kode_produk === product.kode_produk
+          );
+          if (currentProduct) {
+            await ProductService.updateProduct(currentProduct._id, {
+              ...currentProduct,
+              stok: currentProduct.stok + (product.stok - originalLog.stok),
+            });
+            fetchProducts();
+          }
+        }
+
         toast.current.show({
           severity: "success",
           summary: "Berhasil",
@@ -194,6 +230,18 @@ export default function TabelLogMasuk() {
       } else {
         const addedProduct = await InLogProdService.addLogProduct(productData);
         setProducts((prevProducts) => [...prevProducts, addedProduct]);
+
+        // Update stok produk
+        const currentProduct = productList.find(
+          (p) => p.kode_produk === product.kode_produk
+        );
+        if (currentProduct) {
+          await ProductService.updateProduct(currentProduct._id, {
+            ...currentProduct,
+            stok: currentProduct.stok + product.stok,
+          });
+          fetchProducts();
+        }
 
         toast.current.show({
           severity: "success",
@@ -244,10 +292,34 @@ export default function TabelLogMasuk() {
 
   const deleteLogProduct = async () => {
     try {
+      // Cek apakah stok log masuk sudah digunakan dalam log keluar
+      const currentProduct = productList.find(
+        (p) => p.kode_produk === product.kode_produk
+      );
+      if (currentProduct && currentProduct.stok < product.stok) {
+        toast.current.show({
+          severity: "error",
+          summary: "Gagal",
+          detail:
+            "Tidak dapat menghapus karena stok telah digunakan dalam transaksi keluar",
+          life: 3000,
+        });
+        return;
+      }
+
       await InLogProdService.deleteLogProduct(product._id);
       setProducts((prevProducts) =>
         prevProducts.filter((val) => val._id !== product._id)
       );
+
+      // Update stok produk
+      if (currentProduct) {
+        await ProductService.updateProduct(currentProduct._id, {
+          ...currentProduct,
+          stok: currentProduct.stok - product.stok,
+        });
+        fetchProducts();
+      }
 
       setdeleteLogProductDialog(false);
       setProduct(products);
@@ -259,6 +331,12 @@ export default function TabelLogMasuk() {
       });
     } catch (error) {
       console.error("Gagal menghapus produk:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Gagal",
+        detail: error.response?.data?.message || "Gagal menghapus produk",
+        life: 3000,
+      });
     }
   };
 
