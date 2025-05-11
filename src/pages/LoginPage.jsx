@@ -24,19 +24,32 @@ export default function LoginPage() {
       const response = await UserService.userLogin(userData);
       console.log("login response: ", response);
 
-      if (response) {
-        // Save token to localStorage or context
+      if (response && response.accessToken) {
+        // Validasi token ada dan tidak undefined
         localStorage.setItem("token", response.accessToken);
-        // localStorage.setItem("user", JSON.stringify(response.user));
-
         showSuccess("Login berhasil!");
-        navigate("/"); // Redirect to dashboard after login
+        navigate("/");
+      } else {
+        throw new Error("Token tidak diterima dari server");
       }
     } catch (error) {
       console.error("Login error:", error);
-      showError(
-        error.response?.data?.message || "Login gagal. Silakan coba lagi."
-      );
+      localStorage.removeItem("token"); // Bersihkan token jika ada
+
+      // Penanganan error spesifik
+      if (error.response) {
+        const status = error.response.status;
+
+        if (status === 400) {
+          setUsername("");
+          setPassword("");
+          showError("Username atau password salah");
+        } else {
+          showError("Terjadi kesalahan pada server");
+        }
+      } else {
+        showError("Login gagal. Silakan coba lagi.");
+      }
     }
   };
 

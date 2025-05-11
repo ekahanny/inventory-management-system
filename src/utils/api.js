@@ -7,4 +7,43 @@ const axiosInstance = axios.create({
   // withCredentials: true,
 });
 
+// Request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+
+    // Validasi token sebelum attach ke header
+    if (token && token !== "undefined" && token !== "null") {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // Hapus token invalid jika ada
+      localStorage.removeItem("token");
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle error response
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+
+      // Jika menggunakan React Router v6
+      // if (window.location.pathname !== "/login") {
+      //   window.location.href = "/login";
+      //   toast.error("Sesi telah berakhir, silakan login kembali");
+      // }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;
