@@ -23,3 +23,11 @@
   box-shadow: none;
   border-color: inherit;
 }
+
+.center-table-wrapper .p-datatable .p-datatable-thead > tr > th {
+  text-align: center !important;
+}
+
+.center-table-wrapper .p-column-header-content {
+  justify-content: center !important;
+}

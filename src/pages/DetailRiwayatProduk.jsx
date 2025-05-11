@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProductService from "../services/ProductService";
@@ -102,6 +103,17 @@ export default function DetailRiwayatProduk() {
     return category ? category.name : "Unknown";
   };
 
+  const getSeverity = (stok) => {
+    switch (true) {
+      case stok <= 10:
+        return "danger";
+      case stok <= 50:
+        return "warning";
+      default:
+        return "success";
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
       year: "numeric",
@@ -111,66 +123,98 @@ export default function DetailRiwayatProduk() {
   };
 
   return (
-    <div className="flex bg-slate-200 px-3 py-4">
+    <div className="flex bg-slate-200">
       <SidebarComponent />
-      <div className="flex-1">
-        <div className="ml-[210px] mt-[40px] p-4">
+      <div className="flex-1 min-h-screen">
+        <div className="ml-[210px] p-4">
           <NavBar />
 
-          <Button
-            label="Kembali"
-            icon="pi pi-angle-double-left"
-            className="bg-sky-500 hover:bg-sky-600 mr-7 mb-3 text-white text-lg px-3 py-2"
-            onClick={() => navigate(-1)}
-          />
+          <div className="flex justify-between items-center mt-7 mb-4 ml-4">
+            <Button
+              label="Kembali"
+              icon="pi pi-angle-double-left"
+              className="bg-sky-500 hover:bg-sky-600 text-white px-3 py-2"
+              onClick={() => navigate(-1)}
+            />
+          </div>
 
-          {/* Konten Kategori Barang */}
           <div
             ref={componentRef}
-            className="min-h-screen bg-white rounded-md shadow-lg border border-sky-200"
+            className="bg-white rounded-md shadow-lg border border-sky-200 mb-3 mx-3"
           >
-            <h1 className="text-4xl text-sky-700 font-bold text-center pt-7">
-              DETAIL RIWAYAT PRODUK
-            </h1>
-
             {product && (
-              <div className="space-y-2 text-black text-lg ml-28 mr-16 mt-5">
-                <p>
-                  <span className="font-medium">Kode Produk:</span>{" "}
-                  {product.kode_produk}
-                </p>
-                <p>
-                  <span className="font-medium">Nama Produk:</span>{" "}
-                  {product.nama_produk}
-                </p>
-                <p>
-                  <span className="font-medium">Kategori:</span>{" "}
-                  {getCategoryName(product.kategori)}
-                </p>
+              <div className="p-6">
+                <h1 className="text-3xl text-sky-700 font-bold text-center mt-3 mb-4">
+                  DETAIL RIWAYAT PRODUK
+                </h1>
 
-                <div className="card pr-10">
+                <div className=" gap-6 mb-5 text-black text-lg ml-5">
+                  <div className="">
+                    <span className="font-medium">Kode Produk:</span>{" "}
+                    {product.kode_produk}
+                  </div>
+                  <div>
+                    <span className="font-medium">Nama Produk:</span>{" "}
+                    {product.nama_produk}
+                  </div>
+                  <div>
+                    <span className="font-medium">Kategori:</span>{" "}
+                    {getCategoryName(product.kategori)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Status:</span>
+                    {(() => {
+                      const severity = getSeverity(product?.stok || 0);
+                      const statusConfig = {
+                        danger: {
+                          text: "Stok Kurang",
+                          color: "bg-red-500",
+                        },
+                        warning: {
+                          text: "Stok Menipis",
+                          color: "bg-yellow-500",
+                        },
+                        success: {
+                          text: "Stok Aman",
+                          color: "bg-green-500",
+                        },
+                      };
+
+                      const config = statusConfig[severity];
+
+                      return (
+                        <>
+                          <div
+                            className={`p-2 rounded-full ${config.color} animate-pulse`}
+                          ></div>
+                          <span> {config.text}</span>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                <div className="center-table-wrapper overflow-x-auto mx-4">
                   <DataTable
                     value={logProduct}
-                    tableStyle={{ minWidth: "50rem", marginTop: "0.8rem" }}
+                    sortField="tanggal"
+                    sortOrder={1}
+                    tableStyle={{ minWidth: "100%" }}
+                    headerStyle={{ textAlign: "center" }}
                     showFooter
+                    autoLayout
+                    className="text-sm"
                     footerColumnGroup={
                       <ColumnGroup>
                         <Row>
                           <Column
                             footer="Total Jumlah Produk"
                             colSpan={3}
-                            footerStyle={{
-                              border: "1px solid #94a3b8",
-                            }}
-                            footerClassName="font-bold border border-slate-040"
+                            footerClassName="font-bold border border-slate-400"
                           />
                           <Column
                             footer={product?.stok || 0}
-                            footerStyle={{
-                              border: "1px solid #94a3b8",
-                              textAlign: "center",
-                            }}
-                            footerClassName="font-bold"
+                            footerClassName="font-bold border border-slate-400 text-center"
                           />
                         </Row>
                       </ColumnGroup>
@@ -178,18 +222,18 @@ export default function DetailRiwayatProduk() {
                   >
                     <Column
                       header="No."
-                      body={(rowData, { rowIndex }) => rowIndex + 1}
-                      style={{ width: "5%", textAlign: "center" }}
+                      body={(_, { rowIndex }) => rowIndex + 1}
                       className="border border-slate-400 text-center"
-                      headerClassName="border border-slate-400 bg-slate-200"
+                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                      headerStyle={{ textAlign: "center" }}
                     />
                     <Column
                       field="tanggal"
                       header="Tanggal"
                       body={(rowData) => formatDate(rowData.tanggal)}
-                      style={{ width: "15%" }}
-                      className="border border-slate-400"
-                      headerClassName="border border-gray-400 bg-slate-200"
+                      className="border border-slate-400 text-center"
+                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                      headerStyle={{ textAlign: "center" }}
                     />
                     <Column
                       field="isProdukMasuk"
@@ -197,27 +241,37 @@ export default function DetailRiwayatProduk() {
                       body={(rowData) =>
                         rowData.isProdukMasuk ? "Barang Masuk" : "Barang Keluar"
                       }
-                      style={{ width: "15%" }}
-                      className="border border-slate-400"
-                      headerClassName="border border-slate-400 bg-slate-200"
+                      className="border border-slate-400 text-center"
+                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                      headerStyle={{ textAlign: "center" }}
                     />
                     <Column
                       field="stok"
                       header="Jumlah"
-                      body={(rowData) => rowData.stok}
-                      style={{ width: "10%" }}
+                      body={(rowData) => (
+                        <span
+                          className={
+                            rowData.isProdukMasuk
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {rowData.isProdukMasuk ? "+" : "-"}
+                          {rowData.stok}
+                        </span>
+                      )}
                       className="border border-slate-400 text-center"
-                      headerClassName="border border-gray-400 bg-slate-200"
+                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                      headerStyle={{ textAlign: "center" }}
                     />
                   </DataTable>
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center mt-6">
                   <Button
                     label="Cetak"
                     icon="pi pi-print"
-                    // onClick={handlePrint}
-                    className="bg-sky-600 text-white text-sm px-3 py-2 mt-12"
+                    className="bg-sky-600 text-white px-4 py-2"
                   />
                 </div>
               </div>
