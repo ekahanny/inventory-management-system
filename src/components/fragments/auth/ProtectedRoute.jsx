@@ -3,11 +3,11 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 const ProtectedRoute = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   useEffect(() => {
     if (!token || token === "undefined" || token === "null") {
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       navigate("/login", { replace: true });
     }
   }, [navigate, token]);

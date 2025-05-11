@@ -57,7 +57,7 @@ const router = createBrowserRouter([
 const root = createRoot(document.getElementById("root"));
 
 const App = () => {
-  const isAuthenticated = localStorage.getItem("token");
+  const isAuthenticated = sessionStorage.getItem("token");
   const initialPath = isAuthenticated ? "/" : "/login";
 
   return (

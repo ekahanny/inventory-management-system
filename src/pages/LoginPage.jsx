@@ -26,7 +26,7 @@ export default function LoginPage() {
 
       if (response && response.accessToken) {
         // Validasi token ada dan tidak undefined
-        localStorage.setItem("token", response.accessToken);
+        sessionStorage.setItem("token", response.accessToken);
         showSuccess("Login berhasil!");
         navigate("/");
       } else {
