@@ -1,17 +1,47 @@
 import React, { useState, useRef } from "react";
 import { Sidebar } from "primereact/sidebar";
-import { StyleClass } from "primereact/styleclass";
 import { NavLink } from "react-router-dom";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
 
 export default function SidebarComponent() {
-  const [visible, setVisible] = useState(false);
-  const btnRef1 = useRef(null);
-  const btnRef2 = useRef(null);
-  const btnRef3 = useRef(null);
-  const btnRef4 = useRef(null);
+  const toast = useRef(null);
+
+  const handleLogout = () => {
+    confirmDialog({
+      message: "Are you sure you want to sign out?",
+      header: "Logout Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      acceptClassName:
+        "px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400",
+      rejectClassName:
+        "px-2 py-1.5 border-1 border-sky-400 text-sm text-sky-400 mr-2",
+      acceptLabel: "Yes",
+      rejectLabel: "Cancel",
+      accept: () => {
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Redirect to login page
+        setTimeout(() => {
+          window.location.href = "/login"; // Full page reload to clear state
+        }, 1000);
+      },
+      reject: () => {
+        toast.current.show({
+          severity: "info",
+          summary: "Cancelled",
+          detail: "Logout was cancelled",
+          life: 3000,
+        });
+      },
+    });
+  };
 
   return (
     <div className="card flex justify-content-center">
+      <Toast ref={toast} />
+      <ConfirmDialog />
       <Sidebar
         visible={true} // Sidebar selalu tampil
         dismissable={false} // Sidebar tidak bisa ditutup dengan klik di luar
@@ -152,7 +182,7 @@ export default function SidebarComponent() {
                 <div className="mt-auto">
                   <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
                   <a
-                    href=""
+                    onClick={handleLogout}
                     className="flex m-2 align-items-center cursor-pointer p-3 gap-2 border-round text-900 hover:surface-200"
                   >
                     <i className="pi pi-sign-out ml-5"></i>
