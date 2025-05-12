@@ -10,11 +10,17 @@ import InLogProdService from "../services/InLogProdService";
 
 export function Dashboard() {
   const [logProduct, setLogProduct] = useState([]);
+  const [pemasukan, setPemasukan] = useState(0);
+  const [pengeluaran, setPengeluaran] = useState(0);
+  const [profit, setProfit] = useState(0);
+  const [currentMonth, setCurrentMonth] = useState("");
 
   const fetchLogProduct = async () => {
     try {
       const response = await InLogProdService.getAllLogProducts();
       setLogProduct(response.LogProduk);
+      hitungKeuangan(response.LogProduk || []);
+
       console.log("Response API Log Produk: ", response.LogProduk);
     } catch (error) {
       console.error("Gagal mengambil log produk: ", error);
@@ -59,6 +65,46 @@ export function Dashboard() {
     ],
   });
 
+  const hitungKeuangan = (logProduk) => {
+    const now = new Date();
+    const monthName = now.toLocaleString("id-ID", { month: "long" });
+    setCurrentMonth(monthName);
+
+    const currentYear = now.getFullYear();
+
+    // Filter log produk untuk bulan ini
+    const logsBulanIni = logProduk.filter((log) => {
+      if (!log.tanggal) return false;
+      const logDate = new Date(log.tanggal);
+      return (
+        logDate.getMonth() === now.getMonth() &&
+        logDate.getFullYear() === currentYear
+      );
+    });
+
+    // Hitung pemasukan (produk keluar)
+    const totalPemasukan = logsBulanIni
+      .filter((log) => log.isProdukMasuk === false)
+      .reduce((total, log) => total + log.harga * log.stok, 0);
+
+    // Hitung pengeluaran (produk masuk)
+    const totalPengeluaran = logsBulanIni
+      .filter((log) => log.isProdukMasuk === true)
+      .reduce((total, log) => total + log.harga * log.stok, 0);
+
+    setPemasukan(totalPemasukan);
+    setPengeluaran(totalPengeluaran);
+    setProfit(totalPemasukan - totalPengeluaran);
+  };
+
+  const formatRupiah = (angka) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(angka);
+  };
+
   return (
     <div className="flex bg-slate-200">
       <SidebarComponent />
@@ -86,10 +132,12 @@ export function Dashboard() {
                   <p className="font-semibold text-lg text-black mt-1">
                     Pemasukan:
                   </p>
-                  <p className="text-sky-800 text-md mt-1">Oct 2024</p>
+                  <p className="text-sky-800 text-md mt-1">
+                    {currentMonth} {new Date().getFullYear()}
+                  </p>
                 </div>
                 <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
-                  Rp. 10.673.954,-
+                  {formatRupiah(pemasukan)}
                 </p>
               </div>
 
@@ -111,40 +159,45 @@ export function Dashboard() {
                   <p className="font-semibold text-lg text-black mt-1">
                     Pengeluaran:
                   </p>
-                  <p className="text-sky-800 text-md mt-1">Oct 2024</p>
+                  <p className="text-sky-800 text-md mt-1">
+                    {currentMonth} {new Date().getFullYear()}
+                  </p>
                 </div>
                 <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
-                  Rp. 7.364.952,-
+                  {formatRupiah(pengeluaran)}
                 </p>
               </div>
 
-              {/* Barang Kadaluwarsa */}
+              {/* Profit */}
               <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
                 <div className="flex flex-row gap-2 justify-center items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="size-7 fill-sky-600"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="white"
+                    className="size-7 mt-1 fill-sky-600"
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M10.339 2.237a.531.531 0 0 0-.678 0 11.947 11.947 0 0 1-7.078 2.75.5.5 0 0 0-.479.425A12.11 12.11 0 0 0 2 7c0 5.163 3.26 9.564 7.834 11.257a.48.48 0 0 0 .332 0C14.74 16.564 18 12.163 18 7c0-.538-.035-1.069-.104-1.589a.5.5 0 0 0-.48-.425 11.947 11.947 0 0 1-7.077-2.75ZM10 6a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 6Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
-                      clipRule="evenodd"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                     />
                   </svg>
-                  <p className="font-semibold text-lg text-black mt-2">
-                    Produk Tidak Bergerak
+                  <p className="font-semibold text-lg text-black mt-1">
+                    Profit:
+                  </p>
+                  <p className="text-sky-800 text-md mt-1">
+                    {currentMonth} {new Date().getFullYear()}
                   </p>
                 </div>
-                <div className="flex items-center justify-center flex-col">
-                  <a
-                    href="#"
-                    className="my-2 font-semibold text-xl text-red-400 underline"
-                  >
-                    4 Produk
-                  </a>
-                </div>
+                <p
+                  className={`flex items-center justify-center mt-3 mb-2 font-semibold text-xl ${
+                    profit < 0 ? "text-red-500" : "text-black"
+                  } `}
+                >
+                  {formatRupiah(profit)}
+                </p>
               </div>
             </div>
 
