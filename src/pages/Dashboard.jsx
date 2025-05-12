@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { BarChart } from "../components/elements/BarChart";
 import { NavBar } from "../components/elements/NavBar";
@@ -7,6 +8,7 @@ import { PieChart } from "../components/elements/PieChart";
 import SidebarComponent from "../components/elements/Sidebar";
 import TabelRingkasanProduk from "../components/fragments/tabel/produk/TabelRingkasanProduk";
 import InLogProdService from "../services/InLogProdService";
+import { Bar } from "react-chartjs-2";
 
 export function Dashboard() {
   const [logProduct, setLogProduct] = useState([]);
@@ -18,8 +20,9 @@ export function Dashboard() {
   const fetchLogProduct = async () => {
     try {
       const response = await InLogProdService.getAllLogProducts();
-      setLogProduct(response.LogProduk);
+      setLogProduct(response.LogProduk || []);
       hitungKeuangan(response.LogProduk || []);
+      processBarChartData(response.LogProduk || []);
 
       console.log("Response API Log Produk: ", response.LogProduk);
     } catch (error) {
@@ -30,22 +33,6 @@ export function Dashboard() {
   useEffect(() => {
     fetchLogProduct();
   }, []);
-
-  const [dataBar, setDataBar] = useState({
-    labels: DataBar.map((data) => data.month),
-    datasets: [
-      {
-        label: "Barang Masuk",
-        backgroundColor: "#5898d9",
-        data: DataBar.map((data) => data.barangMasuk),
-      },
-      {
-        label: "Barang Keluar",
-        backgroundColor: "#a3ceed",
-        data: DataBar.map((data) => data.barangKeluar),
-      },
-    ],
-  });
 
   const sortedDataPie = DataPie.sort((a, b) => b.sold - a.sold).slice(0, 5);
   const [dataPie, setDataPie] = useState({
@@ -95,6 +82,89 @@ export function Dashboard() {
     setPemasukan(totalPemasukan);
     setPengeluaran(totalPengeluaran);
     setProfit(totalPemasukan - totalPengeluaran);
+  };
+
+  const [dataBar, setDataBar] = useState({
+    labels: DataBar.map((data) => data.month),
+    datasets: [
+      {
+        label: "Barang Masuk",
+        backgroundColor: "#5898d9",
+        data: DataBar.map((data) => data.barangMasuk),
+      },
+      {
+        label: "Barang Keluar",
+        backgroundColor: "#a3ceed",
+        data: DataBar.map((data) => data.barangKeluar),
+      },
+    ],
+  });
+
+  const processBarChartData = (logProduk) => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const monthlyData = {};
+    const months = [];
+
+    for (let month = 0; month < 12; month++) {
+      const date = new Date(currentYear, month, 1);
+      const monthKey = date.toLocaleString("id-ID", { month: "short" });
+      const fullMonthKey = `${monthKey} ${currentYear}`;
+      months.push(fullMonthKey);
+      monthlyData[fullMonthKey] = {
+        barangMasuk: 0,
+        barangKeluar: 0,
+      };
+    }
+
+    logProduk.forEach((log) => {
+      if (!log.tanggal) return;
+      const logDate = new Date(log.tanggal);
+      if (logDate.getFullYear() !== currentYear) return;
+
+      const monthKey = logDate.toLocaleString("id-ID", { month: "short" });
+      const fullMonthKey = `${monthKey} ${currentYear}`;
+
+      if (monthlyData[fullMonthKey]) {
+        if (log.isProdukMasuk) {
+          monthlyData[fullMonthKey].barangMasuk += log.stok;
+        } else {
+          monthlyData[fullMonthKey].barangKeluar += log.stok;
+        }
+      }
+    });
+
+    const masukArray = months.map((month) => monthlyData[month].barangMasuk);
+    const keluarArray = months.map((month) => monthlyData[month].barangKeluar);
+    const maxData = Math.max(...masukArray, ...keluarArray);
+    const maxY = maxData + 20;
+
+    const chartData = {
+      labels: months,
+      datasets: [
+        {
+          label: "Barang Masuk",
+          backgroundColor: "#5898d9",
+          data: masukArray,
+        },
+        {
+          label: "Barang Keluar",
+          backgroundColor: "#a3ceed",
+          data: keluarArray,
+        },
+      ],
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: maxY, // Set max dinamis
+          },
+        },
+      },
+    };
+
+    setDataBar(chartData);
   };
 
   const formatRupiah = (angka) => {
@@ -208,7 +278,7 @@ export function Dashboard() {
                 <h1 className="mt-3 mb-5 text-center font-semibold text-black">
                   Jumlah Barang Masuk & Barang Keluar Per Bulan
                 </h1>
-                <BarChart chartData={dataBar} />
+                <Bar data={dataBar} options={dataBar.options} />
               </div>
 
               {/* Pie Chart */}
