@@ -324,7 +324,6 @@ export default function TabelLogKeluar() {
       kode_produk: selectedCode,
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
-      harga: selectedProduct?.harga || prev.harga, // Isi harga otomatis
     }));
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart } from "../components/elements/BarChart";
 import { NavBar } from "../components/elements/NavBar";
 import { DataBar } from "../utils/DataBar";
@@ -6,8 +6,25 @@ import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";
 import SidebarComponent from "../components/elements/Sidebar";
 import TabelRingkasanProduk from "../components/fragments/tabel/produk/TabelRingkasanProduk";
+import InLogProdService from "../services/InLogProdService";
 
 export function Dashboard() {
+  const [logProduct, setLogProduct] = useState([]);
+
+  const fetchLogProduct = async () => {
+    try {
+      const response = await InLogProdService.getAllLogProducts();
+      setLogProduct(response.LogProduk);
+      console.log("Response API Log Produk: ", response.LogProduk);
+    } catch (error) {
+      console.error("Gagal mengambil log produk: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogProduct();
+  }, []);
+
   const [dataBar, setDataBar] = useState({
     labels: DataBar.map((data) => data.month),
     datasets: [
@@ -66,8 +83,10 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg text-black">Pemasukan:</p>
-                  <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
+                  <p className="font-semibold text-lg text-black mt-1">
+                    Pemasukan:
+                  </p>
+                  <p className="text-sky-800 text-md mt-1">Oct 2024</p>
                 </div>
                 <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
                   Rp. 10.673.954,-
@@ -89,10 +108,10 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg text-black">
+                  <p className="font-semibold text-lg text-black mt-1">
                     Pengeluaran:
                   </p>
-                  <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
+                  <p className="text-sky-800 text-md mt-1">Oct 2024</p>
                 </div>
                 <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
                   Rp. 7.364.952,-
@@ -114,15 +133,14 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg text-black">
-                    Jumlah Produk:
+                  <p className="font-semibold text-lg text-black mt-2">
+                    Produk Tidak Bergerak
                   </p>
-                  <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
                 </div>
                 <div className="flex items-center justify-center flex-col">
                   <a
                     href="#"
-                    className="mt-3 mb-2 font-semibold text-xl text-red-400 underline"
+                    className="my-2 font-semibold text-xl text-red-400 underline"
                   >
                     4 Produk
                   </a>

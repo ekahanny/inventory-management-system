@@ -207,18 +207,24 @@ export default function TabelLogMasuk() {
           )
         );
 
-        // Update stok produk jika ada perubahan
-        if (originalLog && originalLog.stok !== product.stok) {
-          const currentProduct = productList.find(
-            (p) => p.kode_produk === product.kode_produk
-          );
-          if (currentProduct) {
-            await ProductService.updateProduct(currentProduct._id, {
-              ...currentProduct,
-              stok: currentProduct.stok + (product.stok - originalLog.stok),
-            });
-            fetchProducts();
+        // Update master produk (harga dan stok)
+        const currentProduct = productList.find(
+          (p) => p.kode_produk === product.kode_produk
+        );
+        if (currentProduct) {
+          const updateData = {
+            ...currentProduct,
+            harga: product.harga, // Update harga master ke harga terakhir
+          };
+
+          // Update stok jika berbeda
+          if (originalLog && originalLog.stok !== product.stok) {
+            updateData.stok =
+              currentProduct.stok + (product.stok - originalLog.stok);
           }
+
+          await ProductService.updateProduct(currentProduct._id, updateData);
+          fetchProducts(); // Refresh data produk
         }
 
         toast.current.show({
@@ -239,6 +245,7 @@ export default function TabelLogMasuk() {
           await ProductService.updateProduct(currentProduct._id, {
             ...currentProduct,
             stok: currentProduct.stok + product.stok,
+            harga: product.harga,
           });
           fetchProducts();
         }
@@ -375,7 +382,8 @@ export default function TabelLogMasuk() {
       kode_produk: selectedCode,
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
-      harga: selectedProduct?.harga || prev.harga || 0, // Pertahankan harga produk yang dipilih
+      // Hanya set harga dari master produk jika bukan mode edit
+      harga: isEditMode ? prev.harga : selectedProduct?.harga || 0,
     }));
   };
 
@@ -814,27 +822,25 @@ export default function TabelLogMasuk() {
         </div>
 
         <div className="formgrid grid">
-          {showNewProductFields && (
-            <div className="field col">
-              <label htmlFor="harga" className="font-bold">
-                Harga
-              </label>
-              <InputNumber
-                id="harga"
-                value={product.harga}
-                onChange={(e) => onInputNumberChange(e, "harga")}
-                inputClassName={classNames(
-                  "border border-slate-400 p-2 rounded-md",
-                  {
-                    "p-invalid border-red-500": submitted && !product.harga,
-                  }
-                )}
-              />
-              {submitted && !product.harga && (
-                <small className="p-error">Harga harus diisi</small>
+          <div className="field col">
+            <label htmlFor="harga" className="font-bold">
+              Harga Saat Masuk
+            </label>
+            <InputNumber
+              id="harga"
+              value={product.harga}
+              onChange={(e) => onInputNumberChange(e, "harga")}
+              inputClassName={classNames(
+                "border border-slate-400 p-2 rounded-md",
+                {
+                  "p-invalid border-red-500": submitted && !product.harga,
+                }
               )}
-            </div>
-          )}
+            />
+            {submitted && !product.harga && (
+              <small className="p-error">Harga harus diisi</small>
+            )}
+          </div>
 
           <div className="field col">
             <label htmlFor="stok" className="font-bold">
