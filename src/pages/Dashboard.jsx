@@ -66,10 +66,10 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg">Pemasukan:</p>
+                  <p className="font-semibold text-lg text-black">Pemasukan:</p>
                   <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
                 </div>
-                <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl">
+                <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
                   Rp. 10.673.954,-
                 </p>
               </div>
@@ -89,10 +89,12 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg">Pengeluaran:</p>
+                  <p className="font-semibold text-lg text-black">
+                    Pengeluaran:
+                  </p>
                   <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
                 </div>
-                <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl">
+                <p className="flex items-center justify-center mt-3 mb-2 font-semibold text-xl text-black">
                   Rp. 7.364.952,-
                 </p>
               </div>
@@ -112,7 +114,9 @@ export function Dashboard() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="font-semibold text-lg">Kadaluwarsa:</p>
+                  <p className="font-semibold text-lg text-black">
+                    Jumlah Produk:
+                  </p>
                   <p className="text-sky-800 text-md mt-0.5">Oct 2024</p>
                 </div>
                 <div className="flex items-center justify-center flex-col">
@@ -120,7 +124,7 @@ export function Dashboard() {
                     href="#"
                     className="mt-3 mb-2 font-semibold text-xl text-red-400 underline"
                   >
-                    4 Barang
+                    4 Produk
                   </a>
                 </div>
               </div>
@@ -130,7 +134,7 @@ export function Dashboard() {
             <div className="flex flex-row justify-center ml-2 gap-4">
               {/* Bar Chart */}
               <div className="md:w-[850px] sm:w-[500px] bg-white px-10 py-3 rounded-md shadow-lg">
-                <h1 className="mt-3 mb-5 text-center font-semibold">
+                <h1 className="mt-3 mb-5 text-center font-semibold text-black">
                   Jumlah Barang Masuk & Barang Keluar Per Bulan
                 </h1>
                 <BarChart chartData={dataBar} />
@@ -138,11 +142,11 @@ export function Dashboard() {
 
               {/* Pie Chart */}
               <div className="md:w-[350px] bg-white p-4 py-2 rounded-md shadow-lg">
-                <h1 className="my-3 text-center font-semibold">
+                <h1 className="my-3 text-center font-semibold text-black">
                   Barang Terlaris
                 </h1>
                 <PieChart chartData={dataPie} />
-                <p className="flex justify-center items-center mt-3 font-semibold">
+                <p className="flex justify-center items-center mt-6 font-semibold text-black">
                   Oktober 2022
                 </p>
               </div>
