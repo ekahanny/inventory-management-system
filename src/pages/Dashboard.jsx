@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { BarChart } from "../components/elements/BarChart";
 import { NavBar } from "../components/elements/NavBar";
-import { DataBar } from "../utils/DataBar";
 import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";
 import SidebarComponent from "../components/elements/Sidebar";
@@ -85,19 +83,27 @@ export function Dashboard() {
   };
 
   const [dataBar, setDataBar] = useState({
-    labels: DataBar.map((data) => data.month),
+    labels: [],
     datasets: [
       {
         label: "Barang Masuk",
         backgroundColor: "#5898d9",
-        data: DataBar.map((data) => data.barangMasuk),
+        data: [],
       },
       {
         label: "Barang Keluar",
         backgroundColor: "#a3ceed",
-        data: DataBar.map((data) => data.barangKeluar),
+        data: [],
       },
     ],
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
   });
 
   const processBarChartData = (logProduk) => {
@@ -106,8 +112,9 @@ export function Dashboard() {
     const monthlyData = {};
     const months = [];
 
-    for (let month = 0; month < 12; month++) {
-      const date = new Date(currentYear, month, 1);
+    // Inisialisasi data untuk 12 bulan terakhir
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentYear, i, 1);
       const monthKey = date.toLocaleString("id-ID", { month: "short" });
       const fullMonthKey = `${monthKey} ${currentYear}`;
       months.push(fullMonthKey);
@@ -117,8 +124,10 @@ export function Dashboard() {
       };
     }
 
+    // Proses setiap log produk
     logProduk.forEach((log) => {
       if (!log.tanggal) return;
+
       const logDate = new Date(log.tanggal);
       if (logDate.getFullYear() !== currentYear) return;
 
@@ -134,12 +143,15 @@ export function Dashboard() {
       }
     });
 
+    // Siapkan data untuk chart
     const masukArray = months.map((month) => monthlyData[month].barangMasuk);
     const keluarArray = months.map((month) => monthlyData[month].barangKeluar);
-    const maxData = Math.max(...masukArray, ...keluarArray);
-    const maxY = maxData + 20;
 
-    const chartData = {
+    // Hitung max value untuk skala y
+    const maxData = Math.max(...masukArray, ...keluarArray);
+    const maxY = maxData + 15; // Penambahan sesuai permintaan
+
+    setDataBar({
       labels: months,
       datasets: [
         {
@@ -158,13 +170,11 @@ export function Dashboard() {
         scales: {
           y: {
             beginAtZero: true,
-            max: maxY, // Set max dinamis
+            max: maxY,
           },
         },
       },
-    };
-
-    setDataBar(chartData);
+    });
   };
 
   const formatRupiah = (angka) => {
