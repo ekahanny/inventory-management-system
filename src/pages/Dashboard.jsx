@@ -7,38 +7,55 @@ import SidebarComponent from "../components/elements/Sidebar";
 import TabelRingkasanProduk from "../components/fragments/tabel/produk/TabelRingkasanProduk";
 import InLogProdService from "../services/InLogProdService";
 import { Bar } from "react-chartjs-2";
+import CategoryService from "../services/CategoryService";
 
 export function Dashboard() {
   const [logProduct, setLogProduct] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [pemasukan, setPemasukan] = useState(0);
   const [pengeluaran, setPengeluaran] = useState(0);
   const [profit, setProfit] = useState(0);
   const [currentMonth, setCurrentMonth] = useState("");
 
-  const fetchLogProduct = async () => {
-    try {
-      const response = await InLogProdService.getAllLogProducts();
-      setLogProduct(response.LogProduk || []);
-      hitungKeuangan(response.LogProduk || []);
-      processBarChartData(response.LogProduk || []);
-
-      console.log("Response API Log Produk: ", response.LogProduk);
-    } catch (error) {
-      console.error("Gagal mengambil log produk: ", error);
-    }
-  };
-
   useEffect(() => {
-    fetchLogProduct();
+    const fetchData = async () => {
+      try {
+        const [logResponse, categoryResponse] = await Promise.all([
+          InLogProdService.getAllLogProducts(),
+          CategoryService.getCategories(),
+        ]);
+
+        setLogProduct(logResponse.LogProduk || []);
+        setCategories(categoryResponse.KategoriProduk || []);
+
+        // Proses data setelah semua data siap
+        hitungKeuangan(logResponse.LogProduk || []);
+        processBarChartData(logResponse.LogProduk || []);
+        processPieChartData(
+          logResponse.LogProduk || [],
+          categoryResponse.KategoriProduk || []
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const sortedDataPie = DataPie.sort((a, b) => b.sold - a.sold).slice(0, 5);
+  // Untuk memproses data ketika logProduct atau categories berubah
+  useEffect(() => {
+    if (logProduct.length > 0 && categories.length > 0) {
+      processPieChartData(logProduct, categories);
+    }
+  }, [logProduct, categories]);
+
   const [dataPie, setDataPie] = useState({
-    labels: sortedDataPie.map((product) => product.productName),
+    labels: [],
     datasets: [
       {
         label: "Total Sold",
-        data: sortedDataPie.map((product) => product.sold),
+        data: [],
         backgroundColor: [
           "#447ecc",
           "#5898d9",
@@ -116,7 +133,7 @@ export function Dashboard() {
     for (let i = 0; i < 12; i++) {
       const date = new Date(currentYear, i, 1);
       const monthKey = date.toLocaleString("id-ID", { month: "short" });
-      const fullMonthKey = `${monthKey} ${currentYear}`;
+      const fullMonthKey = `${monthKey}`;
       months.push(fullMonthKey);
       monthlyData[fullMonthKey] = {
         barangMasuk: 0,
@@ -132,7 +149,7 @@ export function Dashboard() {
       if (logDate.getFullYear() !== currentYear) return;
 
       const monthKey = logDate.toLocaleString("id-ID", { month: "short" });
-      const fullMonthKey = `${monthKey} ${currentYear}`;
+      const fullMonthKey = `${monthKey}`;
 
       if (monthlyData[fullMonthKey]) {
         if (log.isProdukMasuk) {
@@ -174,6 +191,50 @@ export function Dashboard() {
           },
         },
       },
+    });
+  };
+
+  const processPieChartData = (logProduk) => {
+    if (!categories || categories.length === 0) return;
+
+    const categorySales = {};
+
+    logProduk.forEach((log) => {
+      if (!log.isProdukMasuk && log.produk?.kategori) {
+        const categoryId = log.produk.kategori;
+        const category = categories.find((cat) => cat._id === categoryId);
+
+        if (category) {
+          categorySales[categoryId] = {
+            name: category.nama,
+            sold: (categorySales[categoryId]?.sold || 0) + log.stok,
+          };
+        }
+      }
+    });
+
+    // Konversi ke array dan urutkan
+    const categoryArray = Object.values(categorySales);
+    const sortedCategories = categoryArray
+      .sort((a, b) => b.sold - a.sold)
+      .slice(0, 5);
+
+    // Update state dataPie
+    setDataPie({
+      labels: sortedCategories.map((category) => category.name),
+      datasets: [
+        {
+          label: "Total Barang Terjual",
+          data: sortedCategories.map((category) => category.sold),
+          backgroundColor: [
+            "#447ecc",
+            "#5898d9",
+            "#78b3e2",
+            "#a3cfed",
+            "#c9e1f4",
+          ],
+        },
+      ],
     });
   };
 
@@ -285,8 +346,11 @@ export function Dashboard() {
             <div className="flex flex-row justify-center ml-2 gap-4">
               {/* Bar Chart */}
               <div className="md:w-[850px] sm:w-[500px] bg-white px-10 py-3 rounded-md shadow-lg">
-                <h1 className="mt-3 mb-5 text-center font-semibold text-black">
+                <h1 className="mt-3 text-center font-semibold text-black">
                   Jumlah Barang Masuk & Barang Keluar Per Bulan
+                </h1>
+                <h1 className=" mt-1 mb-3 text-center font-bold text-xl text-black">
+                  ({new Date().getFullYear()})
                 </h1>
                 <Bar data={dataBar} options={dataBar.options} />
               </div>
@@ -298,7 +362,7 @@ export function Dashboard() {
                 </h1>
                 <PieChart chartData={dataPie} />
                 <p className="flex justify-center items-center mt-6 font-semibold text-black">
-                  Oktober 2022
+                  {currentMonth} {new Date().getFullYear()}
                 </p>
               </div>
             </div>
