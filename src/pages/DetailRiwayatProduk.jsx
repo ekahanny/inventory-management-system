@@ -12,6 +12,7 @@ import { Button } from "primereact/button";
 import { useReactToPrint } from "react-to-print";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
+import { LoadingSpinner } from "../components/elements/LoadingSpinner";
 
 export default function DetailRiwayatProduk() {
   const { id } = useParams();
@@ -21,6 +22,7 @@ export default function DetailRiwayatProduk() {
   const [categories, setCategories] = useState([]);
   const componentRef = useRef();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const fetchDetailProduct = async () => {
     try {
@@ -68,22 +70,23 @@ export default function DetailRiwayatProduk() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([
-        fetchDetailProduct(),
-        fetchLogProduct(),
-        fetchCategories(),
-      ]);
+      try {
+        setLoading(true); // mulai loading
+        await Promise.all([
+          fetchDetailProduct(),
+          fetchLogProduct(),
+          fetchCategories(),
+        ]);
+      } catch (error) {
+        console.error("Gagal mengambil data:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      }
     };
     fetchData();
   }, [id]);
-
-  const typeBodyTemplate = (rowData) => {
-    if (rowData === true) {
-      return "Barang Masuk";
-    } else {
-      return "Barang Keluar";
-    }
-  };
 
   // const handlePrint = useReactToPrint({
   //   content: () => componentRef.current,
@@ -129,154 +132,162 @@ export default function DetailRiwayatProduk() {
         <div className="ml-[210px] p-4">
           <NavBar />
 
-          <div className="flex justify-between items-center mt-7 mb-4 ml-4">
-            <Button
-              label="Kembali"
-              icon="pi pi-angle-double-left"
-              className="bg-sky-500 hover:bg-sky-600 text-white px-3 py-2"
-              onClick={() => navigate(-1)}
-            />
-          </div>
-
-          <div
-            ref={componentRef}
-            className="bg-white rounded-md shadow-lg border border-sky-200 mb-3 mx-3"
-          >
-            {product && (
-              <div className="p-6">
-                <h1 className="text-3xl text-sky-700 font-bold text-center mt-3 mb-4">
-                  DETAIL RIWAYAT PRODUK
-                </h1>
-
-                <div className=" gap-6 mb-5 text-black text-lg ml-5">
-                  <div className="">
-                    <span className="font-medium">Kode Produk:</span>{" "}
-                    {product.kode_produk}
-                  </div>
-                  <div>
-                    <span className="font-medium">Nama Produk:</span>{" "}
-                    {product.nama_produk}
-                  </div>
-                  <div>
-                    <span className="font-medium">Kategori:</span>{" "}
-                    {getCategoryName(product.kategori)}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Status:</span>
-                    {(() => {
-                      const severity = getSeverity(product?.stok || 0);
-                      const statusConfig = {
-                        danger: {
-                          text: "Stok Kurang",
-                          color: "bg-red-500",
-                        },
-                        warning: {
-                          text: "Stok Menipis",
-                          color: "bg-yellow-500",
-                        },
-                        success: {
-                          text: "Stok Aman",
-                          color: "bg-green-500",
-                        },
-                      };
-
-                      const config = statusConfig[severity];
-
-                      return (
-                        <>
-                          <div
-                            className={`p-2 rounded-full ${config.color} animate-pulse`}
-                          ></div>
-                          <span> {config.text}</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                <div className="center-table-wrapper overflow-x-auto mx-4">
-                  <DataTable
-                    value={logProduct}
-                    sortField="tanggal"
-                    sortOrder={1}
-                    tableStyle={{ minWidth: "100%" }}
-                    headerStyle={{ textAlign: "center" }}
-                    showFooter
-                    autoLayout
-                    className="text-sm"
-                    footerColumnGroup={
-                      <ColumnGroup>
-                        <Row>
-                          <Column
-                            footer="Total Jumlah Produk"
-                            colSpan={3}
-                            footerClassName="font-bold border border-slate-400"
-                          />
-                          <Column
-                            footer={product?.stok || 0}
-                            footerClassName="font-bold border border-slate-400 text-center"
-                          />
-                        </Row>
-                      </ColumnGroup>
-                    }
-                  >
-                    <Column
-                      header="No."
-                      body={(_, { rowIndex }) => rowIndex + 1}
-                      className="border border-slate-400 text-center"
-                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
-                      headerStyle={{ textAlign: "center" }}
-                    />
-                    <Column
-                      field="tanggal"
-                      header="Tanggal"
-                      body={(rowData) => formatDate(rowData.tanggal)}
-                      className="border border-slate-400 text-center"
-                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
-                      headerStyle={{ textAlign: "center" }}
-                    />
-                    <Column
-                      field="isProdukMasuk"
-                      header="Jenis"
-                      body={(rowData) =>
-                        rowData.isProdukMasuk ? "Barang Masuk" : "Barang Keluar"
-                      }
-                      className="border border-slate-400 text-center"
-                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
-                      headerStyle={{ textAlign: "center" }}
-                    />
-                    <Column
-                      field="stok"
-                      header="Jumlah"
-                      body={(rowData) => (
-                        <span
-                          className={
-                            rowData.isProdukMasuk
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {rowData.isProdukMasuk ? "+" : "-"}
-                          {rowData.stok}
-                        </span>
-                      )}
-                      className="border border-slate-400 text-center"
-                      headerClassName="border border-slate-400 bg-slate-200 !text-center"
-                      headerStyle={{ textAlign: "center" }}
-                    />
-                  </DataTable>
-                </div>
-
-                <div className="flex justify-center mt-6">
-                  <Button
-                    label="Cetak"
-                    icon="pi pi-print"
-                    className="bg-sky-600 text-white px-4 py-2"
-                  />
-                </div>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <div className="flex justify-between items-center mt-7 mb-4 ml-4">
+                <Button
+                  label="Kembali"
+                  icon="pi pi-angle-double-left"
+                  className="bg-sky-500 hover:bg-sky-600 text-white px-3 py-2"
+                  onClick={() => navigate(-1)}
+                />
               </div>
-            )}
-          </div>
+
+              <div
+                ref={componentRef}
+                className="bg-white rounded-md shadow-lg border border-sky-200 mb-3 mx-3"
+              >
+                {product && (
+                  <div className="p-6">
+                    <h1 className="text-3xl text-sky-700 font-bold text-center mt-3 mb-4">
+                      DETAIL RIWAYAT PRODUK
+                    </h1>
+
+                    <div className=" gap-6 mb-5 text-black text-lg ml-5">
+                      <div className="">
+                        <span className="font-medium">Kode Produk:</span>{" "}
+                        {product.kode_produk}
+                      </div>
+                      <div>
+                        <span className="font-medium">Nama Produk:</span>{" "}
+                        {product.nama_produk}
+                      </div>
+                      <div>
+                        <span className="font-medium">Kategori:</span>{" "}
+                        {getCategoryName(product.kategori)}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Status:</span>
+                        {(() => {
+                          const severity = getSeverity(product?.stok || 0);
+                          const statusConfig = {
+                            danger: {
+                              text: "Stok Kurang",
+                              color: "bg-red-500",
+                            },
+                            warning: {
+                              text: "Stok Menipis",
+                              color: "bg-yellow-500",
+                            },
+                            success: {
+                              text: "Stok Aman",
+                              color: "bg-green-500",
+                            },
+                          };
+
+                          const config = statusConfig[severity];
+
+                          return (
+                            <>
+                              <div
+                                className={`p-2 rounded-full ${config.color} animate-pulse`}
+                              ></div>
+                              <span> {config.text}</span>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="center-table-wrapper overflow-x-auto mx-4">
+                      <DataTable
+                        value={logProduct}
+                        sortField="tanggal"
+                        sortOrder={1}
+                        tableStyle={{ minWidth: "100%" }}
+                        headerStyle={{ textAlign: "center" }}
+                        showFooter
+                        autoLayout
+                        className="text-sm"
+                        footerColumnGroup={
+                          <ColumnGroup>
+                            <Row>
+                              <Column
+                                footer="Total Jumlah Produk"
+                                colSpan={3}
+                                footerClassName="font-bold border border-slate-400"
+                              />
+                              <Column
+                                footer={product?.stok || 0}
+                                footerClassName="font-bold border border-slate-400 text-center"
+                              />
+                            </Row>
+                          </ColumnGroup>
+                        }
+                      >
+                        <Column
+                          header="No."
+                          body={(_, { rowIndex }) => rowIndex + 1}
+                          className="border border-slate-400 text-center"
+                          headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                          headerStyle={{ textAlign: "center" }}
+                        />
+                        <Column
+                          field="tanggal"
+                          header="Tanggal"
+                          body={(rowData) => formatDate(rowData.tanggal)}
+                          className="border border-slate-400 text-center"
+                          headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                          headerStyle={{ textAlign: "center" }}
+                        />
+                        <Column
+                          field="isProdukMasuk"
+                          header="Jenis"
+                          body={(rowData) =>
+                            rowData.isProdukMasuk
+                              ? "Barang Masuk"
+                              : "Barang Keluar"
+                          }
+                          className="border border-slate-400 text-center"
+                          headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                          headerStyle={{ textAlign: "center" }}
+                        />
+                        <Column
+                          field="stok"
+                          header="Jumlah"
+                          body={(rowData) => (
+                            <span
+                              className={
+                                rowData.isProdukMasuk
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }
+                            >
+                              {rowData.isProdukMasuk ? "+" : "-"}
+                              {rowData.stok}
+                            </span>
+                          )}
+                          className="border border-slate-400 text-center"
+                          headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                          headerStyle={{ textAlign: "center" }}
+                        />
+                      </DataTable>
+                    </div>
+
+                    <div className="flex justify-center mt-6">
+                      <Button
+                        label="Cetak"
+                        icon="pi pi-print"
+                        className="bg-sky-600 text-white px-4 py-2"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
