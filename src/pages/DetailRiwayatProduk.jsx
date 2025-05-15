@@ -168,6 +168,12 @@ export default function DetailRiwayatProduk() {
                         <span className="font-medium">Kategori:</span>{" "}
                         {getCategoryName(product.kategori)}
                       </div>
+                      <div>
+                        <span className="font-medium">
+                          Total Jumlah Produk:
+                        </span>{" "}
+                        {product.stok}
+                      </div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">Status:</span>
                         {(() => {
@@ -213,14 +219,40 @@ export default function DetailRiwayatProduk() {
                         className="text-sm"
                         footerColumnGroup={
                           <ColumnGroup>
-                            <Row>
+                            {/* <Row>
                               <Column
                                 footer="Total Jumlah Produk"
-                                colSpan={3}
+                                colSpan={4}
                                 footerClassName="font-bold border border-slate-400"
                               />
                               <Column
                                 footer={product?.stok || 0}
+                                footerClassName="font-bold border border-slate-400 text-center"
+                              />
+                            </Row> */}
+                            <Row>
+                              <Column
+                                footer="Total Cash Flow"
+                                colSpan={4}
+                                footerClassName="font-bold border border-slate-400"
+                              />
+                              <Column
+                                footer={logProduct
+                                  .reduce((total, log) => {
+                                    const amount = product.harga * log.stok;
+                                    // Logika terbalik:
+                                    // - Barang masuk (pengeluaran): kurangi total
+                                    // - Barang keluar (pemasukan): tambahkan total
+                                    return (
+                                      total +
+                                      (log.isProdukMasuk ? -amount : amount)
+                                    );
+                                  }, 0)
+                                  .toLocaleString("id-ID", {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 0,
+                                  })}
                                 footerClassName="font-bold border border-slate-400 text-center"
                               />
                             </Row>
@@ -273,16 +305,45 @@ export default function DetailRiwayatProduk() {
                           headerClassName="border border-slate-400 bg-slate-200 !text-center"
                           headerStyle={{ textAlign: "center" }}
                         />
+                        <Column
+                          field="stok"
+                          header="Cash Flow"
+                          body={(rowData) => {
+                            // Hitung total cash flow (harga produk * jumlah stok)
+                            const total = product.harga * rowData.stok;
+                            // Logika terbalik:
+                            // - Barang masuk (pengeluaran): negatif
+                            // - Barang keluar (pemasukan): positif
+                            const isIncome = !rowData.isProdukMasuk;
+                            return (
+                              <span
+                                className={
+                                  isIncome ? "text-green-600" : "text-red-600"
+                                }
+                              >
+                                {isIncome ? "+" : "-"}
+                                {total.toLocaleString("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                  minimumFractionDigits: 0,
+                                })}
+                              </span>
+                            );
+                          }}
+                          className="border border-slate-400 text-center"
+                          headerClassName="border border-slate-400 bg-slate-200 !text-center"
+                          headerStyle={{ textAlign: "center" }}
+                        />
                       </DataTable>
                     </div>
 
-                    <div className="flex justify-center mt-6">
+                    {/* <div className="flex justify-center mt-6">
                       <Button
                         label="Cetak"
                         icon="pi pi-print"
                         className="bg-sky-600 text-white px-4 py-2"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 )}
               </div>
