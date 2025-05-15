@@ -1,10 +1,42 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Menubar } from "primereact/menubar";
 import logo from "../../assets/logo.png";
 import { classNames } from "primereact/utils";
+import { confirmDialog } from "primereact/confirmdialog";
 
 export function NavBar() {
   const items = [];
+
+  const toast = useRef(null);
+
+  const handleLogout = () => {
+    confirmDialog({
+      message: "Are you sure you want to log out?",
+      header: "Logout Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      acceptClassName:
+        "px-2.5 py-1.5 text-sm border border-sky-400 text-white bg-sky-400",
+      rejectClassName:
+        "px-2 py-1.5 border border-sky-400 text-sm text-sky-400 mr-2",
+      acceptLabel: "Yes",
+      rejectLabel: "Cancel",
+      accept: () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1000);
+      },
+      reject: () => {
+        toast.current.show({
+          severity: "info",
+          summary: "Cancelled",
+          detail: "Logout was cancelled",
+          life: 3000,
+        });
+      },
+    });
+  };
 
   const profileItems = [
     {
@@ -16,7 +48,7 @@ export function NavBar() {
     {
       label: "Logout",
       icon: "pi pi-sign-out",
-      command: () => console.log("Logout clicked"),
+      command: () => handleLogout(),
     },
   ];
 

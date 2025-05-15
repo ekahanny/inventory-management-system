@@ -9,7 +9,7 @@ export default function SidebarComponent() {
 
   const handleLogout = () => {
     confirmDialog({
-      message: "Are you sure you want to sign out?",
+      message: "Are you sure you want to log out?",
       header: "Logout Confirmation",
       icon: "pi pi-exclamation-triangle",
       acceptClassName:
@@ -118,7 +118,7 @@ export default function SidebarComponent() {
           >
             <i className="pi pi-sign-out ml-5"></i>
 
-            <span className="font-bold">Sign Out</span>
+            <span className="font-bold">Log Out</span>
           </a>
         </div>
       </div>

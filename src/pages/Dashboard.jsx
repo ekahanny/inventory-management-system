@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { NavBar } from "../components/elements/NavBar";
-import { DataPie } from "../utils/DataPie";
 import { PieChart } from "../components/elements/PieChart";
 import SidebarComponent from "../components/elements/Sidebar";
 import TabelRingkasanProduk from "../components/fragments/tabel/produk/TabelRingkasanProduk";
