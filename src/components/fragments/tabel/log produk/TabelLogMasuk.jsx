@@ -37,7 +37,7 @@ export default function TabelLogMasuk() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProductExist, setIsProductExist] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState(null);
+  const [exportDialog, setExportDialog] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showNewProductFields, setShowNewProductFields] = useState(false);
   const toast = useRef(null);
@@ -348,26 +348,44 @@ export default function TabelLogMasuk() {
   };
 
   const exportExcel = () => {
-    // Format data untuk Excel (hanya kolom yang ditampilkan di DataTable)
+    setExportDialog(true);
+  };
+
+  const handleConfirmExport = () => {
+    setExportDialog(false);
+
+    // Pastikan products ada dan tidak kosong
+    if (!products || products.length === 0) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Peringatan",
+        detail: "Tidak ada data untuk diekspor",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Format data untuk Excel dengan lebih sederhana
     const excelData = products.map((product) => ({
-      "Kode Produk": product.kode_produk,
-      "Nama Produk": product.nama_produk,
+      "Kode Produk": product.kode_produk || "",
+      "Nama Produk": product.nama_produk || "",
       Kategori:
         categories.find((cat) => cat.id === product.kategori)?.name ||
-        product.kategori,
-      "Tanggal Masuk": formatDate(product.tanggal),
-      Harga: formatCurrency(product.harga),
-      "Stok (pcs)": product.stok,
+        product.kategori ||
+        "",
+      "Tanggal Masuk": product.tanggal ? formatDate(product.tanggal) : "",
+      Harga: product.harga ? product.harga : 0,
+      "Stok (pcs)": product.stok ? product.stok : 0,
     }));
 
-    // Buat worksheet dari data
+    // Buat worksheet
     const ws = XLSX.utils.json_to_sheet(excelData);
 
-    // Buat workbook dan tambahkan worksheet
+    // Buat workbook
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Barang Masuk");
 
-    // Export ke file Excel (.xlsx)
+    // Export ke file Excel
     XLSX.writeFile(wb, "Data_Barang_Masuk.xlsx");
   };
 
@@ -883,6 +901,40 @@ export default function TabelLogMasuk() {
               Apakah anda yakin ingin menghapus <b>{product.nama_produk}</b>?
             </span>
           )}
+        </div>
+      </Dialog>
+
+      <Dialog
+        visible={exportDialog}
+        style={{ width: "32rem" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        header="Konfirmasi Ekspor"
+        modal
+        footer={
+          <React.Fragment>
+            <Button
+              label="Batal"
+              icon="pi pi-times"
+              outlined
+              onClick={() => setExportDialog(false)}
+              className="px-2 py-1.5 border-1 border-slate-400 text-sm text-slate-700 mr-2"
+            />
+            <Button
+              label="Export"
+              icon="pi pi-check"
+              onClick={handleConfirmExport}
+              className="px-2.5 py-1.5 text-sm border-1 border-sky-400 text-white bg-sky-400"
+            />
+          </React.Fragment>
+        }
+        onHide={() => setExportDialog(false)}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: "1.5rem" }}
+          />
+          <span>Apakah Anda yakin ingin mengekspor data ke Excel?</span>
         </div>
       </Dialog>
     </div>

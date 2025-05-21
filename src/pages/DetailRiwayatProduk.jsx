@@ -232,7 +232,7 @@ export default function DetailRiwayatProduk() {
                             </Row> */}
                             <Row>
                               <Column
-                                footer="Total Cash Flow"
+                                footer="Total Transaksi"
                                 colSpan={4}
                                 footerClassName="font-bold border border-slate-400"
                               />
@@ -307,7 +307,7 @@ export default function DetailRiwayatProduk() {
                         />
                         <Column
                           field="stok"
-                          header="Cash Flow"
+                          header="Riwayat Transaksi"
                           body={(rowData) => {
                             // Hitung total cash flow (harga produk * jumlah stok)
                             const total = product.harga * rowData.stok;

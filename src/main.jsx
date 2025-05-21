@@ -16,6 +16,7 @@ import RiwayatProduk from "./pages/RiwayatProduk.jsx";
 import DetailRiwayatProduk from "./pages/DetailRiwayatProduk.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProtectedRoute from "../src/components/fragments/auth/ProtectedRoute.jsx";
+import UserProfile from "./pages/UserProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "/detail-riwayat/:id",
         element: <DetailRiwayatProduk />,
+      },
+      {
+        path: "/profile",
+        element: <UserProfile />,
       },
     ],
   },

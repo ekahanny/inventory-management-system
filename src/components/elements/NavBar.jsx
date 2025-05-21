@@ -43,7 +43,7 @@ export function NavBar() {
       label: "Profile",
       icon: "pi pi-user",
       classNames: "w-4",
-      command: () => console.log("Profile clicked"),
+      command: () => (window.location.href = "/profile"),
     },
     {
       label: "Logout",
