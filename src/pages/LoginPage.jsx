@@ -121,15 +121,16 @@ export default function LoginPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full"
-              inputClassName="w-full p-3"
+              inputClassName="w-full px-4 py-3 text-black"
+              className="w-full [&>div]:w-full"
+              toggleMask
               pt={{
                 root: { style: { borderRadius: "8px" } },
                 input: { style: { width: "100%" } },
               }}
               placeholder="Masukkan Password"
-              feedback={false}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+              feedback={false}
             />
           </div>
 

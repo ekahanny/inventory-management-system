@@ -62,8 +62,8 @@ const router = createBrowserRouter([
 const root = createRoot(document.getElementById("root"));
 
 const App = () => {
-  const isAuthenticated = sessionStorage.getItem("token");
-  const initialPath = isAuthenticated ? "/" : "/login";
+  // const isAuthenticated = sessionStorage.getItem("token");
+  // const initialPath = isAuthenticated ? "/" : "/login";
 
   return (
     <StrictMode>

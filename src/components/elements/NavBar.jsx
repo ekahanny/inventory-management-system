@@ -18,8 +18,8 @@ export function NavBar() {
         "px-2.5 py-1.5 text-sm border border-sky-400 text-white bg-sky-400",
       rejectClassName:
         "px-2 py-1.5 border border-sky-400 text-sm text-sky-400 mr-2",
-      acceptLabel: "Yes",
-      rejectLabel: "Cancel",
+      acceptLabel: "Ya",
+      rejectLabel: "Batal",
       accept: () => {
         localStorage.clear();
         sessionStorage.clear();
@@ -31,7 +31,7 @@ export function NavBar() {
         toast.current.show({
           severity: "info",
           summary: "Cancelled",
-          detail: "Logout was cancelled",
+          detail: "Logout dibatalkan",
           life: 3000,
         });
       },

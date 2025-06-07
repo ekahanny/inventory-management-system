@@ -10,16 +10,11 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-
-    // Validasi token sebelum attach ke header
-    if (token && token !== "undefined" && token !== "null") {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      // Hapus token invalid jika ada
-      localStorage.removeItem("token");
     }
-
     return config;
   },
   (error) => {
