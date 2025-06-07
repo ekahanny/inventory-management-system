@@ -266,7 +266,7 @@ export function Dashboard() {
             ) : (
               <>
                 {/* Ringkasan Penjualan */}
-                <div className="flex flex-row mb-5 ml-3 gap-4">
+                <div className="flex flex-row mb-5 ml-7 gap-4">
                   {/* Pemasukan */}
                   <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
                     <div className="flex flex-row gap-2 justify-center items-center">

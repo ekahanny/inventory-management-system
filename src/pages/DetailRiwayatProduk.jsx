@@ -219,17 +219,6 @@ export default function DetailRiwayatProduk() {
                         className="text-sm"
                         footerColumnGroup={
                           <ColumnGroup>
-                            {/* <Row>
-                              <Column
-                                footer="Total Jumlah Produk"
-                                colSpan={4}
-                                footerClassName="font-bold border border-slate-400"
-                              />
-                              <Column
-                                footer={product?.stok || 0}
-                                footerClassName="font-bold border border-slate-400 text-center"
-                              />
-                            </Row> */}
                             <Row>
                               <Column
                                 footer="Total Transaksi"
@@ -239,10 +228,12 @@ export default function DetailRiwayatProduk() {
                               <Column
                                 footer={logProduct
                                   .reduce((total, log) => {
-                                    const amount = product.harga * log.stok;
-                                    // Logika terbalik:
-                                    // - Barang masuk (pengeluaran): kurangi total
-                                    // - Barang keluar (pemasukan): tambahkan total
+                                    const harga =
+                                      log.harga !== undefined
+                                        ? log.harga
+                                        : product.harga;
+                                    const amount = harga * log.stok;
+                                    // Barang keluar (pemasukan) ditambahkan, barang masuk (pengeluaran) dikurangi
                                     return (
                                       total +
                                       (log.isProdukMasuk ? -amount : amount)
@@ -309,12 +300,18 @@ export default function DetailRiwayatProduk() {
                           field="stok"
                           header="Riwayat Transaksi"
                           body={(rowData) => {
-                            // Hitung total cash flow (harga produk * jumlah stok)
-                            const total = product.harga * rowData.stok;
-                            // Logika terbalik:
-                            // - Barang masuk (pengeluaran): negatif
-                            // - Barang keluar (pemasukan): positif
+                            // Ambil harga dari log produk (rowData), bukan dari product
+                            const hargaTransaksi = rowData.harga; // Pastikan field ini ada di data log
+
+                            // Jika harga tidak ada di log, fallback ke harga produk (opsional)
+                            const harga =
+                              hargaTransaksi !== undefined
+                                ? hargaTransaksi
+                                : product.harga;
+
+                            const total = harga * rowData.stok;
                             const isIncome = !rowData.isProdukMasuk;
+
                             return (
                               <span
                                 className={

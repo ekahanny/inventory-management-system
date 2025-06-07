@@ -141,12 +141,6 @@ export default function LoginPage() {
             // loading={loading}
             // disabled={loading}
           />
-
-          <div className="">
-            <a href="#" className="text-white text-sm hover:underline">
-              Lupa password?
-            </a>
-          </div>
         </div>
       </div>
     </div>
