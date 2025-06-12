@@ -494,18 +494,6 @@ export default function TabelKategori() {
             headerClassName="border border-slate-300"
           />
           <Column
-            field="harga"
-            header="Harga"
-            className="border border-slate-300"
-            headerClassName="border border-slate-300"
-            body={(rowData) =>
-              new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(rowData.harga)
-            }
-          />
-          <Column
             field="stok"
             header="Stok"
             className="border border-slate-300"

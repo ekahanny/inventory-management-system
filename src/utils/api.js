@@ -1,13 +1,16 @@
 import axios from "axios";
 
+// Menghubungkan komponen FE ke API BE
+
 const BASE_URL = "http://localhost:5000";
 
+// Konfigurasi Axios Instance
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   // withCredentials: true,
 });
 
-// Request interceptor
+// Request interceptor -> menambahkan header auth ke setiap request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token =
@@ -29,12 +32,6 @@ axiosInstance.interceptors.response.use(
     // Handle error response
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-
-      // Jika menggunakan React Router v6
-      // if (window.location.pathname !== "/login") {
-      //   window.location.href = "/login";
-      //   toast.error("Sesi telah berakhir, silakan login kembali");
-      // }
     }
 
     return Promise.reject(error);

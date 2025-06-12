@@ -58,7 +58,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Redirect root to login if not authenticated
+// Redirect ke login kl tdk terautentikasi
 const root = createRoot(document.getElementById("root"));
 
 const App = () => {

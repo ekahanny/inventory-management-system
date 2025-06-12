@@ -41,6 +41,7 @@ export default function TabelLogKeluar() {
   const [exportDialog, setExportDialog] = useState(false);
   const toast = useRef(null);
   const dt = useRef(null);
+  const [lastOutPrice, setLastOutPrice] = useState(0);
 
   const fetchLogProducts = async () => {
     try {
@@ -330,18 +331,31 @@ export default function TabelLogKeluar() {
   };
 
   const onProductCodeChange = (e) => {
-    fetchProducts();
     const selectedCode = e.value;
     const selectedProduct = productList.find(
       (p) => p.kode_produk === selectedCode
     );
+
+    // Cari log keluar untuk produk ini dari data yang sudah di-fetch (products)
+    const productLogs = products.filter(
+      (log) => log.kode_produk === selectedCode
+    );
+
+    // Urutkan dari yang terbaru
+    productLogs.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+    // Ambil harga terakhir jika ada log keluar
+    const lastOutPrice = productLogs.length > 0 ? productLogs[0].harga : 0;
 
     setProduct((prev) => ({
       ...prev,
       kode_produk: selectedCode,
       nama_produk: selectedProduct?.nama_produk || "",
       kategori: selectedProduct?.kategori || "",
+      harga: lastOutPrice, // Gunakan harga terakhir atau 0 jika tidak ada
     }));
+
+    setLastOutPrice(lastOutPrice);
   };
 
   const onInputNumberChange = (e, name) => {

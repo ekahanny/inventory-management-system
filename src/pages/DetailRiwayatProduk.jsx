@@ -16,7 +16,6 @@ import { LoadingSpinner } from "../components/elements/LoadingSpinner";
 
 export default function DetailRiwayatProduk() {
   const { id } = useParams();
-  const location = useLocation();
   const [product, setProduct] = useState(null);
   const [logProduct, setLogProduct] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -71,7 +70,7 @@ export default function DetailRiwayatProduk() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true); // mulai loading
+        setLoading(true);
         await Promise.all([
           fetchDetailProduct(),
           fetchLogProduct(),
@@ -87,19 +86,6 @@ export default function DetailRiwayatProduk() {
     };
     fetchData();
   }, [id]);
-
-  // const handlePrint = useReactToPrint({
-  //   content: () => componentRef.current,
-  //   pageStyle: `
-  //     @page { size: auto; margin: 5mm; }
-  //     @media print {
-  //       body { -webkit-print-color-adjust: exact; }
-  //       table { width: 100%; border-collapse: collapse; }
-  //       th { background-color: #f0f0f0 !important; }
-  //       th, td { border: 1px solid #000; padding: 8px; }
-  //     }
-  //   `,
-  // });
 
   const getCategoryName = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
@@ -296,12 +282,13 @@ export default function DetailRiwayatProduk() {
                           headerClassName="border border-slate-400 bg-slate-200 !text-center"
                           headerStyle={{ textAlign: "center" }}
                         />
+                        {/* Data Riwayat Transaksi Per Baris */}
                         <Column
                           field="stok"
                           header="Riwayat Transaksi"
                           body={(rowData) => {
                             // Ambil harga dari log produk (rowData), bukan dari product
-                            const hargaTransaksi = rowData.harga; // Pastikan field ini ada di data log
+                            const hargaTransaksi = rowData.harga;
 
                             // Jika harga tidak ada di log, fallback ke harga produk (opsional)
                             const harga =
@@ -333,14 +320,6 @@ export default function DetailRiwayatProduk() {
                         />
                       </DataTable>
                     </div>
-
-                    {/* <div className="flex justify-center mt-6">
-                      <Button
-                        label="Cetak"
-                        icon="pi pi-print"
-                        className="bg-sky-600 text-white px-4 py-2"
-                      />
-                    </div> */}
                   </div>
                 )}
               </div>

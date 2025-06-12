@@ -62,7 +62,7 @@ export function Dashboard() {
     labels: [],
     datasets: [
       {
-        label: "Total Sold",
+        label: "Total Barang Terjual",
         data: [],
         backgroundColor: [
           "#447ecc",
@@ -174,7 +174,7 @@ export function Dashboard() {
 
     // Hitung max value untuk skala y
     const maxData = Math.max(...masukArray, ...keluarArray);
-    const maxY = maxData + 15; // Penambahan sesuai permintaan
+    const maxY = maxData + 15;
 
     setDataBar({
       labels: months,
@@ -266,7 +266,7 @@ export function Dashboard() {
             ) : (
               <>
                 {/* Ringkasan Penjualan */}
-                <div className="flex flex-row mb-5 ml-7 gap-4">
+                <div className="flex flex-row mb-5 ml-24 gap-4">
                   {/* Pemasukan */}
                   <div className="bg-white p-4 mt-3 h-[130px] w-[391px] rounded-md shadow-md overflow-hidden">
                     <div className="flex flex-row gap-2 justify-center items-center">
@@ -338,7 +338,7 @@ export function Dashboard() {
                         />
                       </svg>
                       <p className="font-semibold text-lg text-black mt-1">
-                        Profit:
+                        Cashflow:
                       </p>
                       <p className="text-sky-800 text-md mt-1">
                         {currentMonth} {new Date().getFullYear()}
@@ -373,13 +373,13 @@ export function Dashboard() {
                       Barang Terlaris
                     </h1>
                     <PieChart chartData={dataPie} />
-                    <p className="flex justify-center items-center mt-6 font-semibold text-black">
-                      {currentMonth} {new Date().getFullYear()}
+                    <p className="flex justify-center items-center text-xl mt-6 font-semibold text-black">
+                      ({new Date().getFullYear()})
                     </p>
                   </div>
                 </div>
 
-                <div className="ml-2">
+                <div className="ml-2 px-5">
                   <TabelRingkasanProduk />
                 </div>
               </>

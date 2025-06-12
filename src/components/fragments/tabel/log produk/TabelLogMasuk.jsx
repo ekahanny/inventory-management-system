@@ -224,7 +224,7 @@ export default function TabelLogMasuk() {
           }
 
           await ProductService.updateProduct(currentProduct._id, updateData);
-          fetchProducts(); // Refresh data produk
+          fetchProducts();
         }
 
         toast.current.show({
@@ -241,6 +241,7 @@ export default function TabelLogMasuk() {
         const currentProduct = productList.find(
           (p) => p.kode_produk === product.kode_produk
         );
+        // Dijalankan ketika user memilih barang masuk berdasarkan kode produk, bukan menambah data entry baru
         if (currentProduct) {
           await ProductService.updateProduct(currentProduct._id, {
             ...currentProduct,
