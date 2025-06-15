@@ -11,6 +11,16 @@ const UserService = {
     }
   },
 
+  userRegister: async (userData) => {
+    try {
+      const res = await axiosInstance.post("/register", userData);
+      return res.data;
+    } catch (error) {
+      console.error("Register Gagal: ", error);
+      throw error.response?.data?.msg || "Register Gagal";
+    }
+  },
+
   getUser: async () => {
     try {
       const res = await axiosInstance.get("/user");

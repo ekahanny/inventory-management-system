@@ -17,11 +17,16 @@ import DetailRiwayatProduk from "./pages/DetailRiwayatProduk.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProtectedRoute from "../src/components/fragments/auth/ProtectedRoute.jsx";
 import UserProfile from "./pages/UserProfile.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
   {
     element: <ProtectedRoute />,

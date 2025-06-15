@@ -134,6 +134,16 @@ export default function LoginPage() {
             />
           </div>
 
+          <p className="text-white mt-2">
+            Belum punya akun?{" "}
+            <span
+              className="cursor-pointer font-bold underline"
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </span>
+          </p>
+
           <Button
             label="Login"
             className="py-2 px-4 mt-2 bg-white text-blue-600 font-semibold"
