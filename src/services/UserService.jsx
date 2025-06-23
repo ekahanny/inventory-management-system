@@ -31,6 +31,16 @@ const UserService = {
     }
   },
 
+  getUserById: async (userId) => {
+    try {
+      const res = await axiosInstance.get(`/users/${userId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      return null;
+    }
+  },
+
   updatePassword: async (passwordData) => {
     try {
       const res = await axiosInstance.put("/update-password", {

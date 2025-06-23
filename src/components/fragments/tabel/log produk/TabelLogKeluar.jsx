@@ -17,6 +17,7 @@ import InLogProdService from "../../../../services/InLogProdService";
 import ProductService from "../../../../services/ProductService";
 import * as XLSX from "xlsx";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
+import UserService from "../../../../services/UserService";
 
 export default function TabelLogKeluar() {
   let emptyProduct = {
@@ -42,12 +43,32 @@ export default function TabelLogKeluar() {
   const toast = useRef(null);
   const dt = useRef(null);
   const [lastOutPrice, setLastOutPrice] = useState(0);
+  const [userMap, setUserMap] = useState({});
 
   const fetchLogProducts = async () => {
     try {
       const response = await InLogProdService.getAllLogProducts();
       const productList =
-        response.LogProduk.filter((item) => item.isProdukMasuk === false) || [];
+        response.LogProduk.filter((item) => item.isProdukMasuk === true) || [];
+
+      // Array promises untuk mengambil data user
+      const userPromises = productList.map((item) =>
+        item.createdBy
+          ? UserService.getUserById(item.createdBy)
+          : Promise.resolve(null)
+      );
+
+      const users = await Promise.all(userPromises);
+
+      const userMapping = {};
+      users.forEach((user, index) => {
+        if (user) {
+          userMapping[productList[index].createdBy] = user.nama || "Unknown";
+        }
+      });
+
+      setUserMap(userMapping);
+
       const products = productList.map((item) => ({
         _id: item._id,
         kode_produk: item.produk ? item.produk.kode_produk : "N/A",
@@ -56,8 +77,9 @@ export default function TabelLogKeluar() {
         tanggal: item.tanggal,
         harga: item.harga,
         stok: item.stok,
+        createdBy: item.createdBy, // Tambahkan createdBy
       }));
-      console.log("Response dari API Log Produk : ", response.LogProduk);
+
       setProducts(products);
     } catch (error) {
       console.error("Gagal mengambil log produk:", error);
@@ -266,6 +288,10 @@ export default function TabelLogKeluar() {
   const confirmdeleteLogProduct = (product) => {
     setProduct(product);
     setdeleteLogProductDialog(true);
+  };
+
+  const userBodyTemplate = (rowData) => {
+    return userMap[rowData.createdBy] || "Unknown";
   };
 
   const deleteLogProduct = async () => {
@@ -597,6 +623,14 @@ export default function TabelLogKeluar() {
             header="Stok (pcs)"
             sortable
             style={{ minWidth: "8rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
+            field="createdBy"
+            header="Ditambahkan Oleh"
+            body={userBodyTemplate}
+            style={{ minWidth: "12rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>

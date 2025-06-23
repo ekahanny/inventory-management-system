@@ -203,7 +203,7 @@ export default function RegisterPage() {
           />
 
           <p className="text-white mt-2">
-            Belum punya akun?{" "}
+            Sudah punya akun?{" "}
             <span
               className="cursor-pointer font-bold underline"
               onClick={() => navigate("/login")}
