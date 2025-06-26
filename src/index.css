@@ -41,8 +41,6 @@
   border: 1px solid #0369a1;
   margin-left: 4px;
   margin-top: 15px;
-  /* margin-bottom: 3px; */
-  /* border-color: #0369a1; */
 }
 
 .custom-tabview .p-tabview-nav .p-tabview-nav-link:not(.p-disabled):focus {

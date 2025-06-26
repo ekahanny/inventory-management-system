@@ -156,6 +156,58 @@ export default function DetailRiwayatProduk() {
                       DETAIL RIWAYAT PRODUK
                     </h1>
 
+                    <div className="gap-6 mb-5 text-black text-lg ml-5">
+                      <div className="mt-5">
+                        <span className="font-medium">Kode Produk:</span>{" "}
+                        {product.kode_produk}
+                      </div>
+                      <div>
+                        <span className="font-medium">Nama Produk:</span>{" "}
+                        {product.nama_produk}
+                      </div>
+                      <div>
+                        <span className="font-medium">Kategori:</span>{" "}
+                        {getCategoryName(product.kategori)}
+                      </div>
+                      <div>
+                        <span className="font-medium">
+                          Total Jumlah Produk:
+                        </span>{" "}
+                        {product.stok}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Status:</span>
+                        {(() => {
+                          const severity = getSeverity(product?.stok || 0);
+                          const statusConfig = {
+                            danger: {
+                              text: "Stok Kurang",
+                              color: "bg-red-500",
+                            },
+                            warning: {
+                              text: "Stok Menipis",
+                              color: "bg-yellow-500",
+                            },
+                            success: {
+                              text: "Stok Aman",
+                              color: "bg-green-500",
+                            },
+                          };
+
+                          const config = statusConfig[severity];
+
+                          return (
+                            <>
+                              <div
+                                className={`p-2 rounded-full ${config.color} animate-pulse`}
+                              ></div>
+                              <span> {config.text}</span>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
                     <TabView
                       activeIndex={activeIndex}
                       onTabChange={(e) => setActiveIndex(e.index)}
@@ -166,58 +218,6 @@ export default function DetailRiwayatProduk() {
                         header="Detail Produk"
                         leftIcon="pi pi-history mr-2"
                       >
-                        <div className="gap-6 mb-5 text-black text-lg ml-5">
-                          <div className="mt-5">
-                            <span className="font-medium">Kode Produk:</span>{" "}
-                            {product.kode_produk}
-                          </div>
-                          <div>
-                            <span className="font-medium">Nama Produk:</span>{" "}
-                            {product.nama_produk}
-                          </div>
-                          <div>
-                            <span className="font-medium">Kategori:</span>{" "}
-                            {getCategoryName(product.kategori)}
-                          </div>
-                          <div>
-                            <span className="font-medium">
-                              Total Jumlah Produk:
-                            </span>{" "}
-                            {product.stok}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">Status:</span>
-                            {(() => {
-                              const severity = getSeverity(product?.stok || 0);
-                              const statusConfig = {
-                                danger: {
-                                  text: "Stok Kurang",
-                                  color: "bg-red-500",
-                                },
-                                warning: {
-                                  text: "Stok Menipis",
-                                  color: "bg-yellow-500",
-                                },
-                                success: {
-                                  text: "Stok Aman",
-                                  color: "bg-green-500",
-                                },
-                              };
-
-                              const config = statusConfig[severity];
-
-                              return (
-                                <>
-                                  <div
-                                    className={`p-2 rounded-full ${config.color} animate-pulse`}
-                                  ></div>
-                                  <span> {config.text}</span>
-                                </>
-                              );
-                            })()}
-                          </div>
-                        </div>
-
                         <div className="center-table-wrapper overflow-x-auto mx-4">
                           <DataTable
                             value={logProduct}
@@ -227,7 +227,7 @@ export default function DetailRiwayatProduk() {
                             headerStyle={{ textAlign: "center" }}
                             showFooter
                             autoLayout
-                            className="text-sm"
+                            className="text-sm mt-5"
                             footerColumnGroup={
                               <ColumnGroup>
                                 <Row>
@@ -349,32 +349,34 @@ export default function DetailRiwayatProduk() {
                         header="Tanggal Kadaluarsa"
                         leftIcon="pi pi-info-circle mr-2"
                       >
-                        <div className="mt-4">
-                          <h3 className="text-xl font-semibold mb-4">
-                            Detail Stok per Batch
-                          </h3>
-
+                        <div className="mt-4 text-center">
                           {productStok.length > 0 ? (
                             <DataTable
                               value={productStok}
-                              className="p-datatable-sm"
+                              className="p-datatable-sm text-center"
                               stripedRows
                               showGridlines
+                              tableStyle={{ minWidth: "100%" }}
+                              headerStyle={{ textAlign: "center" }}
+                              autoLayout
                             >
-                              <Column
+                              {/* <Column
                                 field="produk"
                                 header="Product ID"
-                                body={(data) =>
-                                  // data.produk.substring(18, 24).toUpperCase()
-                                  data.produk
-                                }
+                                body={(data) => data.produk}
                                 style={{ width: "20%" }}
-                              />
+                                className="border border-slate-400 text-center"
+                                headerClassName="border border-slate-400 bg-slate-200"
+                                align="center"
+                              /> */}
                               <Column
                                 field="stok"
                                 header="Jumlah Stok"
                                 body={(data) => `${data.stok} pcs`}
                                 style={{ width: "20%" }}
+                                className="border border-slate-400 text-center"
+                                headerClassName="border border-slate-400 bg-slate-200"
+                                align="center"
                               />
                               <Column
                                 field="tanggal"
@@ -392,13 +394,10 @@ export default function DetailRiwayatProduk() {
                                     : "Tidak ada data"
                                 }
                                 style={{ width: "30%" }}
+                                className="border border-slate-400 text-center"
+                                headerClassName="border border-slate-400 bg-slate-200"
+                                align="center"
                               />
-                              {/* <Column
-                                field="tanggal"
-                                header="Tanggal Masuk"
-                                body={(data) => formatDate(data.tanggal)}
-                                style={{ width: "30%" }}
-                              /> */}
                             </DataTable>
                           ) : (
                             <div className="p-4 text-center text-gray-500">
