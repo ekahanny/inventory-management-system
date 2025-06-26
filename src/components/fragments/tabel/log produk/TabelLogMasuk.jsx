@@ -24,6 +24,7 @@ export default function TabelLogMasuk() {
     kode_produk: "",
     nama_produk: "",
     tanggal: "",
+    tanggalKadaluarsa: "",
     kategori: "",
     harga: 0,
     stok: 0,
@@ -75,6 +76,9 @@ export default function TabelLogMasuk() {
         nama_produk: item.produk ? item.produk.nama_produk : "N/A",
         kategori: item.produk ? item.produk.kategori : "Unknown",
         tanggal: item.tanggal,
+        tanggalKadaluarsa: item.tanggalKadaluarsa
+          ? new Date(item.tanggalKadaluarsa)
+          : null,
         harga: item.harga,
         stok: item.stok,
         createdBy: item.createdBy, // Tambahkan createdBy
@@ -161,7 +165,12 @@ export default function TabelLogMasuk() {
       return;
     }
 
-    if (!product.kode_produk || !product.tanggal || !product.stok) {
+    if (
+      !product.kode_produk ||
+      !product.tanggal ||
+      !product.tanggalKadaluarsa ||
+      !product.stok
+    ) {
       toast.current.show({
         severity: "warn",
         summary: "Peringatan",
@@ -208,6 +217,7 @@ export default function TabelLogMasuk() {
       kode_produk: product.kode_produk,
       nama_produk: product.nama_produk,
       tanggal: new Date(product.tanggal).toISOString(),
+      tanggalKadaluarsa: new Date(product.tanggalKadaluarsa).toISOString(),
       kategori: product.kategori,
       harga: product.harga,
       stok: product.stok || 0,
@@ -306,6 +316,8 @@ export default function TabelLogMasuk() {
     setProduct({
       ...product,
       tanggal: new Date(product.tanggal),
+      tanggalKadaluarsa: new Date(product.tanggalKadaluarsa),
+
       kategori: product.kategori?.id || product.kategori,
     });
     console.log("product diedit: ", product);
@@ -397,6 +409,10 @@ export default function TabelLogMasuk() {
         product.kategori ||
         "",
       "Tanggal Masuk": product.tanggal ? formatDate(product.tanggal) : "",
+      "Tanggal Kadaluarsa": product.tanggalKadaluarsa
+        ? formatDate(product.tanggalKadaluarsa)
+        : "",
+
       Harga: product.harga ? product.harga : 0,
       "Stok (pcs)": product.stok ? product.stok : 0,
     }));
@@ -470,11 +486,28 @@ export default function TabelLogMasuk() {
     return userMap[rowData.createdBy] || "Unknown";
   };
 
+  // const formatDate = (dateString) => {
+  //   return new Date(dateString).toLocaleDateString("id-ID", {
+  //     year: "numeric",
+  //     month: "2-digit",
+  //     day: "2-digit",
+  //   });
+  // };
+
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "2-digit",
+    if (!dateString) return "N/A";
+
+    // Handle case untuk Date object atau ISO string
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date:", dateString);
+      return "Invalid Date";
+    }
+
+    return date.toLocaleDateString("id-ID", {
       day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -483,6 +516,7 @@ export default function TabelLogMasuk() {
     setProduct((prev) => ({
       ...emptyProduct,
       tanggal: prev.tanggal,
+      tanggalKadaluarsa: prev.tanggalKadaluarsa,
       stok: prev.stok,
     }));
 
@@ -700,6 +734,15 @@ export default function TabelLogMasuk() {
             headerClassName="border border-slate-300"
           ></Column>
           <Column
+            field="tanggalKadaluarsa"
+            header="Tanggal Kadaluarsa"
+            body={(rowData) => formatDate(rowData.tanggalKadaluarsa)}
+            sortable
+            style={{ minWidth: "10rem" }}
+            className="border border-slate-300"
+            headerClassName="border border-slate-300"
+          ></Column>
+          <Column
             field="harga"
             header="Harga"
             body={priceBodyTemplate}
@@ -720,7 +763,7 @@ export default function TabelLogMasuk() {
             field="createdBy"
             header="Ditambahkan Oleh"
             body={userBodyTemplate}
-            style={{ minWidth: "12rem" }}
+            style={{ minWidth: "8rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
@@ -871,6 +914,33 @@ export default function TabelLogMasuk() {
           />
           {submitted && !product.tanggal && (
             <small className="p-error">Tanggal masuk harus diisi</small>
+          )}
+        </div>
+
+        <div className="field">
+          <label htmlFor="tanggalKadaluarsa" className="font-bold">
+            Tanggal Kadaluarsa
+          </label>
+          <Calendar
+            id="tanggalKadaluarsa"
+            inputClassName={classNames(
+              "border border-slate-400 rounded-md p-2",
+              {
+                "p-invalid border-red-500":
+                  submitted && !product.tanggalKadaluarsa,
+              }
+            )}
+            className="bg-sky-300 rounded-md"
+            value={product.tanggalKadaluarsa}
+            onChange={(e) =>
+              setProduct({ ...product, tanggalKadaluarsa: e.value })
+            }
+            dateFormat="dd-mm-yy"
+            showIcon
+            required
+          />
+          {submitted && !product.tanggalKadaluarsa && (
+            <small className="p-error">Tanggal kadaluarsa harus diisi</small>
           )}
         </div>
 

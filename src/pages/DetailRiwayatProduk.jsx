@@ -15,6 +15,7 @@ import { Row } from "primereact/row";
 import { LoadingSpinner } from "../components/elements/LoadingSpinner";
 import { TabView, TabPanel } from "primereact/tabview";
 import { classNames } from "primereact/utils";
+import StokService from "../services/StokService";
 
 export default function DetailRiwayatProduk() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function DetailRiwayatProduk() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [productStok, setProductStok] = useState([]);
 
   const fetchDetailProduct = async () => {
     try {
@@ -70,6 +72,15 @@ export default function DetailRiwayatProduk() {
     }
   };
 
+  const fetchStokProdById = async (productId) => {
+    try {
+      const res = await StokService.getStokByProdukId(productId);
+      setProductStok(res.data || res);
+      console.log("Stok: ", res);
+    } catch (error) {
+      console.error("Error fetching stock data: ", error);
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,6 +89,7 @@ export default function DetailRiwayatProduk() {
           fetchDetailProduct(),
           fetchLogProduct(),
           fetchCategories(),
+          fetchStokProdById(id),
         ]);
       } catch (error) {
         console.error("Gagal mengambil data:", error);
@@ -337,20 +349,62 @@ export default function DetailRiwayatProduk() {
                         header="Tanggal Kadaluarsa"
                         leftIcon="pi pi-info-circle mr-2"
                       >
-                        <div className="p-4">
+                        <div className="mt-4">
                           <h3 className="text-xl font-semibold mb-4">
-                            Laporan Produk
+                            Detail Stok per Batch
                           </h3>
-                          <p className="text-gray-700">
-                            Ini adalah contoh tab tambahan untuk menampilkan
-                            laporan produk. Anda bisa menambahkan grafik,
-                            statistik, atau informasi lain yang relevan.
-                          </p>
-                          <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                            <p className="text-blue-800">
-                              Contoh konten laporan bisa ditambahkan di sini.
-                            </p>
-                          </div>
+
+                          {productStok.length > 0 ? (
+                            <DataTable
+                              value={productStok}
+                              className="p-datatable-sm"
+                              stripedRows
+                              showGridlines
+                            >
+                              <Column
+                                field="produk"
+                                header="Product ID"
+                                body={(data) =>
+                                  // data.produk.substring(18, 24).toUpperCase()
+                                  data.produk
+                                }
+                                style={{ width: "20%" }}
+                              />
+                              <Column
+                                field="stok"
+                                header="Jumlah Stok"
+                                body={(data) => `${data.stok} pcs`}
+                                style={{ width: "20%" }}
+                              />
+                              <Column
+                                field="tanggal"
+                                header="Tanggal Kadaluarsa"
+                                body={(data) =>
+                                  data.tanggal
+                                    ? new Date(data.tanggal).toLocaleDateString(
+                                        "id-ID",
+                                        {
+                                          day: "2-digit",
+                                          month: "long",
+                                          year: "numeric",
+                                        }
+                                      )
+                                    : "Tidak ada data"
+                                }
+                                style={{ width: "30%" }}
+                              />
+                              {/* <Column
+                                field="tanggal"
+                                header="Tanggal Masuk"
+                                body={(data) => formatDate(data.tanggal)}
+                                style={{ width: "30%" }}
+                              /> */}
+                            </DataTable>
+                          ) : (
+                            <div className="p-4 text-center text-gray-500">
+                              Tidak ada data stok tersedia
+                            </div>
+                          )}
                         </div>
                       </TabPanel>
                     </TabView>
