@@ -729,7 +729,7 @@ export default function TabelLogMasuk() {
             header="Tanggal Masuk"
             body={(rowData) => formatDate(rowData.tanggal)}
             sortable
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "8rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
@@ -738,7 +738,7 @@ export default function TabelLogMasuk() {
             header="Tanggal Kadaluarsa"
             body={(rowData) => formatDate(rowData.tanggalKadaluarsa)}
             sortable
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "8rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>

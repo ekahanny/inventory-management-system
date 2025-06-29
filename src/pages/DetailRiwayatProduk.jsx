@@ -81,6 +81,7 @@ export default function DetailRiwayatProduk() {
       console.error("Error fetching stock data: ", error);
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -360,15 +361,6 @@ export default function DetailRiwayatProduk() {
                               headerStyle={{ textAlign: "center" }}
                               autoLayout
                             >
-                              {/* <Column
-                                field="produk"
-                                header="Product ID"
-                                body={(data) => data.produk}
-                                style={{ width: "20%" }}
-                                className="border border-slate-400 text-center"
-                                headerClassName="border border-slate-400 bg-slate-200"
-                                align="center"
-                              /> */}
                               <Column
                                 field="stok"
                                 header="Jumlah Stok"
@@ -380,7 +372,7 @@ export default function DetailRiwayatProduk() {
                               />
                               <Column
                                 field="tanggal"
-                                header="Tanggal Kadaluarsa"
+                                header="Tanggal Kedaluwarsa"
                                 body={(data) =>
                                   data.tanggal
                                     ? new Date(data.tanggal).toLocaleDateString(

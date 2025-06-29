@@ -35,7 +35,9 @@ export default function RegisterPage() {
     try {
       const response = await UserService.userRegister(formData);
       showSuccess("Registrasi berhasil! Silakan login.");
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (error) {
       console.error("Register error:", error);
       if (error.response) {
@@ -103,18 +105,18 @@ export default function RegisterPage() {
         <div className="flex flex-column align-items-center gap-4 px-3">
           <div className="w-full">
             <label htmlFor="nama" className="block text-white mb-2">
-              Nama Lengkap
+              Nama
             </label>
             <InputText
               id="nama"
               name="nama"
               value={formData.nama}
               onChange={handleInputChange}
-              className="w-full p-3"
+              className="w-full p-3 text-black"
               pt={{
                 root: { style: { borderRadius: "8px" } },
               }}
-              placeholder="Masukkan Nama Lengkap"
+              placeholder="Masukkan Nama"
             />
           </div>
 
@@ -127,7 +129,7 @@ export default function RegisterPage() {
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full p-3"
+              className="w-full p-3 text-black"
               pt={{
                 root: { style: { borderRadius: "8px" } },
               }}
@@ -144,7 +146,7 @@ export default function RegisterPage() {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full p-3"
+              className="w-full p-3 text-black"
               pt={{
                 root: { style: { borderRadius: "8px" } },
               }}

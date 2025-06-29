@@ -580,7 +580,7 @@ export default function TabelLogKeluar() {
           <Column
             field="kode_produk"
             header="Kode Produk"
-            style={{ minWidth: "12rem" }}
+            style={{ minWidth: "10rem" }}
             className="border border-slate-300 text-black"
             headerClassName="border border-slate-300 text-black"
           ></Column>
@@ -588,7 +588,7 @@ export default function TabelLogKeluar() {
             field="nama_produk"
             header="Nama Produk"
             sortable
-            style={{ minWidth: "16rem" }}
+            style={{ minWidth: "12rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
@@ -630,7 +630,7 @@ export default function TabelLogKeluar() {
             field="createdBy"
             header="Ditambahkan Oleh"
             body={userBodyTemplate}
-            style={{ minWidth: "12rem" }}
+            style={{ minWidth: "10rem" }}
             className="border border-slate-300"
             headerClassName="border border-slate-300"
           ></Column>
